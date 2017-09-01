@@ -1,0 +1,24 @@
+﻿
+CREATE TABLE [dbo].[LinkVM] (
+    [LinkName]  NVARCHAR (MAX)       DEFAULT ('') NOT NULL,
+	[Link]  NVARCHAR (MAX)       DEFAULT ('') NOT NULL,
+	[Logo]  NVARCHAR (MAX)       DEFAULT ('') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+    [Appv_1]    NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_2]    NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_3]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_4]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);
+
+CREATE TABLE [dbo].[MachineLink] (
+    [ReqMachine]  NVARCHAR (MAX)       DEFAULT ('') NOT NULL,
+	[LinkName]  NVARCHAR (MAX)       DEFAULT ('') NOT NULL,
+	[Action]  NVARCHAR (MAX)       DEFAULT ('') NOT NULL,
+	[Link]  NVARCHAR (MAX)       DEFAULT ('') NOT NULL,
+	[Freqence]   INT DEFAULT (0) NOT NULL,
+    [Appv_1]    NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_2]    NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_3]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[Appv_4]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);
+

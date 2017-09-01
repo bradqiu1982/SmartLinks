@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link href="@Url.Content("~/Content/bootstrapfileinput.css")" rel="stylesheet" type="text/css" />
+
+    <style type="text/css">
+        .tableFloatingHeaderOriginal th {
+            background-color: #006DC0;
+            font-family: 'Arial Narrow';
+            font-size: 15px;
+        }
+
+        .modal {
+            text-align: center;
+            padding: 0 !important;
+        }
+
+            .modal:before {
+                content: '';
+                display: inline-block;
+                height: 100%;
+                vertical-align: middle;
+                margin-right: -4px;
+            }
+
+        .modal-dialog {
+            display: inline-block;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .panel-default > .panel-heading-open {
+            background: #E41B17;
+            color: white;
+        }
+
+        button[MYTP="BT"], input[MYTP="BT"] {
+            border-top-left-radius: 1.5em;
+            border-bottom-left-radius: 1.5em;
+            border-top-right-radius: 1.5em;
+            border-bottom-right-radius: 1.5em;
+            height: 3em;
+            background-color: #006DC0;
+            color: white;
+        }
+
+        input[type="text"] {
+            border: 1px;
+            border-style: solid;
+            border-color: #006DC0;
+            font-family: 'Arial Narrow';
+        }
+
+        textarea.form-control {
+            border: 1px;
+            border-style: solid;
+            border-color: #006DC0;
+            font-family: 'Arial Narrow';
+            overflow-y: auto !important;
+            overflow-x: auto !important;
+        }
+
+        select.form-control {
+            border: 1px;
+            border-style: solid;
+            border-color: #006DC0;
+            font-family: 'Arial Narrow';
+        }
+
+        thead {
+            background-color: #006DC0;
+            font-family: 'Arial Narrow';
+            color: white !important;
+        }
+
+        table {
+            border-width:2px!important;border-color:black!important;
+             border-top-left-radius:1.5em !important;border-bottom-left-radius:1.5em !important;border-top-right-radius:1.5em !important;border-bottom-right-radius:1.5em !important;
+             -moz-border-radius:1.5em !important;-webkit-border-radius:1.5em !important;
+        }
+
+        tbody {
+            font-family: 'Arial Narrow';
+        }
+
+        table.dataTable tbody td {
+            padding: 4px 10px;
+        }
+
+        label {
+            font-family: 'Arial Narrow';
+        }
+
+        div[MYTP="HOVER"]:hover {
+            background-color: #ECECEC;
+        }
+
+        a[MYTP="HOVER"]:hover {
+            cursor: pointer;
+        }
+
+        div[MYTP="orange"] {
+            border-left-width: 8px;
+            border-left-style: solid;
+            border-left-color: #FF7400;
+        }
+
+        div[MYTP="yello"] {
+            border-left-width: 8px;
+            border-left-style: solid;
+            border-left-color: #FFC000;
+        }
+
+        div[MYTP="green"] {
+            border-left-width: 8px;
+            border-left-style: solid;
+            border-left-color: #00B050;
+        }
+
+
+        div[MYTP="blue"] {
+            border-left-width: 8px;
+            border-left-style: solid;
+            border-left-color: #00B0CC;
+        }
+
+        div[MYTP="red"] {
+            border-left-width: 8px;
+            border-left-style: solid;
+            border-left-color: #DF118C;
+        }
+
+        div[MYTP="realred"] {
+            border-left-width: 8px;
+            border-left-style: solid;
+            border-left-color: red;
+        }
+
+
+        input[readonly], select.form-control[readonly], input[disabled], select.form-control[disabled], textarea.form-control[disabled] {
+            background-color: #DEEBF7 !important;
+        }
+
+        img[MYTP="HOVER"]:hover {
+            background-color: #ECECEC;
+            cursor: pointer;
+        }
+
+    </style>
+
+</head>
+<body  style="padding-top: 95px;">
+    <div class="navbar navbar-default navbar-fixed-top" style="background-color:white;border-color:#5B9BD5;height:85px;margin-bottom: 0px;border-bottom-width:0px!important">
+        <nav class="navbar navbar-default navbar-fixed-top" style="background-color:white;border-color:#5B9BD5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-3">
+                        <div class="navbar-header" style="margin-left:20px">
+                            <a class="navbar-brand" href="#">
+                                <img alt="Brand" src="~/Content/images/FinisarLogo.jpg" style="height:54px; width:250px">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-9" style="padding-right: 0px;padding-left: 0px;">
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - NPI Smart Links</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
