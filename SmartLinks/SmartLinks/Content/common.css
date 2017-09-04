@@ -59,3 +59,8 @@ html,body{
 .lightbox{
     padding: 1% 15%;
 }
+
+.container{
+    width: 100% !important;
+    padding: 0 !important;
+}
