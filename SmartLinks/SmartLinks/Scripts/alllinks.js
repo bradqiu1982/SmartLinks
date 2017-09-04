@@ -10,7 +10,7 @@ var lightBox = function(){
             $('#link').val('');
             $('#comment').val('');
             $('#imgurl').val('');
-            $('#modal_add_Link').attr('disabled', 'disabled');
+            //$('#modal_add_Link').attr('disabled', 'disabled');
             $('.addLink').modal('show');
         });
 
@@ -20,10 +20,12 @@ var lightBox = function(){
             var comment = $('#comment').val();
 
             var image_url = $('#imgurl').val();
-            if (!image_url)
-            {
+            //if (!image_url)
+            //{
+            //    return false;
+            //}
+            if (!link_name || !link)
                 return false;
-            }
 
             $.post('/SmartLinks/AddCustomLink',
             {
