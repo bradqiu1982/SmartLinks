@@ -136,6 +136,17 @@ namespace SmartLinks.Models
             return ret;
         }
 
+        public static void RemoveBaseLink(string linkname)
+        {
+            var sql = "delete from LinkVM where LinkName = '<LinkName>'";
+            sql = sql.Replace("<LinkName>", linkname);
+            DBUtility.ExeLocalSqlNoRes(sql);
+
+            sql = "delete from MachineLink where LinkName = '<LinkName>'";
+            sql = sql.Replace("<LinkName>", linkname);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
         public string LinkName { set; get; }
         public string Link { set; get; }
         public string Logo { set; get; }
