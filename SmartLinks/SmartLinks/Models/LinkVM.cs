@@ -24,8 +24,8 @@ namespace SmartLinks.Models
 
         public static void StoreLink(string linkname, string link, string logo, string comment,string machine)
         {
-            var sql = "delete from MachineLink where LinkName = '<LinkName>'";
-            sql = sql.Replace("<LinkName>", linkname);
+            var sql = "delete from MachineLink where LinkName = '<LinkName>' and ReqMachine='<ReqMachine>'";
+            sql = sql.Replace("<LinkName>", linkname).Replace("<ReqMachine>",machine);
             DBUtility.ExeLocalSqlNoRes(sql);
 
             sql = "insert into MachineLink(LinkName,Link,Logo,Comment,ReqMachine,Freqence) values('<LinkName>','<Link>','<Logo>','<Comment>','<ReqMachine>',0)";
