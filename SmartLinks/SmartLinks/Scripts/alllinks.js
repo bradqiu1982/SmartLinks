@@ -4,9 +4,6 @@ var lightBox = function(){
         $('.carousel').carousel({
             interval: false
         });
-        $('body').on('click', '.span-times', function() {
-            $(this).parent().parent().hide();
-        });
 
         $('body').on('click', '.img_default', function () {
             $('#link_name').val('');
@@ -15,7 +12,6 @@ var lightBox = function(){
             $('#imgurl').val('');
             $('#modal_add_Link').attr('disabled', 'disabled');
             $('.addLink').modal('show');
-
         });
 
         $('body').on('click', '#modal_add_Link', function () {
@@ -47,7 +43,35 @@ var lightBox = function(){
             });
         });
 
+        $('body').on('mouseenter', '.thumbnail', function () {
+            if ($(this).children('.div-title').hasClass('hide')) {
+                $(this).children('.div-title').removeClass('hide');
+            }
+        })
 
+        $('body').on('mouseleave', '.thumbnail', function () {
+            if (!$(this).children('.div-title').hasClass('hide')) {
+                $(this).children('.div-title').addClass('hide');
+            }
+        })
+
+        $('body').on('click', '.delLink', function () {
+            if (!confirm('Do you really want to delete this this link ?')) {
+                return false;
+            }
+            var link_name = $(this).attr('data-link-name');
+            $.post('/SmartLinks/RemoveCustomLink',
+            {
+                link_name: link_name
+            }, function (output) {
+                if (output.success) {
+                    window.location.reload();
+                }
+                else {
+                    alert('Fail to delete this link !');
+                }
+            })
+        })
 	}
     return {
         init: function () {
