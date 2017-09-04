@@ -15,7 +15,6 @@ namespace SmartLinks.Controllers
         {
             try
             {
-
                 IPAddress myIP = IPAddress.Parse(IP);
                 IPHostEntry GetIPHost = Dns.GetHostEntry(myIP);
                 List<string> compName = GetIPHost.HostName.ToString().Split('.').ToList();
@@ -41,7 +40,9 @@ namespace SmartLinks.Controllers
                 }//end if
             }//end
 
-            return View();
+            var vm = LinkVM.RetrieveLinks();
+
+            return View(vm);
         }
 
         public ActionResult AddLink()
@@ -95,20 +96,59 @@ namespace SmartLinks.Controllers
         {
             var linkname = Request["LinkName"];
             var link = Request["UrlAddr"];
+            var comment = Request["comment"];
             var logo = GetLinkLogo();
             if (!string.IsNullOrEmpty(linkname)
                 && !string.IsNullOrEmpty(link)
                 && !string.IsNullOrEmpty(logo))
             {
-
+                LinkVM.StoreLink(linkname, link, logo,comment);
             }
-            return View();
+            return RedirectToAction("SmartLinks", "All");
         }
 
         public ActionResult RedirectToLink(string linkname)
         {
+            var vm = LinkVM.RetrieveLinks();
+            var validlink = string.Empty;
+            foreach (var item in vm)
+            {
+                if (string.Compare(linkname, item.LinkName) == 0)
+                {
+                    validlink = item.Link;
+                    break;
+                }
+            }
+            if (!string.IsNullOrEmpty(validlink))
+            {
+                return Redirect(validlink);
+            }
+            else
+            {
+                return RedirectToAction("SmartLinks","All");
+            }
 
-            return new RedirectResult(linkname, true);
         }
+
+        public JsonResult AddCustomLink()
+        {
+            var mvm = new MachineLink();
+            mvm.Link = Request.Form["link"];
+            mvm.LinkName = Request.Form["link_name"];
+            mvm.Comment = Request.Form["comment"];
+            mvm.Logo = Request.Form["image_url"];
+
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("reqmachine"))
+            {
+                mvm.ReqMachine = ckdict["reqmachine"];
+                
+            }
+
+            var res = new JsonResult();
+            res.Data = new { success = true };
+            return res;
+        }
+
     }
 }

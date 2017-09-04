@@ -6,7 +6,10 @@
     <title>@ViewBag.Title</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
     <link href="@Url.Content("~/Content/bootstrapfileinput.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/common.css")" rel="stylesheet" type="text/css" />
+    <script src="~/Scripts/ajaxfileupload.js" type="text/javascript"></script>
 
     <style type="text/css">
         .tableFloatingHeaderOriginal th {
@@ -183,6 +186,7 @@
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    <script src="~/Scripts/ajaxfileupload.js" type="text/javascript"></script>
     @RenderSection("scripts", required: false)
 </body>
 </html>
