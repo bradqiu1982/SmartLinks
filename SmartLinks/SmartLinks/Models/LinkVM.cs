@@ -5,6 +5,11 @@ using System.Web;
 
 namespace SmartLinks.Models
 {
+    public class LINKACTION
+    {
+        public static string DELETE = "DELETE";
+    }
+
     public class MachineLink
     {
         public MachineLink()
@@ -66,6 +71,21 @@ namespace SmartLinks.Models
             }
             sql = "update MachineLink set Freqence = <Freqence>  where ReqMachine = '<ReqMachine>' and LinkName = '<LinkName>'";
             sql = sql.Replace("<ReqMachine>", machine).Replace("<LinkName>", linkname).Replace("<Freqence>",frequence.ToString());
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public static void RemoveCustomLink(string linkname, string link, string logo, string comment, string machine)
+        {
+            var sql = "select Freqence from MachineLink where ReqMachine = '<ReqMachine>' and LinkName = '<LinkName>'";
+            sql = sql.Replace("<ReqMachine>", machine).Replace("<LinkName>", linkname);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            if (dbret.Count == 0)
+            {
+                StoreLink(linkname, link, logo, comment, machine);
+            }
+
+            sql = "update MachineLink set Action = '<Action>'  where ReqMachine = '<ReqMachine>' and LinkName = '<LinkName>'";
+            sql = sql.Replace("<ReqMachine>", machine).Replace("<LinkName>", linkname).Replace("<Action>", LINKACTION.DELETE);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 

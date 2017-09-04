@@ -13,15 +13,11 @@ public class ImageUpload : IHttpHandler {
             string fn = System.IO.Path.GetFileName(uploads.FileName);
             string url = "";
 
-            var bimage = true;
-
             if(string.Compare(Path.GetExtension(fn),".jpg",true) == 0
                 ||string.Compare(Path.GetExtension(fn),".png",true) == 0
                 ||string.Compare(Path.GetExtension(fn),".gif",true) == 0
                 ||string.Compare(Path.GetExtension(fn),".jpeg",true) == 0)
             {
-                bimage = true;
-
                 string datestring = DateTime.Now.ToString("yyyyMMdd");
                 string imgdir = context.Server.MapPath(".") + "\\images\\" + datestring + "\\";
                 if (!Directory.Exists(imgdir))
@@ -36,37 +32,9 @@ public class ImageUpload : IHttpHandler {
                 uploads.SaveAs(imgdir + fn);
                 url = "/userfiles/images/" +datestring+"/"+ fn;
             }
-            else
-            {
-                bimage = false;
-
-                string datestring = DateTime.Now.ToString("yyyyMMdd");
-                string imgdir = context.Server.MapPath(".") + "\\docs\\" + datestring + "\\";
-                if (!Directory.Exists(imgdir))
-                {
-                    Directory.CreateDirectory(imgdir);
-                }
-
-                fn = Path.GetFileNameWithoutExtension(fn)+"-"+DateTime.Now.ToString("yyyyMMddHHmmss")+Path.GetExtension(fn);
-                fn = fn.Replace(" ", "_").Replace("#", "").Replace("'", "")
-                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
-
-                uploads.SaveAs(imgdir + fn);
-                url = "/userfiles/docs/" +datestring+"/"+ fn;
-
-                //var dict = CookieUtility.UnpackCookie(new HttpRequestWrapper(context.Request));
-                //if (dict.ContainsKey("issuekey")
-                //    && !string.IsNullOrEmpty(dict["issuekey"])
-                //    && dict.ContainsKey("currentaction")
-                //    && string.Compare(dict["currentaction"],"UpdateIssue") == 0)
-                //{
-                //    IssueViewModels.StoreIssueAttachment(dict["issuekey"], url);
-                //}
-            }
-
 
             context.Response.Write(url);
-
+            
             HttpContext.Current.ApplicationInstance.CompleteRequest();
         }
         catch (Exception ex)

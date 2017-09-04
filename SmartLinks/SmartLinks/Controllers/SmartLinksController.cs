@@ -24,9 +24,40 @@ namespace SmartLinks.Controllers
             { return string.Empty; }
         }
 
+        private List<LinkVM> RetrieveAllLinks(string machine)
+        {
+            var ret = new List<LinkVM>();
+            var mvm = MachineLink.RetrieveLinks(machine);
+            var mvmdict = new Dictionary<string, bool>();
+            foreach (var item in mvm)
+            {
+                mvmdict.Add(item.LinkName, true);
+                if (string.Compare(item.Action, LINKACTION.DELETE) != 0)
+                {
+                    var templink = new LinkVM();
+                    templink.LinkName = item.LinkName;
+                    templink.Link = item.Link;
+                    templink.Logo = item.Logo;
+                    templink.Comment = item.Comment;
+                    ret.Add(templink);
+                }
+            }
+            var vm = LinkVM.RetrieveLinks();
+            foreach (var item in vm)
+            {
+                if (!mvmdict.ContainsKey(item.LinkName))
+                {
+                    ret.Add(item);
+                }
+            }
+
+            return ret;
+        }
+
         // GET: SmartLinks
         public ActionResult All()
         {
+            var vm = new List<LinkVM>();
             var ckdict = CookieUtility.UnpackCookie(this);
             if (!ckdict.ContainsKey("reqmachine"))
             {
@@ -38,9 +69,12 @@ namespace SmartLinks.Controllers
                     tempdict.Add("reqmachine", compName);
                     CookieUtility.SetCookie(this, tempdict);
                 }//end if
+                vm = LinkVM.RetrieveLinks();
             }//end
-
-            var vm = LinkVM.RetrieveLinks();
+            else
+            {
+                vm = RetrieveAllLinks(ckdict["reqmachine"]);
+            }
 
             return View(vm);
         }
@@ -104,18 +138,45 @@ namespace SmartLinks.Controllers
             {
                 LinkVM.StoreLink(linkname, link, logo,comment);
             }
-            return RedirectToAction("SmartLinks", "All");
+            return RedirectToAction("All", "SmartLinks");
         }
 
         public ActionResult RedirectToLink(string linkname)
         {
-            var vm = LinkVM.RetrieveLinks();
+            var vm = new List<LinkVM>();
+            var machine = string.Empty;
+
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (!ckdict.ContainsKey("reqmachine"))
+            {
+                string IP = Request.UserHostName;
+                string compName = DetermineCompName(IP);
+                if (!string.IsNullOrEmpty(compName))
+                {
+                    var tempdict = new Dictionary<string, string>();
+                    tempdict.Add("reqmachine", compName);
+                    machine = compName;
+                    CookieUtility.SetCookie(this, tempdict);
+                }//end if
+                vm = LinkVM.RetrieveLinks();
+            }//end
+            else
+            {
+                vm = RetrieveAllLinks(ckdict["reqmachine"]);
+                machine = ckdict["reqmachine"];
+            }
+
+
             var validlink = string.Empty;
             foreach (var item in vm)
             {
                 if (string.Compare(linkname, item.LinkName) == 0)
                 {
                     validlink = item.Link;
+                    if (!string.IsNullOrEmpty(machine))
+                    {
+                        MachineLink.UpdateFrequence(item.LinkName, item.Link, item.Logo, item.Comment, machine);
+                    }
                     break;
                 }
             }
@@ -125,7 +186,7 @@ namespace SmartLinks.Controllers
             }
             else
             {
-                return RedirectToAction("SmartLinks","All");
+                return RedirectToAction("All","SmartLinks");
             }
 
         }
@@ -142,7 +203,53 @@ namespace SmartLinks.Controllers
             if (ckdict.ContainsKey("reqmachine"))
             {
                 mvm.ReqMachine = ckdict["reqmachine"];
-                
+                MachineLink.StoreLink(mvm.LinkName, mvm.Link, mvm.Logo, mvm.Comment, mvm.ReqMachine);
+            }
+
+            var res = new JsonResult();
+            res.Data = new { success = true };
+            return res;
+        }
+
+        public JsonResult RemoveCustomLink()
+        {
+            var linkname = Request.Form["link_name"];
+
+            var vm = new List<LinkVM>();
+            var machine = string.Empty;
+
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (!ckdict.ContainsKey("reqmachine"))
+            {
+                string IP = Request.UserHostName;
+                string compName = DetermineCompName(IP);
+                if (!string.IsNullOrEmpty(compName))
+                {
+                    var tempdict = new Dictionary<string, string>();
+                    tempdict.Add("reqmachine", compName);
+                    machine = compName;
+                    CookieUtility.SetCookie(this, tempdict);
+                }//end if
+                vm = LinkVM.RetrieveLinks();
+            }//end
+            else
+            {
+                vm = RetrieveAllLinks(ckdict["reqmachine"]);
+                machine = ckdict["reqmachine"];
+            }
+
+            var validlink = string.Empty;
+            foreach (var item in vm)
+            {
+                if (string.Compare(linkname, item.LinkName) == 0)
+                {
+                    validlink = item.Link;
+                    if (!string.IsNullOrEmpty(machine))
+                    {
+                        MachineLink.RemoveCustomLink(item.LinkName, item.Link, item.Logo, item.Comment, machine);
+                    }
+                    break;
+                }
             }
 
             var res = new JsonResult();
