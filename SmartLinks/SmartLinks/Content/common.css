@@ -16,6 +16,9 @@ html,body{
     width: 30%;
     margin: 1%;
 }
+.row-column a{
+    text-decoration:none;
+}
 .img_src{
     display: block;
     height: 150px !important;
@@ -26,6 +29,26 @@ html,body{
     background-position: center center;
     /*margin: 4% auto 1% auto;*/
  }
+
+@font-face
+{
+    font-family: myFirstFont;
+    src:  url('../fonts/HARLOWSI.TTF');
+}
+.cus_img_src{
+    display: block;
+    height: 150px !important;
+    font-size: 56px;
+    font-family: myFirstFont;
+    text-align: center;
+    line-height: 150px;
+    color: #fff;
+    -webkit-background-size: contain;
+    -moz-background-size: contain;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
 
 .img_default{
     display: block;
