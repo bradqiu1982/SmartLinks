@@ -141,7 +141,7 @@
     background-color: #FFC000;
 }
 
-.bg-default-data{
+.bg-default-data, .bg-default-data-rect{
     background-image: url(./images/data.png);
     background-repeat: no-repeat;
     background-position: center center;
@@ -150,20 +150,24 @@
     background-size: 80px;
 }
 
-.bg-default-data-transparent{
+.bg-default-data-transparent, .bg-default-link-transparent{
     display: inline-block;
     background-color: #000;
     opacity: 0;
     height: 80px !important;
-    width: 100% !important;
+    width:80% !important;
+    margin: 10px auto 0 auto;
+    cursor: pointer;
 }
 
-.bg-default-data-default{
+.bg-default-link-transparent-rect, .bg-default-data-transparent-rect{
     display: inline-block;
     background-color: #000;
     opacity: 0;
-    height: 80px !important;
-    width: 100% !important;
+    height: 200px !important;
+    width: 80% !important;
+    margin: 10px auto 0 auto;
+    cursor: pointer;
 }
 
 .bg-default-etc{
@@ -176,6 +180,15 @@
 }
 
 .bg-default-link{
+    background-image: url(./images/link.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+    -webkit-background-size: 80px;
+    -moz-background-size: 80px;
+    background-size: 80px;
+    cursor: pointer;
+}
+.bg-default-link-rect{
     background-image: url(./images/link.png);
     background-repeat: no-repeat;
     background-position: center center;
@@ -208,7 +221,7 @@
     color: #909090;
     background-color: #fefefe;
     margin-right: 5px;
-    margin-top: -15px;
+    margin-top: -20px;
 }
 
 .span-times{
