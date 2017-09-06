@@ -242,11 +242,11 @@
     width: 1000px;
     margin: 8% auto 6% auto;
     background: #000; 
-    opacity: 0.7;
+    opacity: 0.8;
     border-radius: 15px;
     z-index:1001;
-    -moz-opacity: 0.7;
-    filter: alpha(opacity=70);
+    -moz-opacity: 0.8;
+    filter: alpha(opacity=80);
 }
 .popup-header{
     color: #fff;

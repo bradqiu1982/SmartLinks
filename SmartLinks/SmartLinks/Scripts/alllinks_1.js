@@ -27,12 +27,7 @@ var lightBox = function(){
             $('.bg-default-etc').append('<span class="bg-default-link-transparent">&nbsp;</span>');
         });
         
-        $('body').on('click', '.bg-default-data-transparent', function () {
-            var link_name = $(this).attr('data-name');
-            window.location.href = '/SmartLinks/RedirectToLink?linkname=' + link_name;
-        })
-
-        $('body').on('click', '.bg-default-data-transparent-rect', function () {
+        $('body').on('click', '.bg-default-data-transparent, .bg-default-data-transparent-rect', function () {
             var link_name = $(this).attr('data-name');
             window.location.href = '/SmartLinks/RedirectToLink?linkname=' + link_name;
         })
@@ -49,7 +44,7 @@ var lightBox = function(){
             }
         })
 
-        $('body').on('click', '.bg-default-link', function () {
+        $('body').on('click', '.bg-default-link, .bg-default-link-rect', function () {
             $('#link_name').val('');
             $('#link').val('');
             $('#comment').val('');
