@@ -26,10 +26,20 @@ var lightBox = function(){
             }
             $('.bg-default-link').each(function () {
                 $(this).append(
-                    '<span class="bg-default-link-transparent">&nbsp;</span>'
+                    '<span class="bg-default-link-transparent">'+
+                        '<div class="div-link-name">'+
+                            '<span class="span-link-name"></span>'+
+                        '</div>'+
+                    '</span>'
                 );
             })
-            $('.bg-default-etc').append('<span class="bg-default-link-transparent">&nbsp;</span>');
+            $('.bg-default-etc').append(
+                '<span class="bg-default-link-transparent">' +
+                    '<div class="div-link-name">' +
+                        '<span class="span-link-name"></span>' +
+                    '</div>' +
+                '</span>'
+            );
         });
         
         $('body').on('click', '.bg-default-data-transparent, .bg-default-data-transparent-rect', function () {
