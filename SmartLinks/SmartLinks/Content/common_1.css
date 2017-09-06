@@ -2,6 +2,7 @@
     margin:0px;
     height:100%;
     background-color: #7030A0;
+    /*font-family: "Arial Narrow";*/
 }
 
 .logo{
@@ -131,7 +132,7 @@
 }
 
 .bg-color-7{
-    background-color: #FFFF00;
+    background-color: #FA9604;
 }
 
 .bg-color-8{
@@ -161,8 +162,7 @@
 
 .bg-default-data-transparent, .bg-default-link-transparent{
     display: inline-block;
-    background-color: #000;
-    opacity: 0;
+    background-color: transparent;
     height: 80px !important;
     width:80% !important;
     margin: 10px auto 0 auto;
@@ -171,8 +171,7 @@
 
 .bg-default-link-transparent-rect, .bg-default-data-transparent-rect{
     display: inline-block;
-    background-color: #000;
-    opacity: 0;
+    background-color: transparent;
     height: 200px !important;
     width: 80% !important;
     margin: 10px auto 0 auto;
@@ -212,7 +211,6 @@
     color: #fff;
     font-size: 18px;
     padding: 10px 20px 10px 10px;
-    /*margin-bottom: 2% !important;*/
 }
 
 .img-computer{
@@ -305,7 +303,6 @@
 
 .popup-body textarea{
     height: 120px;
-    /*margin: 10px 0;*/
     border-radius: 6px;
     width: 100%;
     background-color: transparent;
@@ -348,4 +345,26 @@
     padding: 25% 20%;
     display: inline-block;
     font-size: 18px;
+}
+
+.div-link-name{
+    height: 80px;
+}
+
+.div-link-name-rect{
+    height: 200px;
+}
+
+.span-link-name{
+    color: #fff;
+    font-size: 14px;
+    display: inline-block;
+    padding-top: 70px;
+}
+
+.span-link-name-rect{
+    color: #fff;
+    font-size: 14px;
+    display: inline-block;
+    padding-top: 180px;
 }
