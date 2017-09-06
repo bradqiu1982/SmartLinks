@@ -57,6 +57,13 @@ namespace SmartLinks.Controllers
         // GET: SmartLinks
         public ActionResult All()
         {
+            return View();
+        }
+
+        [HttpPost]
+        public JsonResult AllData()
+        {
+
             var vm = new List<LinkVM>();
             var ckdict = CookieUtility.UnpackCookie(this);
             if (!ckdict.ContainsKey("reqmachine"))
@@ -76,7 +83,10 @@ namespace SmartLinks.Controllers
                 vm = RetrieveAllLinks(ckdict["reqmachine"]);
             }
 
-            return View(vm);
+            var res = new JsonResult();
+            res.Data = new { data = vm};
+            res.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
+            return res;
         }
 
         public ActionResult AddLink()

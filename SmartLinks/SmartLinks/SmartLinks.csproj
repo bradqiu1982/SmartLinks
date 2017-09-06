@@ -180,15 +180,23 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrapfileinput.css" />
     <Content Include="Content\common.css" />
+    <Content Include="Content\common_1.css" />
+    <Content Include="Content\images\computer.png" />
+    <Content Include="Content\images\data.png" />
+    <Content Include="Content\images\etc.png" />
     <Content Include="Content\images\FinisarBuilding.jpg" />
     <Content Include="Content\images\FinisarLogo.jpg" />
+    <Content Include="Content\images\link.png" />
+    <Content Include="Content\images\logo.png" />
     <Content Include="Content\images\plus.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\ajaxfileupload.js" />
+    <Content Include="Scripts\alllinks_1.js" />
     <Content Include="Scripts\alllinks.js" />
+    <Content Include="fonts\HARLOWSI.TTF" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -217,9 +225,10 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
-    <Content Include="Views\SmartLinks\All.cshtml" />
+    <Content Include="Views\SmartLinks\All_bak.cshtml" />
     <Content Include="Views\SmartLinks\AddLink.cshtml" />
     <Content Include="userfiles\ImageUpload.ashx" />
+    <Content Include="Views\SmartLinks\All.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
