@@ -57,6 +57,28 @@ namespace SmartLinks.Controllers
         // GET: SmartLinks
         public ActionResult All()
         {
+            var machine = string.Empty;
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (!ckdict.ContainsKey("reqmachine"))
+            {
+                string IP = Request.UserHostName;
+                string compName = DetermineCompName(IP);
+                if (!string.IsNullOrEmpty(compName))
+                {
+                    var tempdict = new Dictionary<string, string>();
+                    tempdict.Add("reqmachine", compName);
+                    CookieUtility.SetCookie(this, tempdict);
+                    machine = compName;
+                }//end if
+            }//end
+            else
+            {
+                machine = ckdict["reqmachine"];
+            }
+            if (!string.IsNullOrEmpty(machine))
+            {
+                ViewBag.machine = machine;
+            }
             return View();
         }
 

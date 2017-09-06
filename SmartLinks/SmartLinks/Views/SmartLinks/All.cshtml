@@ -11,7 +11,14 @@
         <span class="col-md-3 logo"></span>
         <span class="col-md-3 machine">
             <span class="img-computer"></span>
-            <span>SHG-L80000000</span>
+            @if (ViewBag.machine != null)
+            {
+                <span>@ViewBag.machine</span>
+            }
+            else
+            {
+                <span>SHG-L80000000</span>
+            }
         </span>
     </div>
     <div class="container main-body">
