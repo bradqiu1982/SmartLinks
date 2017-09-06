@@ -78,6 +78,7 @@ var lightBox = function(){
             var image_url = $('#imgurl').val();
             if (!link_name || !link) {
                 alert('Please input LinkName and Link !');
+                return false;
             }
 
             $.post('/SmartLinks/AddCustomLink',
