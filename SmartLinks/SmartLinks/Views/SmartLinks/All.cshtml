@@ -117,12 +117,18 @@
                     </div>
                     <div class="popup-row">
                         <div class="width-8">
-                            <input type="file" id="image_file" class="btn btn-success btn-file">
+                            <span class="btn-file" style="font-family:'Arial Narrow', arial" id="choosefile">
+                                <span class="image-update">Image Update</span>
+                                <input type="file" name="files" id="file1" runat="server" onchange="ShowFileNames(this)" values="Image Update" />
+                            </span>
                         </div>
                         <div class="width-1">&nbsp;</div>
                         <div class="width-10">
                             <textarea class="" id="comment"></textarea>
                         </div>
+                    </div>
+                    <div class="popup-input">
+                        <span id="showfilename" name="showfilename"></span>
                     </div>
                 </div>
                 <div class="popup-footer">
@@ -136,5 +142,24 @@
         $(function () {
             lightBox.init();
         })
+
+        function ShowFileNames(oFile) {
+            $.ajaxFileUpload
+            (
+                {
+                    url: '/userfiles/ImageUpload.ashx',
+                    secureuri: false,
+                    fileElementId: 'file1',
+                    dataType: 'HTML',
+                    success: function (data, status) {
+                        $('#imgurl').val(data);
+                    },
+                    error: function (e) {
+                        window.alert("fail to upload image");
+                    }
+                }
+            );
+            $('#showfilename').text(oFile.value);
+        }
     </script>
 </div>
