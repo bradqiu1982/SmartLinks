@@ -351,20 +351,8 @@
     height: 80px;
 }
 
-.div-link-name-rect{
-    height: 200px;
-}
-
 .span-link-name{
     color: #fff;
     font-size: 14px;
     display: inline-block;
-    padding-top: 70px;
-}
-
-.span-link-name-rect{
-    color: #fff;
-    font-size: 14px;
-    display: inline-block;
-    padding-top: 180px;
 }

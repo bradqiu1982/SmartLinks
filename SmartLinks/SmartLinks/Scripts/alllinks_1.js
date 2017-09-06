@@ -20,8 +20,6 @@ var lightBox = function(){
                     $('#link' + i).removeClass('bg-default-link').addClass('bg-default-data');
                 }
                 if ($('#link' + i).hasClass('bg-default-link-rect')) {
-                    $('#link' + i).find('.div-link-name').removeClass('div-link-name').addClass('div-link-name-rect');
-                    $('#link' + i).find('.span-link-name').removeClass('span-link-name').addClass('span-link-name-rect');
                     $('#link' + i).removeClass('bg-default-link-rect').addClass('bg-default-data-rect');
                     $('#link' + i).children('span').removeClass('bg-default-data-transparent').addClass('bg-default-data-transparent-rect');
                 }
