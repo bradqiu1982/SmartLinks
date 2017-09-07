@@ -18,7 +18,7 @@ var lightBox = function(){
                             '<div class="div-link-name"><span class="span-link-name">' + link_name + '</span></div></span>';
                 $('#link' + i).append(div_str);
                 if (output.data[i - 1].Logo) {
-                    $('#link' + i).attr('style', 'background-image: url(' + output.data[i - 1].Logo + ')');
+                    $('#link' + i).attr('style', 'background-image: url(' + output.data[i - 1].Logo + '); background-size:80% 80%; -moz-background-size:80% 80%;');
                 }
                 if ($('#link' + i).hasClass('bg-default-link')) {
                     $('#link' + i).removeClass('bg-default-link').addClass('bg-default-data');

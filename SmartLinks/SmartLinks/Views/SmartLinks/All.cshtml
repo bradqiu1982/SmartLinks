@@ -129,6 +129,7 @@
                     </div>
                     <div class="popup-input">
                         <span id="showfilename" name="showfilename"></span>
+                        <input id="imgurl" name="imgurl" type="hidden"/>
                     </div>
                 </div>
                 <div class="popup-footer">
@@ -144,6 +145,7 @@
         })
 
         function ShowFileNames(oFile) {
+            $("#popup_add_Link").attr('disabled', 'disabled');
             $.ajaxFileUpload
             (
                 {
@@ -153,8 +155,10 @@
                     dataType: 'HTML',
                     success: function (data, status) {
                         $('#imgurl').val(data);
+                        $("#popup_add_Link").removeAttr('disabled');
                     },
                     error: function (e) {
+                        $("#popup_add_Link").removeAttr('disabled');
                         window.alert("fail to upload image");
                     }
                 }
