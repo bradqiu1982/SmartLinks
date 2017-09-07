@@ -1,5 +1,7 @@
 var lightBox = function(){
     var show = function () {
+        var default_imgs = new Array();
+        default_imgs = ['./Content/images/data.png', './Content/images/etc.png', './Content/images/plus.png'];
         $.post('/SmartLinks/AllData',
         {
 
@@ -19,6 +21,9 @@ var lightBox = function(){
                 $('#link' + i).append(div_str);
                 if (output.data[i - 1].Logo) {
                     $('#link' + i).attr('style', 'background-image: url(' + output.data[i - 1].Logo + '); background-size:80% 80%; -moz-background-size:80% 80%;');
+                }
+                else {
+                    $('#link' + i).attr('style', 'background-image: url(' + default_imgs[(i - 1) % 3] + '); background-size:80% 80%; -moz-background-size:80% 80%;');
                 }
                 if ($('#link' + i).hasClass('bg-default-link')) {
                     $('#link' + i).removeClass('bg-default-link').addClass('bg-default-data');
