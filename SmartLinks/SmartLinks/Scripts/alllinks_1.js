@@ -23,7 +23,7 @@ var lightBox = function(){
                     $('#link' + i).attr('style', 'background-image: url(' + output.data[i - 1].Logo + '); background-size:80% 80%; -moz-background-size:80% 80%;');
                 }
                 else {
-                    $('#link' + i).attr('style', 'background-image: url(' + default_imgs[(i - 1) % 3] + '); background-size:80% 80%; -moz-background-size:80% 80%;');
+                    $('#link' + i).attr('style', 'background-image: url(' + default_imgs[(i - 1) % 3] + ');');
                 }
                 if ($('#link' + i).hasClass('bg-default-link')) {
                     $('#link' + i).removeClass('bg-default-link').addClass('bg-default-data');
