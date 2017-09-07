@@ -13,9 +13,13 @@ var lightBox = function(){
                             '<span class="glyphicon glyphicon-remove span-times delLink"' +
                                 'data-link-name="' + output.data[i-1].LinkName + '" aria-hidden="true" title="Delete"></span>' +
                             '</div>'+
-                            '<span class="bg-default-data-transparent" data-name="' + output.data[i - 1].LinkName + '">'+
+                            '<span class="bg-default-data-transparent" ' +
+                            'data-name="' + output.data[i - 1].LinkName + '">' +
                             '<div class="div-link-name"><span class="span-link-name">' + link_name + '</span></div></span>';
                 $('#link' + i).append(div_str);
+                if (output.data[i - 1].Logo) {
+                    $('#link' + i).attr('style', 'background-image: url(' + output.data[i - 1].Logo + ')');
+                }
                 if ($('#link' + i).hasClass('bg-default-link')) {
                     $('#link' + i).removeClass('bg-default-link').addClass('bg-default-data');
                 }

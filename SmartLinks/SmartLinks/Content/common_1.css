@@ -242,18 +242,18 @@
 }
 
 .popup{
-    position: fixed;
+    position: absolute; /* fixed */
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    width: 1000px;
-    min-height: 450px;
+    max-width: 1000px;
+    min-height: 500px;
     margin: 8% auto 6% auto;
+    padding-bottom: 5%;
     background: #000; 
     opacity: 0.8;
     border-radius: 15px;
-    z-index:1001;
     -moz-opacity: 0.8;
     filter: alpha(opacity=80);
 }
@@ -324,6 +324,10 @@
     float: right;
     margin: -10px 10px;
     height: 35px;
+    background-color: transparent;
+    border: #fff 2px solid;
+    border-radius: 6px;
+    color: #fff;
 }
 
 .popup-input span{
