@@ -20,7 +20,7 @@ var lightBox = function(){
                             '<div class="div-link-name"><span class="span-link-name">' + link_name + '</span></div></span>';
                 $('#link' + i).append(div_str);
                 if (output.data[i - 1].Logo) {
-                    $('#link' + i).attr('style', 'background-image: url(' + output.data[i - 1].Logo + '); background-size:80% 80%; -moz-background-size:80% 80%;');
+                    $('#link' + i).attr('style', 'background-image: url(' + output.data[i - 1].Logo + ');');
                 }
                 else {
                     $('#link' + i).attr('style', 'background-image: url(' + default_imgs[(i - 1) % 1] + ');');
