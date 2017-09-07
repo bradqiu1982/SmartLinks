@@ -157,9 +157,9 @@
     background-image: url(./images/data.png);
     background-repeat: no-repeat;
     background-position: center center;
-    -webkit-background-size: 80px;
-    -moz-background-size: 80px;
-    background-size: 80px;
+    -webkit-background-size: 70px;
+    -moz-background-size: 70px;
+    background-size: 70px;
 }
 
 .bg-default-data-transparent, .bg-default-link-transparent{
