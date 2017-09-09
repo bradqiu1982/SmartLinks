@@ -8,8 +8,8 @@ var lightBox = function(){
         }, function (output) {
             for (var i = 1; i <= output.data.length; i++) {
                 var link_name = output.data[i - 1].LinkName;
-                if (output.data[i - 1].LinkName.length > 10) {
-                    link_name = output.data[i - 1].LinkName.substring(0, 10) + '...';
+                if (output.data[i - 1].LinkName.length > 15) {
+                    link_name = output.data[i - 1].LinkName.substring(0, 15) + '..';
                 }
                 var div_str = '<div class="div-title hide">' +
                             '<span class="glyphicon glyphicon-remove span-times delLink"' +

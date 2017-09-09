@@ -17,6 +17,20 @@
     height: 50px;
     width: 40%;
 }
+
+.logoie8{
+    float: left;
+    margin: 3% -2% auto -8%;
+    background-image: url(./images/SmartLinks_1.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+    -webkit-background-size: contain;
+    -moz-background-size: contain;
+    background-size: contain;
+    height: 50px;
+    width: 40%;
+}
+
 .machine{
     float: right;
     margin: 5% -8% auto auto;
@@ -258,6 +272,24 @@
     min-height: 500px;
     margin: 8% auto 6% auto;
     padding-bottom: 5%;
+    background: #000; 
+    opacity: 0.8;
+    border-radius: 15px;
+    -moz-opacity: 0.8;
+    filter: alpha(opacity=80);
+}
+
+.ie8popup{
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 600px;
+    height: 380px;
+    color:white;
+    margin: 8% auto 6% auto;
+    padding-bottom: 3%;
     background: #000; 
     opacity: 0.8;
     border-radius: 15px;

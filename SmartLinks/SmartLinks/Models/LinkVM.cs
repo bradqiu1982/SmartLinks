@@ -37,7 +37,7 @@ namespace SmartLinks.Models
         public static List<MachineLink> RetrieveLinks(string machine)
         {
             var ret = new List<MachineLink>();
-            var sql = "select LinkName,Link,Logo,Comment,Action from MachineLink where ReqMachine = '<ReqMachine>' order by Freqence desc";
+            var sql = "select LinkName,Link,Logo,Comment,Action from MachineLink where ReqMachine = '<ReqMachine>' and LinkName <> '' and Link <> '' order by Freqence desc";
             sql = sql.Replace("<ReqMachine>", machine);
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
@@ -87,6 +87,29 @@ namespace SmartLinks.Models
             sql = "update MachineLink set Action = '<Action>'  where ReqMachine = '<ReqMachine>' and LinkName = '<LinkName>'";
             sql = sql.Replace("<ReqMachine>", machine).Replace("<LinkName>", linkname).Replace("<Action>", LINKACTION.DELETE);
             DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public static void NeverShowIE8Modal(string machine)
+        {
+            var sql = "delete from MachineLink where LinkName='' and ReqMachine = '<ReqMachine>' and Appv_1 <> ''";
+            sql = sql.Replace("<ReqMachine>", machine);
+            DBUtility.ExeLocalSqlNoRes(sql);
+            sql = "insert into MachineLink(ReqMachine,Appv_1) values('<ReqMachine>','nevershow')";
+            sql = sql.Replace("<ReqMachine>", machine);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
+        public static bool IsNeverShowIE8Modal(string machine)
+        {
+            var ret = false;
+            var sql = "select ReqMachine from MachineLink where  LinkName='' and ReqMachine = '<ReqMachine>' and Appv_1 <> ''";
+            sql = sql.Replace("<ReqMachine>", machine);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            if (dbret.Count > 0)
+            {
+                ret = true;
+            }
+            return ret;
         }
 
         public string ReqMachine { set; get; }

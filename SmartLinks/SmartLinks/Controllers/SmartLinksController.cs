@@ -57,6 +57,17 @@ namespace SmartLinks.Controllers
         // GET: SmartLinks
         public ActionResult All()
         {
+            ViewBag.isie8 = false;
+            ViewBag.showie8modal = false;
+
+            var browse = Request.Browser;
+            if (string.Compare(browse.Browser, "IE", true) == 0
+                && (string.Compare(browse.Version, "7.0", true) == 0
+                || string.Compare(browse.Version, "8.0", true) == 0))
+            {
+                ViewBag.isie8 = true;
+            }
+
             var machine = string.Empty;
             var ckdict = CookieUtility.UnpackCookie(this);
             if (!ckdict.ContainsKey("reqmachine"))
@@ -75,10 +86,19 @@ namespace SmartLinks.Controllers
             {
                 machine = ckdict["reqmachine"];
             }
+
             if (!string.IsNullOrEmpty(machine))
             {
                 ViewBag.machine = machine;
+                if (ViewBag.isie8)
+                {
+                    if (!MachineLink.IsNeverShowIE8Modal(machine))
+                    {
+                        ViewBag.showie8modal = true;
+                    }
+                }
             }
+
             return View();
         }
 
@@ -282,6 +302,20 @@ namespace SmartLinks.Controllers
                     }
                     break;
                 }
+            }
+
+            var res = new JsonResult();
+            res.Data = new { success = true };
+            return res;
+        }
+
+        public JsonResult NeverShowIE8Modal()
+        {
+            var ckdict = CookieUtility.UnpackCookie(this);
+            if (ckdict.ContainsKey("reqmachine"))
+            {
+                var ReqMachine = ckdict["reqmachine"];
+                MachineLink.NeverShowIE8Modal(ReqMachine);
             }
 
             var res = new JsonResult();
