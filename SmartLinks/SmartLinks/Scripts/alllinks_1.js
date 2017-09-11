@@ -73,8 +73,11 @@ var lightBox = function () {
                     '</div>' +
                 '</span>'
             );
-            $('.bg-default-link').removeClass('bg-default-link').addClass('bg-default-link-ie8');
-            $('.bg-default-etc').removeClass('bg-default-etc').addClass('bg-default-etc-ie8');
+
+            if (ie8_flg) {
+                $('.bg-default-link').removeClass('bg-default-link').addClass('bg-default-link-ie8');
+                $('.bg-default-etc').removeClass('bg-default-etc').addClass('bg-default-etc-ie8');
+            }
         });
 
         $('body').on('click', '.bg-default-data-transparent, .bg-default-data-transparent-rect', function () {
@@ -94,7 +97,7 @@ var lightBox = function () {
             }
         })
 
-        $('body').on('click', '.bg-default-link, .bg-default-link-rect', function () {
+        $('body').on('click', '.bg-default-link, .bg-default-link-rect, .bg-default-link-ie8, .bg-default-etc-ie8', function () {
             $('#link_name').val('');
             $('#link').val('');
             $('#comment').val('');
