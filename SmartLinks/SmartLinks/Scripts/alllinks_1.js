@@ -102,8 +102,29 @@ var lightBox = function () {
             $('#link').val('');
             $('#comment').val('');
             $('#imgurl').val('');
+            //check ie8
+            var ie8_flg = !$.support.leadingWhitespace;
+            ie8_flg = true;
+            if (ie8_flg) {
+                $('.input-placeholder').each(function () {
+                    $(this).val($(this).attr('placeholder'));
+                })
+            }
+
             $('.addLink').removeClass('hide');
         });
+
+        $('body').on('focus', '.input-placeholder', function () {
+            if ($(this).attr('placeholder') == $(this).val()) {
+                $(this).val('');
+            }
+        })
+
+        $('body').on('blur', '.input-placeholder', function () {
+            if ($(this).val() == '') {
+                $(this).val($(this).attr('placeholder'));
+            }
+        })
 
         $('body').on('click', '#popup_cancel', function () {
             $('.addLink').addClass('hide');
@@ -114,9 +135,13 @@ var lightBox = function () {
             var link = $('#link').val();
             var comment = $('#comment').val();
             var image_url = $('#imgurl').val();
-            if (!link_name || !link) {
+            if (!link_name || !link || link_name == 'Link Name' || link == "Link") {
                 alert('Please input LinkName and Link !');
                 return false;
+            }
+
+            if (comment == "Comment") {
+                comment = '';
             }
 
             $.post('/SmartLinks/AddCustomLink',
