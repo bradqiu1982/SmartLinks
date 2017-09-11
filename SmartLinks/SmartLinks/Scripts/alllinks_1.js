@@ -1,30 +1,54 @@
-var lightBox = function(){
+var lightBox = function () {
     var show = function () {
+        //check ie8
+        var ie8_flg = !$.support.leadingWhitespace;
+        if (ie8_flg) {
+            $('.logo').removeClass('logo').addClass('logo-ie8');
+            $('.img-computer').removeClass('img-computer').addClass('img-computer-ie8');
+        }
+
         var default_imgs = new Array();
+        var default_imgs_ie8 = new Array();
+        var default_links_ie8 = new Array();
         default_imgs = ['./Content/images/peace.png', './Content/images/data.png', './Content/images/daisy.png', './Content/images/clover.png'];
+        default_imgs_ie8 = ['./Content/images/ie8/peace.png', './Content/images/ie8/data.png', './Content/images/ie8/daisy.png', './Content/images/ie8/clover.png'];
+        default_links_ie8 = ['AGILE', 'BR', 'DOMINO', 'ERP', 'FA', 'TRACEVIEW'];
+
         $.post('/SmartLinks/AllData',
         {
 
         }, function (output) {
+            var link_name = '';
+            var logo = '';
             for (var i = 1; i <= output.data.length; i++) {
-                var link_name = output.data[i - 1].LinkName;
+                link_name = output.data[i - 1].LinkName;
                 if (output.data[i - 1].LinkName.length > 15) {
                     link_name = output.data[i - 1].LinkName.substring(0, 15) + '..';
                 }
                 var div_str = '<div class="div-title hide">' +
                             '<span class="glyphicon glyphicon-remove span-times delLink"' +
-                                'data-link-name="' + output.data[i-1].LinkName + '" aria-hidden="true" title="Delete"></span>' +
-                            '</div>'+
+                                'data-link-name="' + output.data[i - 1].LinkName + '" aria-hidden="true" title="Delete"></span>' +
+                            '</div>' +
                             '<span class="bg-default-data-transparent" ' +
                             'data-name="' + output.data[i - 1].LinkName + '">' +
                             '<div class="div-link-name"><span class="span-link-name">' + link_name + '</span></div></span>';
                 $('#link' + i).append(div_str);
-                if (output.data[i - 1].Logo) {
-                    $('#link' + i).attr('style', 'background-image: url(' + output.data[i - 1].Logo + ');');
+                logo = output.data[i - 1].Logo;
+                if (logo) {
+                    if (ie8_flg) {
+                        //if brower is ie8 or blow and logo in default array, change logo url with suffix -ie8. 
+                        var logo_array = logo.split('/');
+                        var logo_name = logo_array[logo_array.length - 1].split('-')[0];
+                        if ($.inArray(logo_name.toUpperCase(), default_links_ie8) !== -1) {
+                            logo = './Content/images/ie8/' + logo_name + '.png';
+                        }
+                    }
                 }
                 else {
-                    $('#link' + i).attr('style', 'background-image: url(' + default_imgs[(i - 1) % 4] + ');');
+                    //if brower is ie8, use ie8 default logo. 
+                    logo = (ie8_flg) ? default_imgs_ie8[(i - 1) % 4] : default_imgs[(i - 1) % 4];
                 }
+                $('#link' + i).attr('style', 'background-image: url(' + logo + ');');
                 if ($('#link' + i).hasClass('bg-default-link')) {
                     $('#link' + i).removeClass('bg-default-link').addClass('bg-default-data');
                 }
@@ -35,10 +59,10 @@ var lightBox = function(){
             }
             $('.bg-default-link').each(function () {
                 $(this).append(
-                    '<span class="bg-default-link-transparent">'+
-                        '<div class="div-link-name">'+
-                            '<span class="span-link-name"></span>'+
-                        '</div>'+
+                    '<span class="bg-default-link-transparent">' +
+                        '<div class="div-link-name">' +
+                            '<span class="span-link-name"></span>' +
+                        '</div>' +
                     '</span>'
                 );
             })
@@ -50,7 +74,7 @@ var lightBox = function(){
                 '</span>'
             );
         });
-        
+
         $('body').on('click', '.bg-default-data-transparent, .bg-default-data-transparent-rect', function () {
             var link_name = $(this).attr('data-name');
             window.location.href = '/SmartLinks/RedirectToLink?linkname=' + link_name;
@@ -97,7 +121,6 @@ var lightBox = function(){
                 comment: comment,
                 image_url: image_url
             }, function (output) {
-                console.log(output);
                 if (output.success) {
                     $('.addLink').modal('hide');
                     window.location.reload();
@@ -125,7 +148,7 @@ var lightBox = function(){
                 }
             })
         })
-	}
+    }
     return {
         init: function () {
             show();

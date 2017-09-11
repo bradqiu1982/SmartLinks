@@ -18,15 +18,12 @@
     width: 40%;
 }
 
-.logoie8{
+.logo-ie8{
     float: left;
     margin: 3% -2% auto -8%;
-    background-image: url(./images/SmartLinks_1.png);
+    background-image: url(./images/ie8/SmartLinks.png);
     background-repeat: no-repeat;
     background-position: center center;
-    -webkit-background-size: contain;
-    -moz-background-size: contain;
-    background-size: contain;
     height: 50px;
     width: 40%;
 }
@@ -39,6 +36,7 @@
     color: #fff;
     display: inline-block;
 }
+
 .main-body{
     width: 1000px;
     min-width: 1000px;
@@ -240,6 +238,17 @@
     width: 30px !important;
     margin-bottom: -7px;
     background: url(./images/computer.png) no-repeat center center;
+    -webkit-background-size: contain;
+    -moz-background-size: contain;
+    background-size: contain;
+}
+
+.img-computer-ie8{
+    display: inline-block;
+    height: 30px !important; 
+    width: 30px !important;
+    margin-bottom: -7px;
+    background: url(./images/ie8/computer.png) no-repeat center center;
     -webkit-background-size: contain;
     -moz-background-size: contain;
     background-size: contain;
