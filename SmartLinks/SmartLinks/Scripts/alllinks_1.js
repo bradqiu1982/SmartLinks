@@ -2,6 +2,7 @@ var lightBox = function () {
     var show = function () {
         //check ie8
         var ie8_flg = !$.support.leadingWhitespace;
+        ie8_flg = true;
         if (ie8_flg) {
             $('.logo').removeClass('logo').addClass('logo-ie8');
             $('.img-computer').removeClass('img-computer').addClass('img-computer-ie8');
@@ -65,7 +66,7 @@ var lightBox = function () {
                         '</div>' +
                     '</span>'
                 );
-            })
+            });
             $('.bg-default-etc').append(
                 '<span class="bg-default-link-transparent">' +
                     '<div class="div-link-name">' +
@@ -73,6 +74,8 @@ var lightBox = function () {
                     '</div>' +
                 '</span>'
             );
+            $('.bg-default-link').removeClass('bg-default-link').addClass('bg-default-link-ie8');
+            $('.bg-default-etc').removeClass('bg-default-etc').addClass('bg-default-etc-ie8');
         });
 
         $('body').on('click', '.bg-default-data-transparent, .bg-default-data-transparent-rect', function () {

@@ -201,8 +201,17 @@
     background-size: 50px;
 }
 
-.bg-default-link{
-    background-image: url(./images/link.png);
+.bg-default-etc-ie8{
+    background-image: url(./images/ie8/etc.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+    -webkit-background-size: 50px;
+    -moz-background-size: 50px;
+    background-size: 50px;
+}
+
+.bg-default-link-ie8{
+    background-image: url(./images/ie8/link.png);
     background-repeat: no-repeat;
     background-position: center center;
     -webkit-background-size: 80px;
