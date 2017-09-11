@@ -2,7 +2,6 @@ var lightBox = function () {
     var show = function () {
         //check ie8
         var ie8_flg = !$.support.leadingWhitespace;
-        ie8_flg = true;
         if (ie8_flg) {
             $('.logo').removeClass('logo').addClass('logo-ie8');
             $('.img-computer').removeClass('img-computer').addClass('img-computer-ie8');
