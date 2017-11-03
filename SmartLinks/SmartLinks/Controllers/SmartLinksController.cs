@@ -6,6 +6,8 @@ using System.Web;
 using System.Web.Mvc;
 using SmartLinks.Models;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace SmartLinks.Controllers
 {
@@ -234,13 +236,40 @@ namespace SmartLinks.Controllers
             }
             if (!string.IsNullOrEmpty(validlink))
             {
-                return Redirect(validlink);
+                if (validlink.Contains("wuxinpi"))
+                {
+                    var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    var timestamp = now +"_joke";
+                    using (MD5 md5Hash = MD5.Create())
+                    {
+                        var smartkey1 = GetMd5Hash(md5Hash, timestamp) + "::" + now;
+                        var smartkey2 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(smartkey1));
+                        var smartkey = HttpUtility.UrlEncode(smartkey2);
+                        return Redirect(validlink + "?smartkey="+smartkey);
+                    }
+                }
+                else
+                {
+                    return Redirect(validlink);
+                }
             }
             else
             {
                 return RedirectToAction("All","SmartLinks");
             }
 
+        }
+
+        static string GetMd5Hash(MD5 md5Hash, string input)
+        {
+
+            byte[] data = md5Hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(input));
+            StringBuilder sBuilder = new StringBuilder();
+            for (int i = 0; i < data.Length; i++)
+            {
+                sBuilder.Append(data[i].ToString("x2"));
+            }
+            return sBuilder.ToString();
         }
 
         public JsonResult AddCustomLink()
