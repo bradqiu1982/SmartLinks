@@ -25,3 +25,6 @@ CREATE TABLE [dbo].[MachineLink] (
 	[Appv_4]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
 );
 
+CREATE TABLE [dbo].[NGWafer] (
+    [WaferNo]  NVARCHAR (MAX)       DEFAULT ('') NOT NULL
+);

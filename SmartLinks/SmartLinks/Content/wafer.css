@@ -57,12 +57,14 @@ body {
     height: 98%;
     border: 1px #aaa solid;
     border-radius: 4px;
+    overflow-y: auto; 
 }
 
 .mark-detail-op {
     float: right;
     padding: 5px;
     font-size: 16px;
+    margin-right:1%;
 }
 
 .op-setting {
@@ -106,7 +108,7 @@ body {
     background-color: #efefef;
     border-radius: 4px;
     padding-top: 6px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .m-wafer {
