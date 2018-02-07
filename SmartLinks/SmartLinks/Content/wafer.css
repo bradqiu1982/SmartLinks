@@ -95,6 +95,13 @@ body {
     text-align: right;
     padding: 8px 5%;
 }
+.op-notice {
+    float: left;
+    height: 34px;
+    font-style: italic;
+    color: red;
+    border-radius: 5px;
+}
 
 .m-confirm {
     cursor: pointer;
@@ -133,3 +140,5 @@ body {
     padding-left: 0;
     padding-right: 0;
 }
+
+
