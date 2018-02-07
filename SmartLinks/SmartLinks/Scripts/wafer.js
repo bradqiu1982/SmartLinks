@@ -50,10 +50,19 @@
                 return false;
             }
             $('#marks').val(cur_marks.join('\n'));
+            var options = {
+                loadingTips: "正在处理数据，请稍候...",
+                backgroundColor: "#aaa",
+                borderColor: "#fff",
+                opacity: 0.8,
+                borderColor: "#fff",
+                TipsColor: "#000",
+            }
+            $.bootstrapLoading.start(options);
              $.post('/WaferPack/QueryWafer', 
-             {
+            {
                  marks: JSON.stringify(cur_marks)
-             }, function(output){
+            }, function(output){
                  var idx = 0;
                  var datacont = output.data.length;
                  $("#WaferTableID").empty();
@@ -68,7 +77,8 @@
                      }
                      
                  }
-             })
+                 //$.bootstrapLoading.end();
+            })
        }
 
 
