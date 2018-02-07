@@ -89,7 +89,6 @@
                      alert('含有不同WAFER的DATECODE: ' + output.waferdup);
                  }
 
-                 $('#myLoadingModal').modal('hide');
              })
        }
 
