@@ -1,5 +1,7 @@
 ﻿var Wafer = function(){
     var show = function () {
+        var mywafertable = null;
+
        $('#marks').focus();
 
        $('body').on('keypress', '#marks', function(e){
@@ -56,7 +58,13 @@
              }, function(output){
                  var idx = 0;
                  var datacont = output.data.length;
+
+                 if (mywafertable)
+                 {
+                     mywafertable.destroy();
+                 }
                  $("#WaferTableID").empty();
+
                  for (idx = 0; idx < datacont; idx++)
                  {
                      var line = output.data[idx];
@@ -66,8 +74,22 @@
                      else {
                          $("#WaferTableID").append('<tr><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>' + line.WaferNum + '</td><td>' + line.PN + '</td><td>' + line.Status + '</td></tr>');
                      }
-                     
                  }
+
+                 mywafertable = $('#mywafertable').DataTable({
+                     'iDisplayLength': 50,
+                     'aLengthMenu': [[20, 50, 100, -1],
+                     [20, 50, 100, "All"]],
+                     "aaSorting": [],
+                     "order": []
+                 });
+
+                 if (output.waferdup)
+                 {
+                     alert('含有不同WAFER的DATECODE: ' + output.waferdup);
+                 }
+
+                 $('#myLoadingModal').modal('hide');
              })
        }
 

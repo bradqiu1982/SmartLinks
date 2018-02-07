@@ -83,9 +83,41 @@ namespace SmartLinks.Controllers
         {
 
             var wafertable = RetrieveWaferData();
+
+            var waferdupdict = new Dictionary<string, string>();
+            var waferdupcount = new Dictionary<string, int>();
+            foreach (var item in wafertable)
+            {
+                if (!string.IsNullOrEmpty(item.DateCode))
+                {
+                    if (!waferdupdict.ContainsKey(item.DateCode))
+                    {
+                        waferdupdict.Add(item.DateCode, item.WaferNum);
+                        waferdupcount.Add(item.DateCode, 1);
+                    }
+                    else
+                    {
+                        if (string.Compare(item.WaferNum, waferdupdict[item.DateCode],true) != 0)
+                        {
+                            waferdupcount[item.DateCode] = waferdupcount[item.DateCode] + 1;
+                        }
+                    }
+                }
+            }
+
+            var waferdup = "";
+            foreach (var item in waferdupcount)
+            {
+                if (item.Value > 1)
+                {
+                    waferdup = waferdup + item.Key + ";";
+                }
+            }
+
             var ret = new JsonResult();
             ret.Data = new { sucess = true,
-                             data = wafertable
+                             data = wafertable,
+                             waferdup = waferdup
             };
             return ret;
         }

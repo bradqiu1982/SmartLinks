@@ -5,6 +5,9 @@
 }
 
 <link type="text/css" rel="stylesheet" href="~/Content/wafer.css" />
+<link type="text/css" rel="stylesheet" href="~/Content/jquery.dataTables.min.css" />
+<script type="text/javascript" src="~/Scripts/jquery.dataTables.min.js"></script>
+
 <script type="text/javascript" src="~/Scripts/wafer.js"></script>
 <script type="text/javascript">
     $(function(){
@@ -17,7 +20,7 @@
     <div class="marks-submit">
         <div class="total-marks label-danger col-xs-4" id="total-marks">0</div>
         <div class="marks-op col-xs-8 ">
-            <input type="button" class="btn btn-success btn-marks-submit" id="btn-marks-submit" value="Submit">
+            <input type="button" class="btn btn-success btn-marks-submit" id="btn-marks-submit" value="提交" data-toggle="modal" data-target="#myLoadingModal">
         </div>
     </div>
 </div>
@@ -26,7 +29,7 @@
         <span class="glyphicon glyphicon-cog op-setting"></span>
         <span class="glyphicon glyphicon-download-alt op-download"></span>
     </div>
-    <table class="table table-striped table-condensed">
+    <table class="table table-striped table-condensed" id="mywafertable">
         <caption class="tb-caption">Wafer 表</caption>
         <thead>
             <tr>
@@ -74,8 +77,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="m-save-setting">Save</button>
+                <span class="op-notice">* 添加删除操作保存后生效</span>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="m-save-setting">保存</button>
             </div>
         </div>
     </div>
