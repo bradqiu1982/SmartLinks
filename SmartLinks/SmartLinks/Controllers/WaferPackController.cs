@@ -144,7 +144,6 @@ namespace SmartLinks.Controllers
 
         public JsonResult DownloadWaferData()
         {
-            var wafertable = RetrieveWaferData();
             string datestring = DateTime.Now.ToString("yyyyMMdd");
             string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
             if (!Directory.Exists(imgdir))

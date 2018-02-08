@@ -84,6 +84,10 @@ namespace SmartLinks.Models
                     var tempvm = new WaferTableItem();
                     tempvm.SN = Convert.ToString(line[0]);
                     tempvm.WaferNum = Convert.ToString(line[1]);
+                    if (tempvm.WaferNum.Length > 3)
+                    {
+                        tempvm.WaferNum = tempvm.WaferNum.Substring(0, tempvm.WaferNum.Length - 3);
+                    }
                     tempvm.PN = Convert.ToString(line[2]);
                     tetmpres.Add(tempvm);
                 }
