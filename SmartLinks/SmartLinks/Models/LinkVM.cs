@@ -28,7 +28,7 @@ namespace SmartLinks.Models
             sql = sql.Replace("<LinkName>", linkname).Replace("<ReqMachine>",machine);
             DBUtility.ExeLocalSqlNoRes(sql);
 
-            sql = "insert into MachineLink(LinkName,Link,Logo,Comment,ReqMachine,Freqence) values('<LinkName>','<Link>','<Logo>','<Comment>','<ReqMachine>',0)";
+            sql = "insert into MachineLink(LinkName,Link,Logo,Comment,ReqMachine,Freqence) values(N'<LinkName>',N'<Link>',N'<Logo>',N'<Comment>',N'<ReqMachine>',0)";
             sql = sql.Replace("<LinkName>", linkname).Replace("<Link>", link).Replace("<Logo>", logo)
                 .Replace("<Comment>", comment).Replace("<ReqMachine>",machine);
             DBUtility.ExeLocalSqlNoRes(sql);
@@ -37,7 +37,7 @@ namespace SmartLinks.Models
         public static List<MachineLink> RetrieveLinks(string machine)
         {
             var ret = new List<MachineLink>();
-            var sql = "select LinkName,Link,Logo,Comment,Action from MachineLink where ReqMachine = '<ReqMachine>' and LinkName <> '' and Link <> '' order by Freqence desc";
+            var sql = "select LinkName,Link,Logo,Comment,Action from MachineLink where ReqMachine = N'<ReqMachine>' and LinkName <> '' and Link <> '' order by Freqence desc";
             sql = sql.Replace("<ReqMachine>", machine);
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
@@ -84,7 +84,7 @@ namespace SmartLinks.Models
                 StoreLink(linkname, link, logo, comment, machine);
             }
 
-            sql = "update MachineLink set Action = '<Action>'  where ReqMachine = '<ReqMachine>' and LinkName = '<LinkName>'";
+            sql = "update MachineLink set Action = N'<Action>'  where ReqMachine = '<ReqMachine>' and LinkName = '<LinkName>'";
             sql = sql.Replace("<ReqMachine>", machine).Replace("<LinkName>", linkname).Replace("<Action>", LINKACTION.DELETE);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
@@ -94,7 +94,7 @@ namespace SmartLinks.Models
             var sql = "delete from MachineLink where LinkName='' and ReqMachine = '<ReqMachine>' and Appv_1 <> ''";
             sql = sql.Replace("<ReqMachine>", machine);
             DBUtility.ExeLocalSqlNoRes(sql);
-            sql = "insert into MachineLink(ReqMachine,Appv_1) values('<ReqMachine>','nevershow')";
+            sql = "insert into MachineLink(ReqMachine,Appv_1) values(N'<ReqMachine>','nevershow')";
             sql = sql.Replace("<ReqMachine>", machine);
             DBUtility.ExeLocalSqlNoRes(sql);
         }
@@ -132,11 +132,11 @@ namespace SmartLinks.Models
 
         public static void StoreLink(string linkname, string link, string logo,string comment)
         {
-            var sql = "delete from LinkVM where LinkName = '<LinkName>'";
+            var sql = "delete from LinkVM where LinkName = N'<LinkName>'";
             sql = sql.Replace("<LinkName>", linkname);
             DBUtility.ExeLocalSqlNoRes(sql);
 
-            sql = "insert into LinkVM(LinkName,Link,Logo,UpdateTime,Comment) values('<LinkName>','<Link>','<Logo>','<UpdateTime>','<Comment>')";
+            sql = "insert into LinkVM(LinkName,Link,Logo,UpdateTime,Comment) values(N'<LinkName>',N'<Link>',N'<Logo>',N'<UpdateTime>',N'<Comment>')";
             sql = sql.Replace("<LinkName>", linkname).Replace("<Link>", link).Replace("<Logo>", logo)
                 .Replace("<UpdateTime>",DateTime.Now.ToString()).Replace("<Comment>", comment);
             DBUtility.ExeLocalSqlNoRes(sql);

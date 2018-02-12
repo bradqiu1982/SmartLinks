@@ -113,7 +113,7 @@ namespace SmartLinks.Models
             DBUtility.ExeLocalSqlNoRes(sql);
             foreach (var item in waferlist)
             {
-                sql = "insert into NGWafer(WaferNo) values('<WaferNo>')";
+                sql = "insert into NGWafer(WaferNo) values(N'<WaferNo>')";
                 sql = sql.Replace("<WaferNo>", item.Replace("'", "").Trim());
                 DBUtility.ExeLocalSqlNoRes(sql);
             }

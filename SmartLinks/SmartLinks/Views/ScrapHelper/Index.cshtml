@@ -1,0 +1,55 @@
+﻿
+@{
+    ViewBag.Title = "Scrap 助手";
+    Layout = "~/Views/Shared/_Layout4Scrap.cshtml";
+}
+
+
+<link type="text/css" rel="stylesheet" href="~/Content/scrap.css" />
+<link type="text/css" rel="stylesheet" href="~/Content/jquery.dataTables.min.css" />
+<script type="text/javascript" src="~/Scripts/jquery.dataTables.min.js"></script>
+
+<script type="text/javascript" src="~/Scripts/jquery-bootstrap-loading.js"></script>
+<script type="text/javascript" src="~/Scripts/scrap.js"></script>
+<script type="text/javascript">
+    $(function(){
+        Scrap.mainpageinit();
+    })
+</script>
+
+<div class="col-xs-4 mark-lists">
+    <div class="marks-title">
+        <span>请扫描 SN / DateCode :</span>
+    </div>
+    <textarea class="form-control marks" id="marks"></textarea>
+    <div class="marks-submit">
+        <div class="total-marks label-danger col-xs-4" id="total-marks">0</div>
+        <div class="marks-op col-xs-8 ">
+            <input type="button" class="btn btn-success btn-marks-submit" id="btn-marks-submit" value="提交">
+        </div>
+    </div>
+</div>
+<div class="col-xs-8 mark-detail">
+    <div class="mark-detail-op">
+        <span class="glyphicon glyphicon-cog op-setting"></span>
+        <span class="glyphicon glyphicon-download-alt op-download"></span>
+    </div>
+    <table class="table table-striped table-condensed" id="myscraptable">
+        <caption class="tb-caption">Scrap 表</caption>
+        <thead>
+            <tr>
+                <th>SN</th>
+                <th>Date Code</th>
+                <th>PN</th>
+                <th>Which Test</th>
+                <th>Failure Code</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody id="ScrapTableID"></tbody>
+    </table>
+</div>
+
+
+
+

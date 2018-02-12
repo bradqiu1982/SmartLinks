@@ -28,3 +28,30 @@ CREATE TABLE [dbo].[MachineLink] (
 CREATE TABLE [dbo].[NGWafer] (
     [WaferNo]  NVARCHAR (MAX)       DEFAULT ('') NOT NULL
 );
+
+CREATE TABLE [dbo].[PnMainVM] (
+    [PNKey]  NVARCHAR (MAX)       DEFAULT ('') NOT NULL,
+	[PN]  NVARCHAR (MAX)       DEFAULT ('') NOT NULL,
+	[PNPJ]  NVARCHAR (MAX)       DEFAULT ('') NOT NULL,
+	[DefaultResult]  NVARCHAR (MAX)       DEFAULT ('') NOT NULL
+	);
+
+CREATE TABLE [dbo].[PnMESVM] (
+    [PNKey]  NVARCHAR (200)       DEFAULT ('') NOT NULL,
+	[WhichTest]  NVARCHAR (MAX)       DEFAULT ('') NOT NULL,
+	[MESTab]  NVARCHAR (MAX)       DEFAULT ('') NOT NULL,
+	[Bind]  NVARCHAR (200)       DEFAULT ('') NOT NULL
+	);
+
+
+CREATE TABLE [dbo].[PnRulesVM] (
+    [PnKey]  NVARCHAR (200)       DEFAULT ('') NOT NULL,
+	[RuleID]  NVARCHAR (200)       DEFAULT ('') NOT NULL,
+	[WhichTest]  NVARCHAR (200)       DEFAULT ('') NOT NULL,
+	[ErrAbbr]  NVARCHAR (200)       DEFAULT ('') NOT NULL,
+	[Param]  NVARCHAR (200)       DEFAULT ('') NOT NULL,
+	[LowLimit]  NVARCHAR (200)       DEFAULT ('') NOT NULL,
+    [HighLimit]    NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[RuleRes]    NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[CreateDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);

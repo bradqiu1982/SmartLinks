@@ -1,0 +1,210 @@
+﻿html, body {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+}
+
+.body-header {
+    height: 15%;
+    margin-bottom: 1%;
+    border-bottom: 1px solid #00539F;
+}
+
+.logo-img {
+    height: 100%;
+    width: 30%;
+    padding: 2% 5%;
+}
+
+.body-content {
+    height: 80%;
+}
+
+.mark-lists {
+    height: 90%;
+}
+
+.marks {
+    width: 100%;
+    height: 100% !important;
+    max-height: 100%;
+    max-width: 100%;
+    font-size: 18px;
+}
+
+.marks-submit {
+    margin: 2% auto;
+    color: #fff;
+}
+
+.marks-title {
+    font-style:italic;
+}
+
+.total-marks {
+    font-size: 20px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.btn-marks-submit {
+    width: 100%;
+    font-size: 18px !important;
+}
+
+.mark-detail {
+    height: 98%;
+    border: 1px #aaa solid;
+    border-radius: 4px;
+    overflow-y: auto; 
+}
+
+.mark-detail-op {
+    float: right;
+    padding: 5px;
+    font-size: 16px;
+    margin-right:1%;
+}
+
+.op-setting {
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.op-download {
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.tb-caption {
+    text-align: center;
+    font-size: 20px;
+    color: #000;
+    font-weight: bold;
+}
+
+/*rule setting*/
+.nav-sidebar {
+    display: inline-block;
+    height: 100%;
+    padding: 0;
+    border-right: 1px solid #ddd;
+}
+
+.nav-sidebar a {
+    color: #333;
+    -webkit-transition: all 0.08s linear;
+    -moz-transition: all 0.08s linear;
+    -o-transition: all 0.08s linear;
+    transition: all 0.08s linear;
+}
+
+.nav-sidebar .active a {
+    background-color: #428bca;
+    color: #fff;
+    text-shadow: 1px 1px 1px #666;
+}
+
+.nav-sidebar .active a:hover {
+    background-color: #428bca;
+}
+
+.nav-sidebar-icon{
+    text-align: left;
+    font-size: 24px;
+    font-weight: bold;
+    font-style: italic;
+    padding: 10px 15px;
+    border-left: 5px #aaa solid;
+}
+
+.cursor-pointer{
+    cursor: pointer;
+}
+
+.sidebar-show{
+    transform: rotate(90deg); 
+}
+
+.sidebar-hide{
+    transform: unset;
+}
+
+.item-show{
+    display: inline-block;
+    cursor: pointer;
+    width: 80%;
+    margin-left: 5px;
+}
+
+.pn-del{
+    float: right;
+    height: 40px;
+    width: 60px;
+    text-align: center;
+    margin: -10px -15px;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+.pn-add{
+    background-color: #eee;
+    text-align: center;
+    font-size: 20px;
+    color: #888;
+    padding: 8px 15px;
+    cursor: pointer;
+}
+
+.pn-setting-title, .pn-rules-title{
+    width: 100%;
+    background-color: #efefef;
+    border-left: 5px #aa6708 solid;
+    padding: 10px 15px;
+    margin-top: 1%;
+}
+
+.n-row{
+    margin-top: 1%;
+}
+
+#btn-bind{
+    width: 100%;
+}
+
+.tb-total{
+    padding: 6px 12px;
+    text-align:left;
+}
+.input-group-addon{
+    text-align: left;
+    cursor: pointer;
+}
+
+.add-rule-container{
+    font-size: 24px;
+    text-align: right;
+}
+#btn-add-rule{
+    cursor: pointer;
+    color: #000;
+}
+
+.edit-rule, .del-rule{
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.search-container{ 
+    padding: 2px !important; 
+}
+
+.ReturnMainPage {
+    color:cornflowerblue;
+    cursor:pointer;
+}
