@@ -30,6 +30,17 @@ namespace SmartLinks.Models
             TestTime = DateTime.Parse("1982-05-06 10:00:00");
         }
 
+        public SnTestDataVM(string did,string sn,string pn,string wt,string err,string mes, DateTime tm)
+        {
+            DataID = did;
+            ModuleSerialNum = sn;
+            PN = pn;
+            WhichTest = wt;
+            ErrAbbr = err;
+            MESTab = mes;
+            TestTime = tm;
+        }
+
         public string DataID { set; get; }
         public string ModuleSerialNum { set; get; }
         public string PN { set; get; }
@@ -49,19 +60,16 @@ namespace SmartLinks.Models
 
         public static void RetrieveTestData(List<ScrapTableItem> scraptable)
         {
-            var pndict = new Dictionary<string, bool>();
+            var pnkeydict = new Dictionary<string, bool>();
             foreach (var item in scraptable)
             {
-                if (!string.IsNullOrEmpty(item.PN))
+                if (!string.IsNullOrEmpty(item.PNKey) && !pnkeydict.ContainsKey(item.PNKey))
                 {
-                    if (!pndict.ContainsKey(item.PN))
-                    {
-                        pndict.Add(item.PN, true);
-                    }//end if
+                    pnkeydict.Add(item.PNKey, true);
                 }//end if
             }//end foreach
 
-            var mestablist = PnMESVM.RetrievePnMESTabByPNDict(pndict);
+            var mestablist = PnMESVM.RetrievePnMESTabByPNDict(pnkeydict);
 
             var sncond = " ('";
             foreach (var item in scraptable)
@@ -117,19 +125,22 @@ namespace SmartLinks.Models
                 {
                     if (string.Compare(desdata.SN, srcdata.ModuleSerialNum, true) == 0)
                     {
-                        desdata.MesTab = srcdata.MESTab;
-                        desdata.FailureCode = srcdata.ErrAbbr;
-                        desdata.TestTime = srcdata.TestTime.ToString("yyyy-MM-dd HH:mm:ss");
+                        desdata.TestData = new SnTestDataVM(srcdata.DataID, srcdata.ModuleSerialNum
+                            , srcdata.PN, srcdata.WhichTest, srcdata.ErrAbbr, srcdata.MESTab, srcdata.TestTime);
                         break;
                     }
+                }//end foreach
+            }//end foreach
+
+            foreach (var desdata in scraptable)
+            {
+                if (desdata.TestData == null)
+                {
+                    desdata.TestData = new SnTestDataVM();
                 }
             }
-        }
+       }
 
-        public static void RetrieveTestDataField(SnTestDataVM testdata)
-        {
-
-        }
 
     }
 

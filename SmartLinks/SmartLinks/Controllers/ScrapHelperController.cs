@@ -42,9 +42,9 @@ namespace SmartLinks.Controllers
 
             var scraptable = ScrapVM.RetrievePNBySNDC(inputdata);
             SnTestDataVM.RetrieveTestData(scraptable);
-            ScrapVM.RetrieveWhichTest(scraptable);
             ScrapVM.MatchRudeRule(scraptable);
-            //ScrapVM.MatchDetailRule(scraptable);
+            ScrapVM.FinalSetResult(scraptable);
+
             return scraptable;
         }
 
@@ -74,7 +74,7 @@ namespace SmartLinks.Controllers
             {
                 var line1 = string.Empty;
                 line1 = "\"" + item.SN.ToString().Replace("\"", "") + "\"," + "\"" + item.DateCode.Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\","
-                    + "\"" + item.WhichTest.Replace("\"", "") + "\"," + "\"" + item.FailureCode.Replace("\"", "") + "\"," + "\"" + item.Result.Replace("\"", "") + "\",";
+                    + "\"" + item.WhichTest.Replace("\"", "") + "\"," + "\"" + item.TestData.ErrAbbr.Replace("\"", "") + "\"," + "\"" + item.Result.Replace("\"", "") + "\",";
 
                 ret.Add(line1);
             }

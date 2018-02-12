@@ -170,7 +170,8 @@ body {
 }
 
 .n-row{
-    margin-top: 1%;
+    margin-top: 10px;
+    margin-left:2%;
 }
 
 #btn-bind{

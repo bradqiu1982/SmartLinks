@@ -27,10 +27,8 @@ namespace SmartLinks.Models
         public string MESTab { set; get; }
         public string Bind { set; get; }
 
-        public static List<string> RetrievePnMESTabByPNDict(Dictionary<string, bool> pndict)
+        public static List<string> RetrievePnMESTabByPNDict(Dictionary<string, bool> pnkeydict)
         {
-            var pnkeydict = PnMainVM.RetrieveKeyByPNDict(pndict);
-
             var pncond = " ('";
             foreach (var item in pnkeydict)
             {

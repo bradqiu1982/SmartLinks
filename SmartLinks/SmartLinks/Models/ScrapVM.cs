@@ -21,10 +21,9 @@ namespace SmartLinks.Models
             PN = "";
             PNKey = "";
             WhichTest = "";
-            FailureCode = "";
             Result = "";
-            testdata = null;
-            rule = null;
+            TestData = null;
+            MatchedRule = "";
         }
 
         public string SN { set; get; }
@@ -32,16 +31,29 @@ namespace SmartLinks.Models
         public string PN { set; get; }
         public string PNKey { set; get; }
         public string WhichTest { set; get; }
-        public string FailureCode { set; get; }
         public string Result { set; get; }
-        SnTestDataVM testdata { set; get; }
-        PnRulesVM rule { set; get; }
+        public SnTestDataVM TestData { set; get; }
+        public string MatchedRule { set; get; }
+
+        private List<PnRulesVM> rulelist = new List<PnRulesVM>();
+        public List<PnRulesVM> RlueList {
+            set {
+                rulelist.Clear();
+                rulelist.AddRange(value);
+            }
+            get {
+                return rulelist;
+            }
+        }
+
     }
 
     public class ScrapVM
     {
         public static List<ScrapTableItem> RetrievePNBySNDC(List<ScrapTableItem> inputdata)
         {
+            var pnpnkeymap = PnMainVM.PNPNKeyMap();
+
             var hasdatecode = false;
             var hassn = false;
             var ret = new List<ScrapTableItem>();
@@ -108,8 +120,14 @@ namespace SmartLinks.Models
                     else
                     { tempvm.DateCode = Convert.ToString(line[2]); }
 
+                    if (pnpnkeymap.ContainsKey(tempvm.PN)){
+                        tempvm.PNKey = pnpnkeymap[tempvm.PN];
+                    }
+
                     ret.Add(tempvm);
                 }//end if
+
+                
             }
             return ret;
         }
@@ -145,20 +163,57 @@ namespace SmartLinks.Models
         public static void MatchRudeRule(List<ScrapTableItem> scraptable)
         {
             var pnmesmap = PnMESVM.RetriveMESKey2TestDict();
-            var pnpnkeymap = PnMainVM.PNPNKeyMap();
             foreach (var item in scraptable)
             {
-                if (pnpnkeymap.ContainsKey(item.PN))
+                if (!string.IsNullOrEmpty(item.TestData.DataID))
                 {
-                    var pnkey = pnpnkeymap[item.PN];
-                    item.PNKey = pnkey;
-                    if (pnmesmap.ContainsKey(item.MesTab + pnkey))
+                    if (pnmesmap.ContainsKey(item.TestData.MESTab + item.PNKey))
                     {
-                        item.WhichTest = pnmesmap[item.MesTab + pnkey];
+                        item.WhichTest = pnmesmap[item.TestData.MESTab + item.PNKey];
+                        item.RlueList = PnRulesVM.RetrieveRule(item.PNKey, item.WhichTest, item.TestData.ErrAbbr);
                     }
                 }
             }//end foreach
         }
+
+        public static void FinalSetResult(List<ScrapTableItem> scraptable)
+        {
+            var pndefresdict = PnMainVM.PNDefaultResMap();
+            foreach (var item in scraptable)
+            {
+                if (!string.IsNullOrEmpty(item.TestData.DataID)
+                    && string.Compare(item.TestData.ErrAbbr.Trim(), "pass", true) != 0)
+                {
+                    if (item.RlueList.Count == 0)
+                    {
+                        if (pndefresdict.ContainsKey(item.PN)){
+                            item.Result = pndefresdict[item.PN]; }
+                    }
+                    else
+                    {
+                        var hasparam = false;
+                        foreach (var rule in item.RlueList)
+                        {
+                            if (!string.IsNullOrEmpty(rule.Param))
+                            { hasparam = true; }
+                        }
+
+                        if (hasparam)
+                        {
+                            //ADD TEST CASE INTO RULE FIRST
+                            //TO BE DONE
+                        }
+                        else
+                        {
+                            item.Result = item.RlueList[0].RuleRes;
+                            item.MatchedRule = item.PN + "_" + item.WhichTest + "_" + item.TestData.ErrAbbr;
+                        }
+                    }
+                }//end if
+            }//foreach
+        }
+
+
 
     }
 }

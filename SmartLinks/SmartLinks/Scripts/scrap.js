@@ -76,7 +76,9 @@
                    //    $("#ScrapTableID").append('<tr class="danger"><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>' + line.scrapNum + '</td><td>' + line.PN + '</td><td>' + line.Status + '</td></tr>');
                    //}
                    //else {
-                   $("#ScrapTableID").append('<tr><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>' + line.PN + '</td><td>' + line.WhichTest + '</td><td>' + line.FailureCode + '</td><td>' + line.Result + '</td></tr>');
+                   $("#ScrapTableID").append('<tr><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>'
+                       + line.PN + '</td><td>' + line.WhichTest + '</td><td>' + line.TestData.ErrAbbr
+                       + '</td><td>' + line.MatchedRule + '</td><td>' + line.Result + '</td></tr>');
                    //}
                }
                $.bootstrapLoading.end();

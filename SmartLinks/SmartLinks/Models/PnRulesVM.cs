@@ -56,6 +56,27 @@ namespace SmartLinks.Models
             return ret;
         }
 
+        public static List<PnRulesVM> RetrieveRule(string pnkey,string whichtest,string errabbr)
+        {
+            var ret = new List<PnRulesVM>();
+            var sql = "select PnKey,RuleID,WhichTest,ErrAbbr,Param,LowLimit,HighLimit,RuleRes from PnRulesVM "
+                +" where PnKey = @PnKey and WhichTest = @WhichTest and ErrAbbr = @ErrAbbr order by CreateDate DESC";
+
+            var pa = new Dictionary<string, string>();
+            pa.Add("@PnKey", pnkey);
+            pa.Add("@WhichTest", whichtest);
+            pa.Add("@ErrAbbr", errabbr);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, pa);
+
+            foreach (var line in dbret)
+            {
+                ret.Add(new PnRulesVM(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4]), Convert.ToString(line[5])
+                    , Convert.ToString(line[6]), Convert.ToString(line[7])));
+            }
+            return ret;
+        }
+
         public static void AddRule(string pnkey, string ruleid, string wt, string err, string para, string low, string high, string ruleres)
         {
             var sql = "insert into PnRulesVM(PnKey,RuleID,WhichTest,ErrAbbr,Param,LowLimit,HighLimit,RuleRes,CreateDate) values(@PnKey,@RuleID,@WhichTest,@ErrAbbr,@Param,@LowLimit,@HighLimit,@RuleRes,@CreateDate)";
