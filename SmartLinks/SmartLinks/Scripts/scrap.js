@@ -135,6 +135,7 @@
         $(function () {
             stationfill();
             errorabbrfill();
+            testcasefill();
         });
 
         $('body').on('mouseenter', '.pn-del', function () {
@@ -301,10 +302,35 @@
                      });
         }
 
+        var testcasefill = function () {
+            $.post('/ScrapHelper/GetAllTestCase',
+                     {},
+                     function (output) {
+                         if (output.data.length > 0) {
+
+                             $('#m-testcase').autoComplete('destroy');
+                             $('#m-testcase').autoComplete({
+                                 minChars: 0,
+                                 source: function (term, suggest) {
+                                     term = term.toLowerCase();
+                                     var suggestions = [];
+                                     for (i = 0; i < output.data.length; i++) {
+                                         if (output.data[i].toLowerCase().indexOf(term) != -1) {
+                                             suggestions.push(output.data[i]);
+                                         }
+                                     }
+                                     suggest(suggestions);
+                                 }
+                             });
+                         }
+                     });
+        }
+
         $('body').on('click', '#btn-add-rule', function () {
             $('#m-rule-id').val('');
             $('#m-whichtest').val('');
             $('#m-errabbr').val('');
+            $('#m-testcase').val('');
             $('#m-param').val('');
             $('#m-min').val('');
             $('#m-max').val('');
@@ -317,6 +343,7 @@
 
             var whichtest = $.trim($('#m-whichtest').val());
             var errabbr = $.trim($('#m-errabbr').val());
+            var testcase = $.trim($('#m-testcase').val());
             var param = $.trim($('#m-param').val());
             var min = $.trim($('#m-min').val());
             var max = $.trim($('#m-max').val());
@@ -341,6 +368,7 @@
                      pnkey: pnkey,
                      whichtest: whichtest,
                      errabbr: errabbr,
+                     testcase: testcase,
                      param : param,
                      min: min,
                      max: max,
@@ -350,6 +378,7 @@
                          var appendStr = '<tr id="' + output.rid + '">'
                                 + '<td>' + whichtest + '</td>'
                                 + '<td>' + errabbr + '</td>'
+                                + '<td>' + testcase + '</td>'
                                 + '<td>' + param + '</td>'
                                 + '<td>' + min + '</td>'
                                 + '<td>' + max + '</td>'
@@ -372,6 +401,7 @@
                     pnkey: pnkey,
                     whichtest: whichtest,
                     errabbr: errabbr,
+                    testcase: testcase,
                     param : param,
                     min: min,
                     max: max,
@@ -380,10 +410,11 @@
                      if (output.sucess) {
                         $('#' + rule_id).children().eq(0).html(whichtest);
                         $('#' + rule_id).children().eq(1).html(errabbr);
-                        $('#' + rule_id).children().eq(2).html(param);
-                        $('#' + rule_id).children().eq(3).html(min);
-                        $('#' + rule_id).children().eq(4).html(max);
-                        $('#' + rule_id).children().eq(5).html(ruleres);
+                        $('#' + rule_id).children().eq(2).html(testcase);
+                        $('#' + rule_id).children().eq(3).html(param);
+                        $('#' + rule_id).children().eq(4).html(min);
+                        $('#' + rule_id).children().eq(5).html(max);
+                        $('#' + rule_id).children().eq(6).html(ruleres);
                         $('#modal-rule-add').modal('hide');
                         $('#m-rule-id').val('');
                      }
@@ -438,13 +469,15 @@
             var rule_id = $(this).data('id');
             var whichtest = $.trim($('#' + rule_id).children().eq(0).html());
             var errabbr = $.trim($('#' + rule_id).children().eq(1).html());
-            var param = $.trim($('#' + rule_id).children().eq(2).html());
-            var min = $.trim($('#' + rule_id).children().eq(3).html());
-            var max = $.trim($('#' + rule_id).children().eq(4).html());
-            var ruleres = $.trim($('#' + rule_id).children().eq(5).html());
+            var testcase = $.trim($('#' + rule_id).children().eq(2).html());
+            var param = $.trim($('#' + rule_id).children().eq(3).html());
+            var min = $.trim($('#' + rule_id).children().eq(4).html());
+            var max = $.trim($('#' + rule_id).children().eq(5).html());
+            var ruleres = $.trim($('#' + rule_id).children().eq(6).html());
             $('#m-rule-id').val(rule_id);
             $('#m-whichtest').val(whichtest);
             $('#m-errabbr').val(errabbr);
+            $('#m-testcase').val(testcase);
             $('#m-param').val(param);
             $('#m-min').val(min);
             $('#m-max').val(max);

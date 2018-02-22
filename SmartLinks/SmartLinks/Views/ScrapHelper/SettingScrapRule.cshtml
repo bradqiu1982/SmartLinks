@@ -136,6 +136,7 @@
                         <tr>
                             <th>Which Test</th>
                             <th>ErrAbbr</th>
+                            <th>TestCase</th>
                             <th>Param</th>
                             <th>Low Limit</th>
                             <th>High Limit</th>
@@ -149,6 +150,7 @@
                             <tr id="@(ruleitem.RuleID)">
                                 <td>@(ruleitem.WhichTest)</td>
                                 <td>@(ruleitem.ErrAbbr)</td>
+                                <td>@(ruleitem.TestCase)</td>
                                 <td>@(ruleitem.Param)</td>
                                 <td>@(ruleitem.LowLimit)</td>
                                 <td>@(ruleitem.HighLimit)</td>
@@ -220,6 +222,12 @@
                     <label class="col-xs-3 m-label">ErrAbbr<font color="red">*</font></label>
                     <div class="col-xs-8">
                         <input type="text" class="form-control" id="m-errabbr" name="m-errabbr">
+                    </div>
+                </div>
+                <div class="row n-row">
+                    <label class="col-xs-3 m-label">Test Case</label>
+                    <div class="col-xs-8">
+                        <input type="text" class="form-control" id="m-testcase" name="m-testcase">
                     </div>
                 </div>
                 <div class="row n-row">

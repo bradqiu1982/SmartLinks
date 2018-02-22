@@ -43,7 +43,7 @@ namespace SmartLinks.Controllers
             var scraptable = ScrapVM.RetrievePNBySNDC(inputdata);
             SnTestDataVM.RetrieveTestData(scraptable);
             ScrapVM.MatchRudeRule(scraptable);
-            ScrapVM.FinalSetResult(scraptable);
+            ScrapVM.FinalSetResult(scraptable,this);
 
             return scraptable;
         }
@@ -324,6 +324,20 @@ namespace SmartLinks.Controllers
             return ret;
         }
 
+        public JsonResult GetAllTestCase()
+        {
+            var tclist = new List<string>();
+            tclist.Add("ALL");
+            var tlist = PnRulesVM.RetrieveAllTestCase();
+            tclist.AddRange(tlist);
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                data = tclist
+            };
+            return ret;
+        }
+
         public JsonResult UpdatePNRule()
         {
 
@@ -333,6 +347,7 @@ namespace SmartLinks.Controllers
             var pnkey = Request.Form["pnkey"];
             var whichtest = Request.Form["whichtest"];
             var errabbr = Request.Form["errabbr"];
+            var testcase = Request.Form["testcase"];
             var param = Request.Form["param"];
             var min = Request.Form["min"];
             var max = Request.Form["max"];
@@ -340,11 +355,11 @@ namespace SmartLinks.Controllers
 
             if (string.IsNullOrEmpty(rule_id))
             {
-                PnRulesVM.AddRule(pnkey, nruleid, whichtest, errabbr, param, min, max, ruleres);
+                PnRulesVM.AddRule(pnkey, nruleid, whichtest, errabbr, param, min, max, ruleres,testcase);
             }
             else
             {
-                PnRulesVM.EditRule(pnkey, rule_id, whichtest, errabbr, param, min, max, ruleres);
+                PnRulesVM.EditRule(pnkey, rule_id, whichtest, errabbr, param, min, max, ruleres,testcase);
             }
 
             var ret = new JsonResult();

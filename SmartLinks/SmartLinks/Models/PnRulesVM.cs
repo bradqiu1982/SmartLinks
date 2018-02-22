@@ -15,6 +15,7 @@ namespace SmartLinks.Models
         public string LowLimit { set; get; }
         public string HighLimit { set; get; }
         public string RuleRes { set; get; }
+        public string TestCase { set; get; }
 
         public PnRulesVM()
         {
@@ -26,9 +27,10 @@ namespace SmartLinks.Models
             LowLimit = "";
             HighLimit = "";
             RuleRes = "";
+            TestCase = "";
         }
 
-        public PnRulesVM(string pnkey, string ruleid, string wt, string err, string para, string low, string high, string ruleres)
+        public PnRulesVM(string pnkey, string ruleid, string wt, string err, string para, string low, string high, string ruleres,string tc)
         {
             PnKey = pnkey;
             RuleID = ruleid;
@@ -38,12 +40,13 @@ namespace SmartLinks.Models
             LowLimit = low;
             HighLimit = high;
             RuleRes = ruleres;
+            TestCase = tc;
         }
 
         public static List<PnRulesVM> RetrieveRule(string pnkey)
         {
             var ret = new List<PnRulesVM>();
-            var sql = "select PnKey,RuleID,WhichTest,ErrAbbr,Param,LowLimit,HighLimit,RuleRes from PnRulesVM where PnKey = @PnKey order by CreateDate DESC";
+            var sql = "select PnKey,RuleID,WhichTest,ErrAbbr,Param,LowLimit,HighLimit,RuleRes,TestCase from PnRulesVM where PnKey = @PnKey order by CreateDate DESC";
             var pa = new Dictionary<string, string>();
             pa.Add("@PnKey", pnkey);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, pa);
@@ -51,7 +54,7 @@ namespace SmartLinks.Models
             {
                 ret.Add(new PnRulesVM(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2])
                     , Convert.ToString(line[3]), Convert.ToString(line[4]), Convert.ToString(line[5])
-                    , Convert.ToString(line[6]), Convert.ToString(line[7])));
+                    , Convert.ToString(line[6]), Convert.ToString(line[7]), Convert.ToString(line[8])));
             }
             return ret;
         }
@@ -59,8 +62,8 @@ namespace SmartLinks.Models
         public static List<PnRulesVM> RetrieveRule(string pnkey,string whichtest,string errabbr)
         {
             var ret = new List<PnRulesVM>();
-            var sql = "select PnKey,RuleID,WhichTest,ErrAbbr,Param,LowLimit,HighLimit,RuleRes from PnRulesVM "
-                +" where PnKey = @PnKey and WhichTest = @WhichTest and ErrAbbr = @ErrAbbr order by CreateDate DESC";
+            var sql = "select PnKey,RuleID,WhichTest,ErrAbbr,Param,LowLimit,HighLimit,RuleRes,TestCase from PnRulesVM "
+                + " where PnKey = @PnKey and WhichTest = @WhichTest and ErrAbbr = @ErrAbbr order by CreateDate DESC";
 
             var pa = new Dictionary<string, string>();
             pa.Add("@PnKey", pnkey);
@@ -72,14 +75,14 @@ namespace SmartLinks.Models
             {
                 ret.Add(new PnRulesVM(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2])
                     , Convert.ToString(line[3]), Convert.ToString(line[4]), Convert.ToString(line[5])
-                    , Convert.ToString(line[6]), Convert.ToString(line[7])));
+                    , Convert.ToString(line[6]), Convert.ToString(line[7]), Convert.ToString(line[8])));
             }
             return ret;
         }
 
-        public static void AddRule(string pnkey, string ruleid, string wt, string err, string para, string low, string high, string ruleres)
+        public static void AddRule(string pnkey, string ruleid, string wt, string err, string para, string low, string high, string ruleres,string tc)
         {
-            var sql = "insert into PnRulesVM(PnKey,RuleID,WhichTest,ErrAbbr,Param,LowLimit,HighLimit,RuleRes,CreateDate) values(@PnKey,@RuleID,@WhichTest,@ErrAbbr,@Param,@LowLimit,@HighLimit,@RuleRes,@CreateDate)";
+            var sql = "insert into PnRulesVM(PnKey,RuleID,WhichTest,ErrAbbr,Param,LowLimit,HighLimit,RuleRes,CreateDate,TestCase) values(@PnKey,@RuleID,@WhichTest,@ErrAbbr,@Param,@LowLimit,@HighLimit,@RuleRes,@CreateDate,@TestCase)";
             var pa = new Dictionary<string, string>();
             pa.Add("@PnKey",pnkey);
             pa.Add("@RuleID",ruleid);
@@ -90,13 +93,14 @@ namespace SmartLinks.Models
             pa.Add("@HighLimit",high);
             pa.Add("@RuleRes", ruleres);
             pa.Add("@CreateDate", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            pa.Add("@TestCase", tc);
             DBUtility.ExeLocalSqlNoRes(sql,pa);
             PnMESVM.BindMesTab(pnkey, wt);
         }
 
-        public static void EditRule(string pnkey, string ruleid, string wt, string err, string para, string low, string high, string ruleres)
+        public static void EditRule(string pnkey, string ruleid, string wt, string err, string para, string low, string high, string ruleres, string tc)
         {
-            var sql = "update PnRulesVM set WhichTest=@WhichTest,ErrAbbr=@ErrAbbr,Param=@Param,LowLimit=@LowLimit,HighLimit=@HighLimit,RuleRes= @RuleRes where RuleID = @RuleID";
+            var sql = "update PnRulesVM set WhichTest=@WhichTest,ErrAbbr=@ErrAbbr,Param=@Param,LowLimit=@LowLimit,HighLimit=@HighLimit,RuleRes= @RuleRes,TestCase= @TestCase where RuleID = @RuleID";
             var pa = new Dictionary<string, string>();
             pa.Add("@RuleID", ruleid);
             pa.Add("@WhichTest", wt);
@@ -105,8 +109,21 @@ namespace SmartLinks.Models
             pa.Add("@LowLimit", low);
             pa.Add("@HighLimit", high);
             pa.Add("@RuleRes", ruleres);
+            pa.Add("@TestCase", tc);
             DBUtility.ExeLocalSqlNoRes(sql, pa);
             PnMESVM.BindMesTab(pnkey, wt);
+        }
+
+        public static List<string> RetrieveAllTestCase()
+        {
+            var ret = new List<string>();
+            var sql = "select distinct TestCase from PnRulesVM where TestCase <> '' order by TestCase";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                ret.Add(Convert.ToString(line[0]));
+            }
+            return ret;
         }
 
         public static void RemoveRule(string ruleid)

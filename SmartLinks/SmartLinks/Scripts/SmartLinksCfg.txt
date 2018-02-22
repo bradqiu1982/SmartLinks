@@ -1,1 +1,4 @@
-﻿
+﻿TRACEVIEWFOLDER:::\\cn-traceview\Traceview
+SHAREFOLDERUSER:::brad.qiu
+SHAREFOLDERDOMIN:::china
+SHAREFOLDERPWD:::wangle@123456

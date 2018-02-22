@@ -28,9 +28,10 @@ namespace SmartLinks.Models
             ErrAbbr = "";
             MESTab = "";
             TestTime = DateTime.Parse("1982-05-06 10:00:00");
+            TestStation = "";
         }
 
-        public SnTestDataVM(string did,string sn,string pn,string wt,string err,string mes, DateTime tm)
+        public SnTestDataVM(string did,string sn,string pn,string wt,string err,string mes, DateTime tm,string ts)
         {
             DataID = did;
             ModuleSerialNum = sn;
@@ -39,6 +40,7 @@ namespace SmartLinks.Models
             ErrAbbr = err;
             MESTab = mes;
             TestTime = tm;
+            TestStation = ts;
         }
 
         public string DataID { set; get; }
@@ -48,7 +50,7 @@ namespace SmartLinks.Models
         public string ErrAbbr { set; get; }
         public string MESTab { set; get; }
         public DateTime TestTime { set; get; }
-
+        public string TestStation { set; get; }
 
         private List<DataField> pdatafield = new List<DataField>();
         public List<DataField> DFieldList {
@@ -85,7 +87,7 @@ namespace SmartLinks.Models
             var ret = new List<SnTestDataVM>();
             foreach (var tabname in mestablist)
             {
-                var sql = "select dc_<DCTABLE>HistoryId,ModuleSerialNum, ErrAbbr, TestTimeStamp,assemblypartnum,WhichTest from "
+                var sql = "select dc_<DCTABLE>HistoryId,ModuleSerialNum, ErrAbbr, TestTimeStamp,assemblypartnum,WhichTest,TestStation from "
                     + " insite.dc_<DCTABLE> (nolock)  where ModuleSerialNum in <SNCOND>";
                 sql = sql.Replace("<SNCOND>", sncond).Replace("<DCTABLE>",tabname);
                 var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
@@ -98,6 +100,7 @@ namespace SmartLinks.Models
                     data.TestTime = Convert.ToDateTime(line[3]);
                     data.PN = Convert.ToString(line[4]);
                     data.WhichTest = Convert.ToString(line[5]);
+                    data.TestStation = Convert.ToString(line[6]);
                     data.MESTab = tabname;
                     ret.Add(data);
                 }
@@ -126,7 +129,7 @@ namespace SmartLinks.Models
                     if (string.Compare(desdata.SN, srcdata.ModuleSerialNum, true) == 0)
                     {
                         desdata.TestData = new SnTestDataVM(srcdata.DataID, srcdata.ModuleSerialNum
-                            , srcdata.PN, srcdata.WhichTest, srcdata.ErrAbbr, srcdata.MESTab, srcdata.TestTime);
+                            , srcdata.PN, srcdata.WhichTest, srcdata.ErrAbbr, srcdata.MESTab, srcdata.TestTime,srcdata.TestStation);
                         break;
                     }
                 }//end foreach

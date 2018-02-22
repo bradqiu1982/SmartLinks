@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Web;
+using System.Web.Mvc;
 
 namespace SmartLinks.Models
 {
@@ -176,7 +180,108 @@ namespace SmartLinks.Models
             }//end foreach
         }
 
-        public static void FinalSetResult(List<ScrapTableItem> scraptable)
+        private static bool MatchRuleWithParam(ScrapTableItem data, PnRulesVM rule,Controller ctrl)
+        {
+            var traceviewfilelist = TraceViewVM.LoadTraceView2Local(data.TestData.TestStation,data.TestData.ModuleSerialNum
+                ,data.WhichTest,data.TestData.TestTime.ToString("yyyy-MM-dd HH:mm:ss"),ctrl);
+
+            if (traceviewfilelist.Count == 0)
+            {
+                return false;
+            }
+
+            var traceviewdata = new List<TraceViewData>();
+            bool wildmatch = true;
+            if (IsDigitsOnly(rule.LowLimit))
+            {
+                wildmatch = false;
+            }
+
+            foreach (var filename in traceviewfilelist)
+            {
+                var testcase = rule.TestCase;
+                if (string.IsNullOrEmpty(rule.TestCase))
+                { testcase = "ALL"; }
+
+                var tempret = TraceViewVM.RetrieveTestDataFromTraceView(wildmatch, filename, testcase, rule.Param);
+                if (tempret.Count > 0)
+                {
+                    traceviewdata.AddRange(tempret);
+                }
+            }
+
+            if (traceviewdata.Count == 0)
+            {
+                return false;
+            }
+
+            if (wildmatch)
+            {
+                if (rule.LowLimit.Contains("##"))
+                {
+                    try
+                    {
+                        var lowhigh = rule.LowLimit.Split(new string[] { "##" }, StringSplitOptions.RemoveEmptyEntries);
+                        var low = 0.0;
+                        var high = 0.0;
+                        if (lowhigh[0].ToUpper().Contains("0X"))
+                        {
+                            var parsed = long.Parse(lowhigh[0].ToUpper().Replace("0X", ""), NumberStyles.AllowHexSpecifier);
+                            low = Convert.ToDouble(parsed);
+                        }
+                        else
+                        {
+                            low = Convert.ToDouble(lowhigh[0]);
+                        }
+                        if (lowhigh[1].ToUpper().Contains("0X"))
+                        {
+                            var parsed = long.Parse(lowhigh[1].ToUpper().Replace("0X", ""), NumberStyles.AllowHexSpecifier);
+                            high = Convert.ToDouble(parsed);
+                        }
+                        else
+                        {
+                            high = Convert.ToDouble(lowhigh[1]);
+                        }
+
+                        foreach (var tdata in traceviewdata)
+                        {
+                            if (tdata.dValue >= low && tdata.dValue <= high)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    catch (Exception E) { }
+                }
+                else
+                {
+                    foreach (var tdata in traceviewdata)
+                    {
+                        if (string.Compare(tdata.Value.ToUpper().Trim(), rule.LowLimit.ToUpper().Trim()) != 0)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (var tdata in traceviewdata)
+                {
+                    var low = Convert.ToDouble(rule.LowLimit);
+                    var high = Convert.ToDouble(rule.HighLimit);
+                    if (tdata.dValue >= low && tdata.dValue <= high)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+
+        }
+
+        public static void FinalSetResult(List<ScrapTableItem> scraptable, Controller ctrl)
         {
             var pndefresdict = PnMainVM.PNDefaultResMap();
             foreach (var item in scraptable)
@@ -186,27 +291,37 @@ namespace SmartLinks.Models
                 {
                     if (item.RlueList.Count == 0)
                     {
-                        if (pndefresdict.ContainsKey(item.PN)){
-                            item.Result = pndefresdict[item.PN]; }
+                        if (pndefresdict.ContainsKey(item.PN))
+                        {
+                            item.Result = pndefresdict[item.PN];
+                            item.MatchedRule = "DEFAULT";
+                        }
                     }
                     else
                     {
-                        var hasparam = false;
                         foreach (var rule in item.RlueList)
                         {
                             if (!string.IsNullOrEmpty(rule.Param))
-                            { hasparam = true; }
+                            {
+                                if (MatchRuleWithParam(item,rule,ctrl))
+                                {
+                                    item.Result = rule.RuleRes;
+                                    item.MatchedRule = item.PN + "_" + item.WhichTest + "_" + item.TestData.ErrAbbr + "_" + rule.Param;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                item.Result = rule.RuleRes;
+                                item.MatchedRule = item.PN + "_" + item.WhichTest + "_" + item.TestData.ErrAbbr;
+                                break;
+                            }
                         }
 
-                        if (hasparam)
+                        if (string.IsNullOrEmpty(item.Result))
                         {
-                            //ADD TEST CASE INTO RULE FIRST
-                            //TO BE DONE
-                        }
-                        else
-                        {
-                            item.Result = item.RlueList[0].RuleRes;
-                            item.MatchedRule = item.PN + "_" + item.WhichTest + "_" + item.TestData.ErrAbbr;
+                            item.Result = pndefresdict[item.PN];
+                            item.MatchedRule = "DEFAULT";
                         }
                     }
                 }//end if
@@ -214,6 +329,6 @@ namespace SmartLinks.Models
         }
 
 
-
     }
+
 }
