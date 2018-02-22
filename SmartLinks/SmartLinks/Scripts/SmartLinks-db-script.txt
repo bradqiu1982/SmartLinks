@@ -56,3 +56,14 @@ CREATE TABLE [dbo].[PnRulesVM] (
 	[TestCase]    NVARCHAR (200) DEFAULT ('') NOT NULL,
 	[CreateDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
 );
+
+CREATE TABLE [dbo].[ScrapHistoryVM] (
+    [SN]  NVARCHAR (200)       DEFAULT ('') NOT NULL,
+	[DateCode]  NVARCHAR (200)       DEFAULT ('') NOT NULL,
+	[PN]  NVARCHAR (200)       DEFAULT ('') NOT NULL,
+	[WhichTest]  NVARCHAR (200)       DEFAULT ('') NOT NULL,
+	[ErrAbbr]  NVARCHAR (200)       DEFAULT ('') NOT NULL,
+	[MatchRule]  NVARCHAR (MAX)       DEFAULT ('') NOT NULL,
+    [Result]    NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[CreateDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);

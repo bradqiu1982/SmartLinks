@@ -57,6 +57,11 @@ body {
     font-size: 18px !important;
 }
 
+.btn-marks-clean {
+    width: 100%;
+    font-size: 18px !important;
+}
+
 .mark-detail {
     height: 98%;
     border: 1px #aaa solid;
@@ -77,6 +82,10 @@ body {
 }
 
 .op-download {
+    margin-left: 5px;
+    cursor: pointer;
+}
+.op-historydownload {
     margin-left: 5px;
     cursor: pointer;
 }

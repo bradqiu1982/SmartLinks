@@ -51,6 +51,10 @@ namespace SmartLinks.Controllers
         public JsonResult QueryScrap()
         {
             var scraptable = RetrieveScrapData();
+            foreach (var item in scraptable)
+            {
+                ScrapHistoryVM.AddHistory(item);
+            }
 
             var ret = new JsonResult();
             ret.Data = new
@@ -67,14 +71,14 @@ namespace SmartLinks.Controllers
             var wafertable = RetrieveScrapData();
             var ret = new List<string>();
 
-            var line = "SN,Date Code,PN,Site,Failure Code,Result";
+            var line = "SN,Date Code,PN,Site,Failure Code,Match Rule,Result";
             ret.Add(line);
 
             foreach (var item in wafertable)
             {
                 var line1 = string.Empty;
                 line1 = "\"" + item.SN.ToString().Replace("\"", "") + "\"," + "\"" + item.DateCode.Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\","
-                    + "\"" + item.WhichTest.Replace("\"", "") + "\"," + "\"" + item.TestData.ErrAbbr.Replace("\"", "") + "\"," + "\"" + item.Result.Replace("\"", "") + "\",";
+                    + "\"" + item.WhichTest.Replace("\"", "") + "\"," + "\"" + item.TestData.ErrAbbr.Replace("\"", "") + "\"," + "\"" + item.MatchedRule.Replace("\"", "") + "\"," + "\"" + item.Result.Replace("\"", "") + "\",";
 
                 ret.Add(line1);
             }
@@ -96,6 +100,58 @@ namespace SmartLinks.Controllers
             var url = "/userfiles/docs/" + datestring + "/" + fn;
 
             var lines = PrepeareSNScrapReport();
+
+            var wholefile = "";
+            foreach (var l in lines)
+            {
+                wholefile = wholefile + l + "\r\n";
+            }
+            System.IO.File.WriteAllText(filename, wholefile, Encoding.UTF8);
+
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                sucess = true,
+                data = url
+            };
+            return ret;
+        }
+
+        private List<string> PrepeareSNScrapHistory()
+        {
+            var historytable = ScrapHistoryVM.RetrieveHistory();
+            var ret = new List<string>();
+
+            var line = "SN,Date Code,PN,Site,Failure Code,Match Rule,Result,Create Date";
+            ret.Add(line);
+
+            foreach (var item in historytable)
+            {
+                var line1 = string.Empty;
+                line1 = "\"" + item.SN.ToString().Replace("\"", "") + "\"," + "\"" + item.DateCode.Replace("\"", "") + "\"," + "\"" + item.PN.Replace("\"", "") + "\","
+                    + "\"" + item.WhichTest.Replace("\"", "") + "\"," + "\"" + item.ErrAbbr.Replace("\"", "") + "\"," + "\"" + item.MatchRule.Replace("\"", "")
+                    + "\"," + "\"" + item.Result.Replace("\"", "") + "\"," + "\"" + item.CreateDate.ToString("yyyy-MM-dd HH:mm:ss").Replace("\"", "") + "\",";
+
+                ret.Add(line1);
+            }
+
+            return ret;
+        }
+
+        public JsonResult DownloadScrapHistory()
+        {
+            string datestring = DateTime.Now.ToString("yyyyMMdd");
+            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+            if (!Directory.Exists(imgdir))
+            {
+                Directory.CreateDirectory(imgdir);
+            }
+
+            var fn = "Scrap_History_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
+            var filename = imgdir + fn;
+            var url = "/userfiles/docs/" + datestring + "/" + fn;
+
+            var lines = PrepeareSNScrapHistory();
 
             var wholefile = "";
             foreach (var l in lines)

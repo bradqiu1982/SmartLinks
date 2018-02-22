@@ -72,14 +72,22 @@
 
                for (idx = 0; idx < datacont; idx++) {
                    var line = output.data[idx];
-                   //if (line.Status === "NG") {
-                   //    $("#ScrapTableID").append('<tr class="danger"><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>' + line.scrapNum + '</td><td>' + line.PN + '</td><td>' + line.Status + '</td></tr>');
-                   //}
-                   //else {
-                   $("#ScrapTableID").append('<tr><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>'
+                   if (line.Result === "直接报废") {
+                       $("#ScrapTableID").append('<tr class="danger"><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>'
                        + line.PN + '</td><td>' + line.WhichTest + '</td><td>' + line.TestData.ErrAbbr
                        + '</td><td>' + line.MatchedRule + '</td><td>' + line.Result + '</td></tr>');
-                   //}
+                   }
+                   else if (line.Result === "隔离报废")
+                   {
+                       $("#ScrapTableID").append('<tr class="warning"><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>'
+                      + line.PN + '</td><td>' + line.WhichTest + '</td><td>' + line.TestData.ErrAbbr
+                      + '</td><td>' + line.MatchedRule + '</td><td>' + line.Result + '</td></tr>');
+                   }
+                   else {
+                       $("#ScrapTableID").append('<tr class="success"><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>'
+                       + line.PN + '</td><td>' + line.WhichTest + '</td><td>' + line.TestData.ErrAbbr
+                       + '</td><td>' + line.MatchedRule + '</td><td>' + line.Result + '</td></tr>');
+                   }
                }
                $.bootstrapLoading.end();
                myscraptable = $('#myscraptable').DataTable({
@@ -93,6 +101,11 @@
            })
         }
 
+        
+        $('body').on('click', '#btn-marks-clean', function () {
+            $('#total-marks').html(0);
+            $('#marks').val('');
+        })
 
         $('body').on('click', '#btn-marks-submit', function () {
             RefreshscrapTable(true);
@@ -129,6 +142,15 @@
                 window.open(output.data, '_blank');
             })
         })
+
+        $('body').on('click', '.op-historydownload', function () {
+            $.post('/ScrapHelper/DownloadScrapHistory',
+            {
+            }, function (output) {
+                window.open(output.data, '_blank');
+            })
+        })
+
     }
 
     var settingpage = function () {
