@@ -6,15 +6,41 @@ using System.Web.Mvc;
 using SmartLinks.Models;
 using System.Text;
 using System.IO;
-
+using System.Net;
 
 namespace SmartLinks.Controllers
 {
     public class ScrapHelperController : Controller
     {
+        public static string DetermineCompName(string IP)
+        {
+            try
+            {
+                IPAddress myIP = IPAddress.Parse(IP);
+                IPHostEntry GetIPHost = Dns.GetHostEntry(myIP);
+                List<string> compName = GetIPHost.HostName.ToString().Split('.').ToList();
+                return compName.First();
+            }
+            catch (Exception ex)
+            { return string.Empty; }
+        }
+
+        private void UserAuth()
+        {
+            string IP = Request.UserHostName;
+            var compName = DetermineCompName(IP);
+            ViewBag.compName = compName;
+            var glbcfg = CfgUtility.GetSysConfig(this);
+            if (glbcfg.ContainsKey(ViewBag.compName.ToUpper()))
+            {
+                ViewBag.LogAdmin = true;
+            }
+        }
+        
         // GET: ScrapHelper
         public ActionResult Index()
         {
+            UserAuth();
             return View();
         }
 

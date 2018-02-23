@@ -34,9 +34,12 @@
 </div>
 <div class="col-xs-8 mark-detail">
     <div class="mark-detail-op">
-        <span class="glyphicon glyphicon-cog op-setting"></span>
-        <span class="glyphicon glyphicon-download-alt op-download"></span>
-        <span class="glyphicon glyphicon-cloud-download op-historydownload"></span>
+        <span class="glyphicon glyphicon-cog op-setting" data-toggle="tooltip" title="Setting Rule"></span>
+        <span class="glyphicon glyphicon-download-alt op-download" data-toggle="tooltip" title="DownLoad Table"></span>
+        @if (ViewBag.LogAdmin != null && ViewBag.LogAdmin)
+        {
+            <span class="glyphicon glyphicon-cloud-download op-historydownload" data-toggle="tooltip" title="DownLoad Scrap History"></span>
+        }
     </div>
     <table class="table table-striped table-condensed" id="myscraptable">
         <caption class="tb-caption">Scrap 表</caption>
