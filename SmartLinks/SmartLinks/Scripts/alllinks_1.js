@@ -10,9 +10,9 @@ var lightBox = function () {
         var default_imgs = new Array();
         var default_imgs_ie8 = new Array();
         var default_links_ie8 = new Array();
-        default_imgs = ['./Content/images/peace.png', './Content/images/data.png', './Content/images/daisy.png', './Content/images/clover.png'];
-        default_imgs_ie8 = ['./Content/images/ie8/peace.png', './Content/images/ie8/data.png', './Content/images/ie8/daisy.png', './Content/images/ie8/clover.png'];
-        default_links_ie8 = ['AGILE', 'BR', 'DOMINO', 'ERP', 'FA', 'TRACEVIEW', 'DAISY', 'OA', 'CLOVER'];
+        default_imgs = ['./Content/images/peace.png', './Content/images/data.png', './Content/images/daisy.png', './Content/images/clover.png', './Content/images/scrap.png'];
+        default_imgs_ie8 = ['./Content/images/ie8/peace.png', './Content/images/ie8/data.png', './Content/images/ie8/daisy.png', './Content/images/ie8/clover.png', './Content/images/ie8/scrap.png'];
+        default_links_ie8 = ['AGILE', 'BR', 'DOMINO', 'ERP', 'FA', 'TRACEVIEW', 'DAISY', 'OA', 'CLOVER', 'SCRAP'];
 
         $.post('/SmartLinks/AllData',
         {

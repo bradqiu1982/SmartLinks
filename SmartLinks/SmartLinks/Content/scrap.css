@@ -97,6 +97,21 @@ body {
     font-weight: bold;
 }
 
+.tr-danger {
+    background-color: #f6baba;
+    border-color: #eed3d7;
+}
+
+.tr-warning {
+    background-color: #f5e8ab;
+    border-color: #fbeed5;
+}
+
+.tr-success {
+    background-color: #98dd7f;
+    border-color: #d6e9c6;
+}
+
 /*rule setting*/
 .nav-sidebar {
     display: inline-block;

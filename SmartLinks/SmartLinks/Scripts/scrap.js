@@ -73,18 +73,18 @@
                for (idx = 0; idx < datacont; idx++) {
                    var line = output.data[idx];
                    if (line.Result === "直接报废") {
-                       $("#ScrapTableID").append('<tr class="danger"><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>'
+                       $("#ScrapTableID").append('<tr class="tr-danger"><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>'
                        + line.PN + '</td><td>' + line.WhichTest + '</td><td>' + line.TestData.ErrAbbr
                        + '</td><td>' + line.MatchedRule + '</td><td>' + line.Result + '</td></tr>');
                    }
                    else if (line.Result === "隔离报废")
                    {
-                       $("#ScrapTableID").append('<tr class="warning"><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>'
+                       $("#ScrapTableID").append('<tr class="tr-warning"><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>'
                       + line.PN + '</td><td>' + line.WhichTest + '</td><td>' + line.TestData.ErrAbbr
                       + '</td><td>' + line.MatchedRule + '</td><td>' + line.Result + '</td></tr>');
                    }
                    else {
-                       $("#ScrapTableID").append('<tr class="success"><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>'
+                       $("#ScrapTableID").append('<tr class="tr-success"><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>'
                        + line.PN + '</td><td>' + line.WhichTest + '</td><td>' + line.TestData.ErrAbbr
                        + '</td><td>' + line.MatchedRule + '</td><td>' + line.Result + '</td></tr>');
                    }
