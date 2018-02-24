@@ -105,6 +105,11 @@
         $('body').on('click', '#btn-marks-clean', function () {
             $('#total-marks').html(0);
             $('#marks').val('');
+            if (myscraptable) {
+                myscraptable.destroy();
+                myscraptable = null;
+            }
+            $("#ScrapTableID").empty();
         })
 
         $('body').on('click', '#btn-marks-submit', function () {

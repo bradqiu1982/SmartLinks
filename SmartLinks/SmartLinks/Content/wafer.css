@@ -57,6 +57,11 @@ body {
     font-size: 18px !important;
 }
 
+.btn-marks-clean {
+    width: 100%;
+    font-size: 18px !important;
+}
+
 .mark-detail {
     height: 98%;
     border: 1px #aaa solid;

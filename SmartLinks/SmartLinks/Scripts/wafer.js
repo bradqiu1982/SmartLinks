@@ -105,6 +105,16 @@
            RefreshWaferTable(true);
        })
 
+       $('body').on('click', '#btn-marks-clean', function () {
+           $('#total-marks').html(0);
+           $('#marks').val('');
+           if (mywafertable) {
+               mywafertable.destroy();
+               mywafertable = null;
+           }
+           $("#WaferTableID").empty();
+       })
+
        $('body').on('click', '.op-setting', function(){
             $('#modal-op-setting').modal('show');
        })
