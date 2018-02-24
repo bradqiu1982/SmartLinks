@@ -40,6 +40,10 @@ namespace SmartLinks.Models
             pncond = pncond.Substring(0, pncond.Length - 2);
             pncond = pncond + ") ";
 
+            if (pncond.Length < 4) {
+                return new List<string>();
+            }
+
             var mesdict = new Dictionary<string, bool>();
             var sql = "select MESTab from PnMESVM where PNKey in <PNKeyCond> and Bind = 'TRUE'";
             sql = sql.Replace("<PNKeyCond>", pncond);
