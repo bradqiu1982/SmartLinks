@@ -68,6 +68,7 @@ namespace SmartLinks.Models
             sncond = sncond.Substring(0, sncond.Length - 2);
             sncond = sncond + ") ";
 
+            var queryedsndict = new Dictionary<string, bool>();
             var tetmpres = new List<WaferTableItem>();
 
             var sql = "SELECT distinct c.ContainerName as SN,dc.[ParamValueString] as wafer,pb.productname MaterialPN FROM insite.container c with(nolock)"
@@ -99,30 +100,57 @@ namespace SmartLinks.Models
                 }
                 tempvm.PN = Convert.ToString(line[2]);
                 tetmpres.Add(tempvm);
+
+                if (!queryedsndict.ContainsKey(tempvm.SN.Trim().ToUpper()))
+                {
+                    queryedsndict.Add(tempvm.SN.Trim().ToUpper(), true);
+                }
             }
 
-            //var sql = "select ToContainer,Wafer,FromProductName,FromPNDescription from [PDMS].[dbo].[ComponentIssueSummary] where ToContainer in <SNCOND> and Wafer is not null and FromPNDescription is not null order by Wafer";
-            //sql = sql.Replace("<SNCOND>", sncond);
+            var leftsnlist = new List<string>();
+            foreach (var item in desdata)
+            {
+                if (!string.IsNullOrEmpty(item.SN.Trim())
+                    && !queryedsndict.ContainsKey(item.SN.Trim().ToUpper()))
+                {
+                    leftsnlist.Add(item.SN.Trim());
+                }
+            }
 
-            //var dbret = DBUtility.ExeMESReportSqlWithRes(sql);
-            //foreach(var line in dbret)
-            //{
-            //    var pndesc = Convert.ToString(line[3]);
 
-            //    if ((pndesc.ToUpper().Contains("LD,") && pndesc.ToUpper().Contains("VCSEL,"))
-            //            || (pndesc.ToUpper().Contains("CSG") && (pndesc.ToUpper().Contains("INGAAS VCSEL") || pndesc.ToUpper().Contains("VCSEL ARRAY"))))
-            //    {
-            //        var tempvm = new WaferTableItem();
-            //        tempvm.SN = Convert.ToString(line[0]);
-            //        tempvm.WaferNum = Convert.ToString(line[1]);
-            //        if (tempvm.WaferNum.Length > 3)
-            //        {
-            //            tempvm.WaferNum = tempvm.WaferNum.Substring(0, tempvm.WaferNum.Length - 3);
-            //        }
-            //        tempvm.PN = Convert.ToString(line[2]);
-            //        tetmpres.Add(tempvm);
-            //    }
-            //}
+            if (leftsnlist.Count > 0)
+            {
+                sncond = " ('";
+                foreach (var item in leftsnlist)
+                {
+                    sncond = sncond + item + "','";
+                }
+                sncond = sncond.Substring(0, sncond.Length - 2);
+                sncond = sncond + ") ";
+
+                sql = "select ToContainer,Wafer,FromProductName,FromPNDescription from [PDMS].[dbo].[ComponentIssueSummary] where ToContainer in <SNCOND> and Wafer is not null and FromPNDescription is not null order by Wafer";
+                sql = sql.Replace("<SNCOND>", sncond);
+
+                dbret = DBUtility.ExeMESReportSqlWithRes(sql);
+                foreach (var line in dbret)
+                {
+                    var pndesc = Convert.ToString(line[3]);
+
+                    if ((pndesc.ToUpper().Contains("LD,") && pndesc.ToUpper().Contains("VCSEL,"))
+                            || (pndesc.ToUpper().Contains("CSG") && (pndesc.ToUpper().Contains("INGAAS VCSEL") || pndesc.ToUpper().Contains("VCSEL ARRAY"))))
+                    {
+                        var tempvm = new WaferTableItem();
+                        tempvm.SN = Convert.ToString(line[0]);
+                        tempvm.WaferNum = Convert.ToString(line[1]);
+                        if (tempvm.WaferNum.Length > 3)
+                        {
+                            tempvm.WaferNum = tempvm.WaferNum.Substring(0, tempvm.WaferNum.Length - 3);
+                        }
+                        tempvm.PN = Convert.ToString(line[2]);
+                        tetmpres.Add(tempvm);
+                    }
+                }
+            }
 
             foreach (var des in desdata)
             {

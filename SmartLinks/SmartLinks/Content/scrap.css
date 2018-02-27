@@ -98,17 +98,17 @@ body {
 }
 
 .tr-danger {
-    background-color: #f6baba;
+    background-color: #f6baba!important;
     border-color: #eed3d7;
 }
 
 .tr-warning {
-    background-color: #f5e8ab;
+    background-color: #f5e8ab!important;
     border-color: #fbeed5;
 }
 
 .tr-success {
-    background-color: #98dd7f;
+    background-color: #98dd7f!important;
     border-color: #d6e9c6;
 }
 
