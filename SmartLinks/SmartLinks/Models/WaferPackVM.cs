@@ -71,41 +71,34 @@ namespace SmartLinks.Models
             var queryedsndict = new Dictionary<string, bool>();
             var tetmpres = new List<WaferTableItem>();
 
-            var sql = "SELECT distinct c.ContainerName as SN,dc.[ParamValueString] as wafer,pb.productname MaterialPN FROM insite.container c with(nolock)"
-            + " inner join insite.currentStatus cs(nolock) on c.currentStatusId = cs.currentStatusId "
-            + "inner join insite.workflowstep ws(nolock) on cs.WorkflowStepId = ws.WorkflowStepId "
-            + "inner join insite.historyMainline hml with (nolock) on c.containerId = hml.containerId "
-            + "inner join insite.componentIssueHistory cih with (nolock) on hml.historyMainlineId=cih.historyMainlineId "
-            + "inner join insite.issueHistoryDetail ihd with (nolock) on cih.componentIssueHistoryId = ihd.componentIssueHistoryId "
-            + "inner join insite.issueActualsHistory iah with (nolock) on ihd.issueHistoryDetailId = iah.issueHistoryDetailId "
-            + "inner join insite.container cFrom with (nolock) on iah.fromContainerId = cFrom.containerId "
-            + "inner join insite.product p with (nolock) on cFrom.productId = p.productId "
-            + "inner join insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId "
-            + "inner join insite.historyMainline hmll with (nolock)on cFrom.containerId=hmll.historyid "
-            + "inner join insite.product pp with (nolock) on c.productid=pp.productid "
-            + "left outer join insite.productfamily pf (nolock) on pp.productFamilyId = pf.productFamilyId "
-            + "inner join insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid "
-            + "inner join[InsiteDB].[insite].[dc_AOC_ManualInspection] dc (nolock) on hmll.[HistoryMainlineId]= dc.[HistoryMainlineId] "
-            + "where dc.parametername= 'Trace_ID'  and p.description like '%VCSEL%'  and c.containername in <SNCOND> order by c.ContainerName,pb.productname ";
+            var sql = "select ToContainer,Wafer,FromProductName,FromPNDescription from [PDMS].[dbo].[ComponentIssueSummary] where ToContainer in <SNCOND> and Wafer is not null and FromPNDescription is not null order by Wafer";
             sql = sql.Replace("<SNCOND>", sncond);
-            var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+
+            var dbret = DBUtility.ExeMESReportSqlWithRes(sql);
             foreach (var line in dbret)
             {
-                var tempvm = new WaferTableItem();
-                tempvm.SN = Convert.ToString(line[0]);
-                tempvm.WaferNum = Convert.ToString(line[1]);
-                if (tempvm.WaferNum.Length > 3)
-                {
-                    tempvm.WaferNum = tempvm.WaferNum.Substring(0, tempvm.WaferNum.Length - 3);
-                }
-                tempvm.PN = Convert.ToString(line[2]);
-                tetmpres.Add(tempvm);
+                var pndesc = Convert.ToString(line[3]);
 
-                if (!queryedsndict.ContainsKey(tempvm.SN.Trim().ToUpper()))
+                if ((pndesc.ToUpper().Contains("LD,") && pndesc.ToUpper().Contains("VCSEL,"))
+                        || (pndesc.ToUpper().Contains("CSG") && (pndesc.ToUpper().Contains("INGAAS VCSEL") || pndesc.ToUpper().Contains("VCSEL ARRAY"))))
                 {
-                    queryedsndict.Add(tempvm.SN.Trim().ToUpper(), true);
+                    var tempvm = new WaferTableItem();
+                    tempvm.SN = Convert.ToString(line[0]);
+                    tempvm.WaferNum = Convert.ToString(line[1]);
+                    if (tempvm.WaferNum.Length > 3)
+                    {
+                        tempvm.WaferNum = tempvm.WaferNum.Substring(0, tempvm.WaferNum.Length - 3);
+                    }
+                    tempvm.PN = Convert.ToString(line[2]);
+                    tetmpres.Add(tempvm);
+
+                    if (!queryedsndict.ContainsKey(tempvm.SN.Trim().ToUpper()))
+                    {
+                        queryedsndict.Add(tempvm.SN.Trim().ToUpper(), true);
+                    }
                 }
             }
+
 
             var leftsnlist = new List<string>();
             foreach (var item in desdata)
@@ -128,27 +121,35 @@ namespace SmartLinks.Models
                 sncond = sncond.Substring(0, sncond.Length - 2);
                 sncond = sncond + ") ";
 
-                sql = "select ToContainer,Wafer,FromProductName,FromPNDescription from [PDMS].[dbo].[ComponentIssueSummary] where ToContainer in <SNCOND> and Wafer is not null and FromPNDescription is not null order by Wafer";
+                sql = "SELECT distinct c.ContainerName as SN,dc.[ParamValueString] as wafer,pb.productname MaterialPN FROM insite.container c with(nolock)"
+                    + " inner join insite.currentStatus cs(nolock) on c.currentStatusId = cs.currentStatusId "
+                    + "inner join insite.workflowstep ws(nolock) on cs.WorkflowStepId = ws.WorkflowStepId "
+                    + "inner join insite.historyMainline hml with (nolock) on c.containerId = hml.containerId "
+                    + "inner join insite.componentIssueHistory cih with (nolock) on hml.historyMainlineId=cih.historyMainlineId "
+                    + "inner join insite.issueHistoryDetail ihd with (nolock) on cih.componentIssueHistoryId = ihd.componentIssueHistoryId "
+                    + "inner join insite.issueActualsHistory iah with (nolock) on ihd.issueHistoryDetailId = iah.issueHistoryDetailId "
+                    + "inner join insite.container cFrom with (nolock) on iah.fromContainerId = cFrom.containerId "
+                    + "inner join insite.product p with (nolock) on cFrom.productId = p.productId "
+                    + "inner join insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId "
+                    + "inner join insite.historyMainline hmll with (nolock)on cFrom.containerId=hmll.historyid "
+                    + "inner join insite.product pp with (nolock) on c.productid=pp.productid "
+                    + "left outer join insite.productfamily pf (nolock) on pp.productFamilyId = pf.productFamilyId "
+                    + "inner join insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid "
+                    + "inner join[InsiteDB].[insite].[dc_AOC_ManualInspection] dc (nolock) on hmll.[HistoryMainlineId]= dc.[HistoryMainlineId] "
+                    + "where dc.parametername= 'Trace_ID'  and p.description like '%VCSEL%'  and c.containername in <SNCOND> order by c.ContainerName,pb.productname ";
                 sql = sql.Replace("<SNCOND>", sncond);
-
-                dbret = DBUtility.ExeMESReportSqlWithRes(sql);
+                dbret = DBUtility.ExeRealMESSqlWithRes(sql);
                 foreach (var line in dbret)
                 {
-                    var pndesc = Convert.ToString(line[3]);
-
-                    if ((pndesc.ToUpper().Contains("LD,") && pndesc.ToUpper().Contains("VCSEL,"))
-                            || (pndesc.ToUpper().Contains("CSG") && (pndesc.ToUpper().Contains("INGAAS VCSEL") || pndesc.ToUpper().Contains("VCSEL ARRAY"))))
+                    var tempvm = new WaferTableItem();
+                    tempvm.SN = Convert.ToString(line[0]);
+                    tempvm.WaferNum = Convert.ToString(line[1]);
+                    if (tempvm.WaferNum.Length > 3)
                     {
-                        var tempvm = new WaferTableItem();
-                        tempvm.SN = Convert.ToString(line[0]);
-                        tempvm.WaferNum = Convert.ToString(line[1]);
-                        if (tempvm.WaferNum.Length > 3)
-                        {
-                            tempvm.WaferNum = tempvm.WaferNum.Substring(0, tempvm.WaferNum.Length - 3);
-                        }
-                        tempvm.PN = Convert.ToString(line[2]);
-                        tetmpres.Add(tempvm);
+                        tempvm.WaferNum = tempvm.WaferNum.Substring(0, tempvm.WaferNum.Length - 3);
                     }
+                    tempvm.PN = Convert.ToString(line[2]);
+                    tetmpres.Add(tempvm);
                 }
             }
 
