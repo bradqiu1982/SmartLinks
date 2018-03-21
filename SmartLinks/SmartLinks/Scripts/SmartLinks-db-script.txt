@@ -67,3 +67,18 @@ CREATE TABLE [dbo].[ScrapHistoryVM] (
     [Result]    NVARCHAR (200) DEFAULT ('') NOT NULL,
 	[CreateDate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
 );
+
+
+CREATE TABLE [dbo].[TechVideoVM] (
+    [VID]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[VSubject]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[VDescription]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[VPath]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[Updater]   NVARCHAR (200) DEFAULT ('') NOT NULL
+	);
+
+CREATE TABLE [dbo].[machineusermap] (
+    [machine]   NVARCHAR (300)   DEFAULT ('')  NOT NULL,
+    [username]   NVARCHAR (300)   DEFAULT ('')  NOT NULL
+);
