@@ -84,5 +84,6 @@ namespace SmartLinks.Models
         public string VPath { set; get; }
         public string UpdateTime { set; get; }
         public string Updater { set; get; }
+        public string IPath { set; get; }
     }
 }

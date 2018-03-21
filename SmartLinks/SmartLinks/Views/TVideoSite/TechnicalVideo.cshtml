@@ -70,22 +70,28 @@
                         </a>
                         <ul class="dropdown-menu">
                             @*<li class="RemoveVideoMenu" videoid="@item.VID">
-                                <a>Delete</a>
-                            </li>*@
+                                    <a>Delete</a>
+                                </li>*@
                         </ul>
                     </div>
                 </div>
-
                 <div class="item-content" videoid="@item.VID">
-                    <div class="item-date">@item.UpdateTime</div>
-                </div>
-                <div class="item-content" videoid="@item.VID">
-                    <div>@item.VSubject</div>
+                    <div class="col-xs-3">
+                        <img src="@item.IPath" style="width:80px;height:80px;"/>
+                    </div>
+                    <div class="col-xs-9">
+                        <div>
+                            <div class="item-date">@item.UpdateTime</div>
+                        </div>
+                        <div>
+                            <div>@item.VSubject</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
         }
     </div>
+
     <div class="col-sm-9 item-details-show">
         @if (ViewBag.ActiveVideo != null)
         {

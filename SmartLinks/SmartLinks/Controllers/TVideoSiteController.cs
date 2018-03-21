@@ -57,6 +57,32 @@ namespace SmartLinks.Controllers
             }
         }
 
+        public void RetrieveVideoTile(List<TechVideoVM> vm)
+        {
+            foreach (var item in vm)
+            {
+                var localfn = Server.MapPath(item.VPath);
+                if (System.IO.File.Exists(localfn))
+                {
+                    var onlyname = System.IO.Path.GetFileNameWithoutExtension(localfn);
+
+                    var mp4name = System.IO.Path.GetFileName(localfn);
+                    var imgpath = localfn.Replace(mp4name, "") + onlyname + ".jpg";
+
+                    if (System.IO.File.Exists(imgpath))
+                    {
+                        item.IPath = item.VPath.Replace(mp4name, "") + onlyname + ".jpg";
+                    }
+                    else
+                    {
+                        var ffMpeg2 = new NReco.VideoConverter.FFMpegConverter();
+                        ffMpeg2.GetVideoThumbnail(localfn, imgpath);
+                        item.IPath = item.VPath.Replace(mp4name, "") + onlyname + ".jpg";
+                    }
+                }//video file exist
+            }//foreach
+        }
+
         public ActionResult TechnicalVideo(string activeid, string searchkey)
         {
             UserAuth();
@@ -69,6 +95,7 @@ namespace SmartLinks.Controllers
             var vm = TechVideoVM.RetrieveVideo(searchkey);
             if (vm.Count > 0)
             {
+                RetrieveVideoTile(vm);
                 if (string.IsNullOrEmpty(activeid))
                 {
                     ViewBag.ActiveVideo = vm[0];
