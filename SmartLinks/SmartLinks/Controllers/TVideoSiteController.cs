@@ -61,7 +61,7 @@ namespace SmartLinks.Controllers
         {
             UserAuth();
 
-            if (string.Compare(ViewBag.username, ViewBag.compName) == 0)
+            if (string.Compare(ViewBag.username, ViewBag.compName) == 0 && activeid== null)
             {
                 return RedirectToAction("Welcome");
             }
