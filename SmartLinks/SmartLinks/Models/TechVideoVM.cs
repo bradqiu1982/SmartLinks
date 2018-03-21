@@ -52,11 +52,21 @@ namespace SmartLinks.Models
             var sql = "";
             if (string.IsNullOrEmpty(searchkey))
             {
-                sql = "select VID,VSubject,VDescription,VPath,UpdateTime,Updater from TechVideoVM order by UpdateTime desc";
+                sql = @"select VID,VSubject,VDescription,VPath,UpdateTime,Updater,tmp_log.ViewCnt
+                        from TechVideoVM as tv 
+                        left join (
+                            select VideoID, count(VideoID) as ViewCnt from VideoLog group by VideoID
+                        ) as tmp_log on tmp_log.VideoID = tv.VID
+                        order by tmp_log.ViewCnt desc, UpdateTime desc";
             }
             else
             {
-                sql = "select VID,VSubject,VDescription,VPath,UpdateTime,Updater from TechVideoVM where VSubject like '%<searchkey>%' or VDescription like '%<searchkey>%' order by UpdateTime desc";
+                sql = @"select VID,VSubject,VDescription,VPath,UpdateTime,Updater,tmp_log.ViewCnt
+                        from TechVideoVM as tv 
+                        left join (
+                            select VideoID, count(VideoID) as ViewCnt from VideoLog group by VideoID
+                        ) as tmp_log on tmp_log.VideoID = tv.VID where VSubject like '%<searchkey>%' or VDescription like '%<searchkey>%' 
+                        order by tmp_log.ViewCnt desc, UpdateTime desc";
                 sql = sql.Replace("<searchkey>", searchkey);
             }
 

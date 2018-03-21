@@ -14,6 +14,14 @@
             <li class="active"><a href="~/TVideoSite/TechnicalVideo">Technical Video</a></li>
         </ol>
     </div>
+    @if (ViewBag.VideoAdmin != null && ViewBag.VideoAdmin)
+    {
+        <div class="nav navbar-nav navbar-right">
+            <a href="/TVideoSite/VideoLogHistory" target="_blank" title="View Log Detail">
+                <img src="~/Content/images/video_log.png" width="30" height="30" class="vlog-img" />
+            </a>
+        </div>
+    }
 </div>
 
 <link href="~/Content/technicalvideo.css" rel="stylesheet" type="text/css" />
@@ -82,7 +90,7 @@
         @if (ViewBag.ActiveVideo != null)
         {
             <div class="row" style="margin-bottom:10px;">
-                <video src="@ViewBag.ActiveVideo.VPath" width='640' height='480' controls type='video/mp4'>Your browser does not support the video tag.</video>
+                <video id="play-box" data-vid="@ViewBag.ActiveVideo.VID" data-vname="@ViewBag.ActiveVideo.VSubject" src="@ViewBag.ActiveVideo.VPath" width='640' height='480' controls type='video/mp4'>Your browser does not support the video tag.</video>
             </div>
             
             <div class="row">
@@ -147,3 +155,18 @@
     </div>
 </div>
 }
+
+<script>
+    $(function () {
+        var video = document.getElementById('play-box');
+        video.addEventListener("playing", function () {
+            var vid = $('#play-box').attr("data-vid");
+            var vname = $('#play-box').attr("data-vname");
+            $.post('/TVideoSite/VideoLog',
+            {
+                vid: vid,
+                vname: vname
+            }, function () {});
+        }, false);
+    })
+</script>

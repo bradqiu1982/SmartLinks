@@ -258,4 +258,11 @@ body {
     width: 100%;
 }
 
+.vlog-container {
+    margin-left: 5%;
+    margin-right: 5%;
+}
 
+.vlog-img{
+    cursor: pointer;
+}

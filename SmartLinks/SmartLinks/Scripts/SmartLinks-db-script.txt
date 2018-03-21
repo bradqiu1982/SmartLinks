@@ -82,3 +82,36 @@ CREATE TABLE [dbo].[machineusermap] (
     [machine]   NVARCHAR (300)   DEFAULT ('')  NOT NULL,
     [username]   NVARCHAR (300)   DEFAULT ('')  NOT NULL
 );
+
+
+
+USE [DebugDB]
+GO
+
+/****** Object:  Table [dbo].[VideoLog]    Script Date: 3/21/2018 3:11:10 PM ******/
+
+CREATE TABLE [dbo].[VideoLog](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[UserName] [nvarchar](50) DEFAULT ('') NOT NULL,
+	[Machine] [nvarchar](50) DEFAULT ('') NOT NULL,
+	[Url] [nvarchar](50) DEFAULT ('') NOT NULL,
+	[OperateModule] [nvarchar](50) DEFAULT ('') NOT NULL,
+	[Operate] [nvarchar](50) DEFAULT ('') NOT NULL,
+	[VideoID] [nvarchar](50) DEFAULT ('') NOT NULL,
+	[LogType] [tinyint] DEFAULT (0) NOT NULL,
+	[LogLevel] [nvarchar](50) DEFAULT ('') NOT NULL,
+	[Message] [nvarchar](max) DEFAULT ('') NOT NULL,
+	[CreateAt] [datetime] DEFAULT ('') NOT NULL,
+	[APVal1] [nvarchar](max) DEFAULT ('') NOT NULL,
+	[APVal2] [nvarchar](max) DEFAULT ('') NOT NULL,
+	[APVal3] [nvarchar](max) DEFAULT ('') NOT NULL,
+	CONSTRAINT [PK_VideoLog] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'0: Default 1:TechVideo' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'VideoLog', @level2type=N'COLUMN',@level2name=N'LogType'
+GO

@@ -80,7 +80,6 @@ namespace SmartLinks.Controllers
                         if (string.Compare(activeid, item.VID) == 0)
                         {
                             ViewBag.ActiveVideo = item;
-
                         }
                     }
                     if (ViewBag.ActiveVideo == null)
@@ -172,6 +171,31 @@ namespace SmartLinks.Controllers
             var ret = new JsonResult();
             ret.Data = new { sucess = true };
             return ret;
+        }
+
+        [HttpPost]
+        public JsonResult VideoLog()
+        {
+            UserAuth();
+            var vid = Request.Form["vid"];
+            var vname = Request.Form["vname"];
+            if (!string.IsNullOrEmpty(vid))
+            {
+                VideoLogVM.WriteLog(ViewBag.username.ToUpper(), DetermineCompName(Request.UserHostName),
+                                                    Request.Url.ToString(), "TVideoSite", "ViewVideo", vid, VideoLogType.TechVideo, VLog4NetLevel.Info, vname);
+            }
+            var res = new JsonResult();
+            res.Data = new { success = true };
+            return res;
+            
+        }
+
+        public ActionResult VideoLogHistory()
+        {
+            UserAuth();
+            var history = VideoLogVM.GetVideoLog();
+            ViewBag.history = history;
+            return View();
         }
 
     }
