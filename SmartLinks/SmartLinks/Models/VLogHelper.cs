@@ -85,6 +85,12 @@ namespace SmartLinks.Models
         public static void WriteLog(string uName, string machine, string url, 
                 string oModule, string op, string vId, int lType, VLog4NetLevel lLevel, string msg)
         {
+            var ret = GetVideoLog(vId, "", uName);
+            if (ret.Count > 0)
+            {
+                return;
+            }
+
             var dic = new Dictionary<string, string>();
             dic.Add("uname", uName);
             dic.Add("machine", machine);
@@ -96,7 +102,7 @@ namespace SmartLinks.Models
             VLogHelper.WriteLog(msg, lLevel, dic);
         }
 
-        public static List<VideoLogVM> GetVideoLog(string vid = "", string vname = "")
+        public static List<VideoLogVM> GetVideoLog(string vid = "", string vname = "",string uname = "")
         {
             var sql = @"select ID, VideoID, Message, UserName, CreateAt from VideoLog where 1 = 1";
             var param = new Dictionary<string, string>();
@@ -109,6 +115,11 @@ namespace SmartLinks.Models
             {
                 sql += " and Message = @vanme";
                 param.Add("@vname", vname);
+            }
+            if (!string.IsNullOrEmpty(uname))
+            {
+                sql += " and UserName = @UserName";
+                param.Add("@UserName", uname);
             }
             sql += " order by CreateAt DESC ";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, param);
