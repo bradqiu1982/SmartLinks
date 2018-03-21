@@ -57,14 +57,14 @@ body {
 }
 
 .item-panel{
-    min-height: 100px;
+    min-height: 110px;
     margin-top: 10px;
     border: 1px #aaa solid;
     border-left-width: 5px;
 }
 
 .item-panel-active{
-    min-height: 100px;
+    min-height: 110px;
     margin-top: 5px;
     border: 1px #337ab7 solid;
     border-left-width: 5px;
@@ -89,6 +89,7 @@ body {
 
 .item-content {
     cursor:pointer;
+    min-height:90px;
 }
 
 .item-op{
