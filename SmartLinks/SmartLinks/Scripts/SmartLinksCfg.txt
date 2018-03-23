@@ -9,3 +9,4 @@ WUX-L80005949:::Alex.Chen
 WUX-L80004222:::Armon.Kong
 WUX-L80008413:::Yan.Shi
 VideoAdmin:::Windy.Ju;Shawn.Zhang;Brad.Qiu;Yan.Shi;JingShu.Xu
+UseLog4Net=False

@@ -102,6 +102,31 @@ namespace SmartLinks.Models
             VLogHelper.WriteLog(msg, lLevel, dic);
         }
 
+        public static void WriteLog2(string uName, string machine, string url,
+        string oModule, string op, string vId, int lType, VLog4NetLevel lLevel, string msg)
+        {
+            var ret = GetVideoLog(vId, "", uName);
+            if (ret.Count > 0)
+            {
+                return;
+            }
+            var sql = "INSERT INTO [NPITrace].[dbo].[VideoLog] ([UserName],[Machine],[Url],[OperateModule],[Operate],[VideoID],[LogType],[LogLevel],[Message],[CreateAt]) VALUES (@uname, @machine, @url, @module, @operate, @vid, @ltype, @llevel, @msg, @date)";
+
+            var dic = new Dictionary<string, string>();
+            dic.Add("@uname", uName);
+            dic.Add("@machine", machine);
+            dic.Add("@url", url);
+            dic.Add("@module", oModule);
+            dic.Add("@operate", op);
+            dic.Add("@vid", vId);
+            dic.Add("@ltype", lType.ToString());
+            dic.Add("@llevel", "INFO");
+            dic.Add("@msg", msg);
+            dic.Add("@date", DateTime.Now.ToString());
+
+            DBUtility.ExeLocalSqlNoRes(sql, dic);
+        }
+
         public static List<VideoLogVM> GetVideoLog(string vid = "", string vname = "",string uname = "")
         {
             var sql = @"select ID, VideoID, Message, UserName, CreateAt from VideoLog where 1 = 1";

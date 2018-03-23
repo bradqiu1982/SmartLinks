@@ -204,12 +204,30 @@ namespace SmartLinks.Controllers
         public JsonResult VideoLog()
         {
             UserAuth();
+
+            var uselog = false;
+            var cfg = CfgUtility.GetSysConfig(this);
+            if (cfg.ContainsKey("UseLog4Net") && cfg["UseLog4Net"].ToUpper().Contains("TRUE")){
+                uselog = true;
+            }
+            else {
+                uselog = false;
+            }
+
             var vid = Request.Form["vid"];
             var vname = Request.Form["vname"];
             if (!string.IsNullOrEmpty(vid))
             {
-                VideoLogVM.WriteLog(ViewBag.username.ToUpper(), DetermineCompName(Request.UserHostName),
+                if (uselog)
+                {
+                    VideoLogVM.WriteLog(ViewBag.username.ToUpper(), DetermineCompName(Request.UserHostName),
                                                     Request.Url.ToString(), "TVideoSite", "ViewVideo", vid, VideoLogType.TechVideo, VLog4NetLevel.Info, vname);
+                }
+                else
+                {
+                    VideoLogVM.WriteLog2(ViewBag.username.ToUpper(), DetermineCompName(Request.UserHostName),
+                                                    Request.Url.ToString(), "TVideoSite", "ViewVideo", vid, VideoLogType.TechVideo, VLog4NetLevel.Info, vname);
+                }
             }
             var res = new JsonResult();
             res.Data = new { success = true };

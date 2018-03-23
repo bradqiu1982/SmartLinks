@@ -85,26 +85,23 @@ CREATE TABLE [dbo].[machineusermap] (
 
 
 
-USE [DebugDB]
-GO
-
 /****** Object:  Table [dbo].[VideoLog]    Script Date: 3/21/2018 3:11:10 PM ******/
 
 CREATE TABLE [dbo].[VideoLog](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
-	[UserName] [nvarchar](50) DEFAULT ('') NOT NULL,
-	[Machine] [nvarchar](50) DEFAULT ('') NOT NULL,
-	[Url] [nvarchar](50) DEFAULT ('') NOT NULL,
-	[OperateModule] [nvarchar](50) DEFAULT ('') NOT NULL,
-	[Operate] [nvarchar](50) DEFAULT ('') NOT NULL,
-	[VideoID] [nvarchar](50) DEFAULT ('') NOT NULL,
+	[UserName] [nvarchar](200) DEFAULT ('') NOT NULL,
+	[Machine] [nvarchar](200) DEFAULT ('') NOT NULL,
+	[Url] [nvarchar](500) DEFAULT ('') NOT NULL,
+	[OperateModule] [nvarchar](200) DEFAULT ('') NOT NULL,
+	[Operate] [nvarchar](200) DEFAULT ('') NOT NULL,
+	[VideoID] [nvarchar](200) DEFAULT ('') NOT NULL,
 	[LogType] [tinyint] DEFAULT (0) NOT NULL,
-	[LogLevel] [nvarchar](50) DEFAULT ('') NOT NULL,
+	[LogLevel] [nvarchar](200) DEFAULT ('') NOT NULL,
 	[Message] [nvarchar](max) DEFAULT ('') NOT NULL,
 	[CreateAt] [datetime] DEFAULT ('') NOT NULL,
-	[APVal1] [nvarchar](max) DEFAULT ('') NOT NULL,
-	[APVal2] [nvarchar](max) DEFAULT ('') NOT NULL,
-	[APVal3] [nvarchar](max) DEFAULT ('') NOT NULL,
+	[APVal1] [nvarchar](200) DEFAULT ('') NOT NULL,
+	[APVal2] [nvarchar](200) DEFAULT ('') NOT NULL,
+	[APVal3] [nvarchar](200) DEFAULT ('') NOT NULL,
 	CONSTRAINT [PK_VideoLog] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
