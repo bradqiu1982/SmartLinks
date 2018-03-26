@@ -21,9 +21,12 @@
                 <img src="~/Content/images/video_log.png" width="30" height="30" class="vlog-img" />
             </a>
         </div>
-        <div class="nav navbar-nav navbar-right" style="margin-right:5px;cursor:pointer">
-             <img src="~/Content/images/test.png" width="30" height="30" class="vtest-img" data-toggle="tooltip" title="Access Test"/>
-        </div>
+        if (ViewBag.ActiveVideo != null && ViewBag.ActiveVideo.TestList.Count > 0)
+        {
+            <div class="nav navbar-nav navbar-right" style="margin-right:5px;cursor:pointer">
+                <img src="~/Content/images/test.png" width="30" height="30" class="vtest-img" data-toggle="tooltip" title="Access Test" />
+            </div>
+        }
     }
 </div>
 

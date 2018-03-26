@@ -114,6 +114,11 @@ namespace SmartLinks.Controllers
                         ViewBag.ActiveVideo = vm[0];
                     }
                 }
+
+                if (ViewBag.ActiveVideo != null)
+                {
+                    ViewBag.ActiveVideo.TestList = VTestVM.RetrieveTest(ViewBag.ActiveVideo.VID);
+                }
             }
 
             return View(vm);
@@ -335,6 +340,7 @@ namespace SmartLinks.Controllers
                 var giftoffer = Request.Form["giftoffer"];
                 var testnotice = Request.Form["testnotice"];
                 var imgpath = RetrieveGiftImg();
+                VTestVM.CleanTest(vid);
 
                 var answer = vtests[0][0];
                 for (var lidx = 1; lidx < vtests.Count; lidx++)
@@ -355,7 +361,7 @@ namespace SmartLinks.Controllers
                         tempvm.AddOptionalAnswer(Convert.ToString(vtests[lidx][3]));
                         tempvm.AddOptionalAnswer(Convert.ToString(vtests[lidx][4]));
                         tempvm.AddOptionalAnswer(Convert.ToString(vtests[lidx][5]));
-                        //tempvm.StoreTestVM();
+                        tempvm.StoreTestVM();
                     }
                 }//end for
             }

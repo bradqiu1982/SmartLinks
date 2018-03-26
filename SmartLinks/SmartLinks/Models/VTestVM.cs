@@ -50,14 +50,12 @@ namespace SmartLinks.Models
             }
         }
 
+
         public void StoreTestVM()
         {
             CompleteAnswer();
-            var sql = "delete from VTestVM where VID = '<VID>'";
-            sql = sql.Replace("<VID>", VID);
-            DBUtility.ExeLocalSqlNoRes(sql);
 
-            sql = @"insert into VTestVM(VID,TestID,TestContent,Answer,TestNotice,GiftOffer,GiftPath,OptionalAnswer0,OptionalAnswer1,OptionalAnswer2,OptionalAnswer3,OptionalAnswer4) 
+            var sql = @"insert into VTestVM(VID,TestID,TestContent,Answer,TestNotice,GiftOffer,GiftPath,OptionalAnswer0,OptionalAnswer1,OptionalAnswer2,OptionalAnswer3,OptionalAnswer4) 
                         values(@VID,@TestID,@TestContent,@Answer,@TestNotice,@GiftOffer,@GiftPath,@OptionalAnswer0,@OptionalAnswer1,@OptionalAnswer2,@OptionalAnswer3,@OptionalAnswer4)";
 
             var param = new Dictionary<string, string>();
@@ -75,10 +73,17 @@ namespace SmartLinks.Models
             DBUtility.ExeLocalSqlNoRes(sql,param);
         }
 
+        public static void CleanTest(string vid)
+        {
+            var sql = "delete from VTestVM where VID = '<VID>'";
+            sql = sql.Replace("<VID>", vid);
+            DBUtility.ExeLocalSqlNoRes(sql);
+        }
+
         public static List<VTestVM> RetrieveTest(string vid)
         {
             var ret = new List<VTestVM>();
-            var sql = "select VID,TestID,TestContent,Answer,TestNotice,GiftOffer,GiftPath,OptionalAnswer0,OptionalAnswer1,OptionalAnswer2,OptionalAnswer3,OptionalAnswer4 from VTestVM where VID = '<VID>'";
+            var sql = "select VID,TestID,TestContent,Answer,TestNotice,GiftOffer,GiftPath,OptionalAnswer0,OptionalAnswer1,OptionalAnswer2,OptionalAnswer3,OptionalAnswer4 from VTestVM where VID = '<VID>' order by TestID";
             sql = sql.Replace("<VID>", vid);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             foreach (var line in dbret)
@@ -90,6 +95,8 @@ namespace SmartLinks.Models
                 temp.AddOptionalAnswer(Convert.ToString(line[9]));
                 temp.AddOptionalAnswer(Convert.ToString(line[10]));
                 temp.AddOptionalAnswer(Convert.ToString(line[11]));
+
+                ret.Add(temp);
             }
             return ret;
         }

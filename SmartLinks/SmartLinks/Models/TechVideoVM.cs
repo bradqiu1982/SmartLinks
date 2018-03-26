@@ -15,6 +15,7 @@ namespace SmartLinks.Models
             VPath = "";
             UpdateTime = "";
             Updater = "";
+            testlist.Clear();
         }
 
         public TechVideoVM(string vid,string sub, string des, string path, string time,string uper)
@@ -25,6 +26,7 @@ namespace SmartLinks.Models
             VPath = path;
             UpdateTime = time;
             Updater = uper;
+            testlist.Clear();
         }
 
         public static string GetUniqKey()
@@ -85,5 +87,12 @@ namespace SmartLinks.Models
         public string UpdateTime { set; get; }
         public string Updater { set; get; }
         public string IPath { set; get; }
+
+        private List<VTestVM> testlist = new List<VTestVM>();
+        public List<VTestVM> TestList {
+            set { testlist.Clear();testlist.AddRange(value); }
+            get { return testlist; }
+        }
+
     }
 }
