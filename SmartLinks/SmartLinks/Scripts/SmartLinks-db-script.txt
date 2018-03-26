@@ -83,7 +83,21 @@ CREATE TABLE [dbo].[machineusermap] (
     [username]   NVARCHAR (300)   DEFAULT ('')  NOT NULL
 );
 
-
+CREATE TABLE [dbo].[VTestVM] (
+    [VID]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+    [TestID]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[TestContent]   NVARCHAR (MAX)   DEFAULT ('')  NOT NULL,
+    [Answer]   NVARCHAR (16)   DEFAULT ('')  NOT NULL,
+	[TestNotice]   NVARCHAR (MAX)   DEFAULT ('')  NOT NULL,
+    [GiftOffer]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[GiftPath]   NVARCHAR (500)   DEFAULT ('')  NOT NULL,
+    [OptionalAnswer0]   NVARCHAR (500)   DEFAULT ('')  NOT NULL,
+	[OptionalAnswer1]   NVARCHAR (500)   DEFAULT ('')  NOT NULL,
+    [OptionalAnswer2]   NVARCHAR (500)   DEFAULT ('')  NOT NULL,
+	[OptionalAnswer3]   NVARCHAR (500)   DEFAULT ('')  NOT NULL,
+    [OptionalAnswer4]   NVARCHAR (500)   DEFAULT ('')  NOT NULL,
+	[OptionalAnswer5]   NVARCHAR (500)   DEFAULT ('')  NOT NULL
+);
 
 /****** Object:  Table [dbo].[VideoLog]    Script Date: 3/21/2018 3:11:10 PM ******/
 

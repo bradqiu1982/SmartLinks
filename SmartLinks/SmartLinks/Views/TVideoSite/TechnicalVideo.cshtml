@@ -21,6 +21,9 @@
                 <img src="~/Content/images/video_log.png" width="30" height="30" class="vlog-img" />
             </a>
         </div>
+        <div class="nav navbar-nav navbar-right" style="margin-right:5px;cursor:pointer">
+             <img src="~/Content/images/test.png" width="30" height="30" class="vtest-img" data-toggle="tooltip" title="Access Test"/>
+        </div>
     }
 </div>
 
@@ -35,11 +38,17 @@
 
 <div class="Tvideo-container row">
 
-    <div class="col-sm-3 item-panels" >
-
+    <div class="col-sm-3" style="width:37.2%;padding-left:1px;">
         <div class="item-panel-toolbar">
             @if (ViewBag.VideoAdmin != null && ViewBag.VideoAdmin)
             {
+                if (ViewBag.ActiveVideo != null)
+                {
+                    <div class="add-test-btn" data-toggle="tooltip" title="Add Test">
+                        <img class="toolbar-img" src="~/Content/images/addtest.png">
+                    </div>
+                }
+
                 <div class="add-video-btn" data-toggle="tooltip" title="Add Video">
                     <img class="toolbar-img" src="~/Content/images/add_column.png">
                 </div>
@@ -55,42 +64,45 @@
         </div>
 
         <hr style="margin-top:1px;margin-bottom:1px;border: 1px solid;border-color:lightgrey" />
-        @foreach (var item in Model)
-        {
-            var panel = "item-panel";
-            if (string.Compare(item.VID, ViewBag.ActiveVideo.VID) == 0)
-            { panel = "item-panel-active"; }
 
-            <div class="@panel">
-                <div class="item-title">
-                    <div class="item-name">@item.Updater</div>
-                    <div class="item-op dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                            <span class="glyphicon glyphicon-option-vertical" title="Operations" data-toggle="tooltip"></span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            @*<li class="RemoveVideoMenu" videoid="@item.VID">
-                                    <a>Delete</a>
-                                </li>*@
-                        </ul>
-                    </div>
-                </div>
-                <div class="item-content" videoid="@item.VID">
-                    <div class="col-xs-3">
-                        <img src="@item.IPath" style="width:80px;height:80px;"/>
-                    </div>
-                    <div class="col-xs-9">
-                        <div>
-                            <div class="item-date">@item.UpdateTime</div>
-                        </div>
-                        <div>
-                            <div>@item.VSubject</div>
+        <div class="item-panels">
+            @foreach (var item in Model)
+            {
+                var panel = "item-panel";
+                if (string.Compare(item.VID, ViewBag.ActiveVideo.VID) == 0)
+                { panel = "item-panel-active"; }
+
+                <div class="@panel">
+                    <div class="item-title">
+                        <div class="item-name">@item.Updater</div>
+                        <div class="item-op dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <span class="glyphicon glyphicon-option-vertical" title="Operations" data-toggle="tooltip"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                @*<li class="RemoveVideoMenu" videoid="@item.VID">
+                                <a>Delete</a>
+                            </li>*@
+                            </ul>
                         </div>
                     </div>
+                    <div class="item-content" videoid="@item.VID">
+                        <div class="col-xs-3">
+                            <img src="@item.IPath" style="width:80px;height:80px;" />
+                        </div>
+                        <div class="col-xs-9">
+                            <div>
+                                <div class="item-date">@item.UpdateTime</div>
+                            </div>
+                            <div>
+                                <div>@item.VSubject</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        }
-    </div>
+            }
+        </div>
+   </div>
 
     <div class="col-sm-9 item-details-show">
         @if (ViewBag.ActiveVideo != null)
@@ -160,6 +172,84 @@
         </div>
     </div>
 </div>
+}
+
+@using (Html.BeginForm("UploadVideoTest", "TVideoSite", FormMethod.Post, new { enctype = "multipart/form-data", id = "uploadtestform", name = "uploadtestform" }))
+{
+    <input type="text" class="hide" id="activevid" name="activevid" value="@ViewBag.ActiveVideo.VID">
+
+    <div id="add-test-modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header" style="padding:10px;">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Upload Test</h4>
+                    </div>
+                    <div class="upload-test-container">
+                        <div class="row" style="margin-bottom:5px;margin-left:2%;">
+                                <div class="col-xs-6">
+                                    <label>Test Gift Supplier</label>
+                                    <div class="row">
+                                        <input class="form-control" id="giftoffer" name="giftoffer" type="text" value="" />
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label>Test Confirm Notice</label>
+                                    <div class="row">
+                                        <input class="form-control" id="testnotice" name="testnotice" type="text" value="" />
+                                    </div>
+                                </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <label>Test Excel File<span style="color:red">*</span></label>
+                                <div class="row" style="text-align:center;height:100px;margin-top:20px;margin-left:20px;">
+                                    <span class="btn btn-default btn-file" id="choosefile1" style="padding:0px;background-color:transparent !important;border-color:transparent !important;">
+                                        <img src="~/Content/images/CloudUpload.png" MYTP="HOVER" style="height:100px; width:150px"> <input type="file" name="files1" id="file1" runat="server" onchange="ShowFileNames1(this)" />
+                                    </span>
+                                </div>
+                                <div class="row" style="margin-top:10px;margin-left:20px;">
+                                    <label class="control-label" id="showfile1" name="showfile1"></label>
+                                    <input class="form-control text-box single-line" value="" id="attachmentupload1" name="attachmentupload1" type="hidden" />
+                                </div>
+                                <script type="text/javascript">
+                                    function ShowFileNames1(oFile) {
+                                        $('#showfile1').text(oFile.value);
+                                        document.getElementById("attachmentupload1").value = oFile.value;
+                                    }
+                                </script>
+                            </div>
+                            <div class="col-xs-6">
+                                <label>Gift Picture</label>
+                                <div class="row" style="text-align:center;height:100px;margin-top:20px;margin-left:20px;">
+                                    <span class="btn btn-default btn-file" id="choosefile2" style="padding:0px;background-color:transparent !important;border-color:transparent !important;">
+                                        <img src="~/Content/images/imgupload.png" MYTP="HOVER" style="height:100px; width:150px"> <input type="file" name="files2" id="file2" runat="server" onchange="ShowFileNames2(this)" />
+                                    </span>
+                                </div>
+                                <div class="row" style="margin-top:10px;margin-left:20px;">
+                                    <label class="control-label" id="showfile2" name="showfile2"></label>
+                                    <input class="form-control text-box single-line" value="" id="attachmentupload2" name="attachmentupload2" type="hidden" />
+                                </div>
+                                <script type="text/javascript">
+                                    function ShowFileNames2(oFile) {
+                                        $('#showfile2').text(oFile.value);
+                                        document.getElementById("attachmentupload2").value = oFile.value;
+                                    }
+                                </script>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="upload-video-footer">
+                        <div class="upload-play">
+                            <img src="~/Content/images/upload.png" class="upload-test-upload upload-video-op" id="upload-test" data-val="upload" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 <script>

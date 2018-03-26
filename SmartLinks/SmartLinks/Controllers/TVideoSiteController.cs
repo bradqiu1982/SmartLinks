@@ -171,6 +171,8 @@ namespace SmartLinks.Controllers
             return ret;
         }
 
+
+
         public ActionResult UploadTechnicalVideo()
         {
             UserAuth();
@@ -242,6 +244,124 @@ namespace SmartLinks.Controllers
             ViewBag.history = history;
             return View();
         }
+
+        public List<List<string>> RetrieveExcelTest()
+        {
+            var ret = new List<List<string>>();
+
+            try
+            {
+                foreach (string fl in Request.Files)
+                {
+                    if (fl != null && Request.Files[fl].ContentLength > 0)
+                    {
+                        string fn = Path.GetFileName(Request.Files[fl].FileName)
+                            .Replace(" ", "_").Replace("#", "")
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                        var ext = Path.GetExtension(fn).ToLower();
+                        var allvtype = ".xlsx,.xls,.xlsm,.csv,.ods,.xml";
+
+                        if (allvtype.Contains(ext))
+                        {
+                            string datestring = DateTime.Now.ToString("yyyyMMdd");
+                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+
+                            if (!Directory.Exists(imgdir))
+                            {
+                                Directory.CreateDirectory(imgdir);
+                            }
+
+                            var srvfd = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
+                            Request.Files[fl].SaveAs(imgdir + srvfd);
+                            return ExcelReader.RetrieveDataFromExcel(imgdir + srvfd, null);
+                        }//end if
+                    }//end if
+                }
+
+            }
+            catch (Exception ex) { }
+            return ret;
+        }
+
+        public string RetrieveGiftImg()
+        {
+            var ret = "";
+
+            try
+            {
+                foreach (string fl in Request.Files)
+                {
+                    if (fl != null && Request.Files[fl].ContentLength > 0)
+                    {
+                        string fn = Path.GetFileName(Request.Files[fl].FileName)
+                            .Replace(" ", "_").Replace("#", "")
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+
+                        var ext = Path.GetExtension(fn).ToLower();
+                        var allvtype = ".jpg,.jpeg,.png,.bmp";
+
+                        if (allvtype.Contains(ext))
+                        {
+                            string datestring = DateTime.Now.ToString("yyyyMMdd");
+                            string imgdir = Server.MapPath("~/userfiles") + "\\docs\\" + datestring + "\\";
+
+                            if (!Directory.Exists(imgdir))
+                            {
+                                Directory.CreateDirectory(imgdir);
+                            }
+
+                            var srvfd = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
+                            Request.Files[fl].SaveAs(imgdir + srvfd);
+                            return "/userfiles/docs/" + datestring + "/" + srvfd;
+                        }//end if
+                    }//end if
+                }
+
+            }
+            catch (Exception ex) { }
+            return ret;
+        }
+
+
+
+        public ActionResult UploadVideoTest()
+        {
+            var vtests = RetrieveExcelTest();
+            if (vtests.Count > 1
+                && vtests[0][0].Length == (vtests.Count - 1))
+            {
+                var vid =  Request.Form["activevid"];
+                var giftoffer = Request.Form["giftoffer"];
+                var testnotice = Request.Form["testnotice"];
+                var imgpath = RetrieveGiftImg();
+
+                var answer = vtests[0][0];
+                for (var lidx = 1; lidx < vtests.Count; lidx++)
+                {
+                    if (!string.IsNullOrEmpty(vtests[lidx][0]))
+                    {
+                        var tempvm = new VTestVM();
+                        tempvm.VID = vid;
+                        tempvm.TestID = TechVideoVM.GetUniqKey();
+                        tempvm.TestNotice = testnotice;
+                        tempvm.GiftOffer = giftoffer;
+                        tempvm.GiftPath = imgpath;
+                        tempvm.Answer = answer.Substring((lidx-1), 1);
+                        tempvm.TestContent = vtests[lidx][0];
+
+                        tempvm.AddOptionalAnswer(Convert.ToString(vtests[lidx][1]));
+                        tempvm.AddOptionalAnswer(Convert.ToString(vtests[lidx][2]));
+                        tempvm.AddOptionalAnswer(Convert.ToString(vtests[lidx][3]));
+                        tempvm.AddOptionalAnswer(Convert.ToString(vtests[lidx][4]));
+                        tempvm.AddOptionalAnswer(Convert.ToString(vtests[lidx][5]));
+                        //tempvm.StoreTestVM();
+                    }
+                }//end for
+            }
+            return RedirectToAction("TechnicalVideo", "TVideoSite");
+        }
+
 
     }
 }
