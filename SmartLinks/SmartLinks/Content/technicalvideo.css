@@ -285,3 +285,13 @@ body {
 .vlog-img{
     cursor: pointer;
 }
+
+.test-notice-container1 {
+    margin-top:10px;
+    height:260px;
+}
+
+.test-notice-container2 {
+    margin-top:10px;
+    height:60px;
+}

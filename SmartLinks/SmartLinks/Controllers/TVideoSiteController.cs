@@ -87,7 +87,7 @@ namespace SmartLinks.Controllers
         {
             UserAuth();
 
-            if (string.Compare(ViewBag.username, ViewBag.compName) == 0 && activeid== null)
+            if (string.Compare(ViewBag.username, ViewBag.compName) == 0)
             {
                 return RedirectToAction("Welcome");
             }
@@ -333,8 +333,9 @@ namespace SmartLinks.Controllers
         public ActionResult UploadVideoTest()
         {
             var vtests = RetrieveExcelTest();
-            if (vtests.Count > 1
-                && vtests[0][0].Length == (vtests.Count - 1))
+            
+
+            if (vtests.Count > 1)
             {
                 var vid =  Request.Form["activevid"];
                 var giftoffer = Request.Form["giftoffer"];
@@ -342,10 +343,10 @@ namespace SmartLinks.Controllers
                 var imgpath = RetrieveGiftImg();
                 VTestVM.CleanTest(vid);
 
-                var answer = vtests[0][0];
+                
                 for (var lidx = 1; lidx < vtests.Count; lidx++)
                 {
-                    if (!string.IsNullOrEmpty(vtests[lidx][0]))
+                    if (!string.IsNullOrEmpty(vtests[lidx][0]) && !string.IsNullOrEmpty(vtests[lidx][2]))
                     {
                         var tempvm = new VTestVM();
                         tempvm.VID = vid;
@@ -353,14 +354,16 @@ namespace SmartLinks.Controllers
                         tempvm.TestNotice = testnotice;
                         tempvm.GiftOffer = giftoffer;
                         tempvm.GiftPath = imgpath;
-                        tempvm.Answer = answer.Substring((lidx-1), 1);
                         tempvm.TestContent = vtests[lidx][0];
+                        tempvm.TestType = vtests[lidx][1];
+                        tempvm.Answer = vtests[lidx][2];
 
-                        tempvm.AddOptionalAnswer(Convert.ToString(vtests[lidx][1]));
-                        tempvm.AddOptionalAnswer(Convert.ToString(vtests[lidx][2]));
-                        tempvm.AddOptionalAnswer(Convert.ToString(vtests[lidx][3]));
-                        tempvm.AddOptionalAnswer(Convert.ToString(vtests[lidx][4]));
-                        tempvm.AddOptionalAnswer(Convert.ToString(vtests[lidx][5]));
+                        var aw = new List<string>();
+                        for (var idx = 0; idx < 6; idx++)
+                        {
+                            aw.Add(vtests[lidx][idx + 3]);
+                        }
+                        tempvm.OptionalAnswers = Newtonsoft.Json.JsonConvert.SerializeObject(aw);
                         tempvm.StoreTestVM();
                     }
                 }//end for

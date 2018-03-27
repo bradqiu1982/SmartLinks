@@ -9,67 +9,46 @@ namespace SmartLinks.Models
     {
         public VTestVM()
         {
-            OptionalAnswerCount = 5;
             VID = "";
             TestID = "";
+            TestType = "";
             TestContent = "";
             Answer = "";
             TestNotice = "";
             GiftOffer = "";
             GiftPath = "";
-            optionalanswerlist.Clear();
+            OptionalAnswers = "";
         }
 
-        public VTestVM(string vid,string tid,string tc,string ans,string tn,string gfer,string gfph)
+        public VTestVM(string vid,string tid,string tt,string tc,string ans,string tn,string gfer,string gfph,string osw)
         {
-            OptionalAnswerCount = 5;
             VID = vid;
             TestID = tid;
+            TestType = tt;
             TestContent = tc;
             Answer = ans;
             TestNotice = tn;
             GiftOffer = gfer;
             GiftPath = gfph;
-            optionalanswerlist.Clear();
-        }
-
-        public void AddOptionalAnswer(string ans)
-        {
-            if (AnswerList.Count < OptionalAnswerCount)
-            {
-                AnswerList.Add(ans);
-            }
-        }
-
-        private void CompleteAnswer()
-        {
-            var ascount = AnswerList.Count;
-            for (var idx = ascount; idx < OptionalAnswerCount; idx++)
-            {
-                AnswerList.Add("");
-            }
+            OptionalAnswers = osw;
         }
 
 
         public void StoreTestVM()
         {
-            CompleteAnswer();
-
-            var sql = @"insert into VTestVM(VID,TestID,TestContent,Answer,TestNotice,GiftOffer,GiftPath,OptionalAnswer0,OptionalAnswer1,OptionalAnswer2,OptionalAnswer3,OptionalAnswer4) 
-                        values(@VID,@TestID,@TestContent,@Answer,@TestNotice,@GiftOffer,@GiftPath,@OptionalAnswer0,@OptionalAnswer1,@OptionalAnswer2,@OptionalAnswer3,@OptionalAnswer4)";
+            var sql = @"insert into VTestVM(VID,TestID,TestType,TestContent,Answer,TestNotice,GiftOffer,GiftPath,OptionalAnswers) 
+                        values(@VID,@TestID,@TestType,@TestContent,@Answer,@TestNotice,@GiftOffer,@GiftPath,@OptionalAnswers)";
 
             var param = new Dictionary<string, string>();
             param.Add("@VID", VID);
             param.Add("@TestID", TestID);
+            param.Add("@TestType", TestType);
             param.Add("@TestContent", TestContent);
             param.Add("@Answer", Answer);
             param.Add("@TestNotice", TestNotice);
             param.Add("@GiftOffer", GiftOffer);
             param.Add("@GiftPath", GiftPath);
-            for(var idx = 0;idx < OptionalAnswerCount;idx++)
-            {
-                param.Add("@OptionalAnswer" + idx, AnswerList[idx]);
-            }
+            param.Add("@OptionalAnswers", OptionalAnswers);
             DBUtility.ExeLocalSqlNoRes(sql,param);
         }
 
@@ -83,39 +62,42 @@ namespace SmartLinks.Models
         public static List<VTestVM> RetrieveTest(string vid)
         {
             var ret = new List<VTestVM>();
-            var sql = "select VID,TestID,TestContent,Answer,TestNotice,GiftOffer,GiftPath,OptionalAnswer0,OptionalAnswer1,OptionalAnswer2,OptionalAnswer3,OptionalAnswer4 from VTestVM where VID = '<VID>' order by TestID";
+            var sql = "select VID,TestID,TestType,TestContent,Answer,TestNotice,GiftOffer,GiftPath,OptionalAnswers from VTestVM where VID = '<VID>' order by TestID";
             sql = sql.Replace("<VID>", vid);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql);
             foreach (var line in dbret)
             {
                 var temp = new VTestVM(Convert.ToString(line[0]),Convert.ToString(line[1]), Convert.ToString(line[2])
-                    , Convert.ToString(line[3]), Convert.ToString(line[4]), Convert.ToString(line[5]), Convert.ToString(line[6]));
-                temp.AddOptionalAnswer(Convert.ToString(line[7]));
-                temp.AddOptionalAnswer(Convert.ToString(line[8]));
-                temp.AddOptionalAnswer(Convert.ToString(line[9]));
-                temp.AddOptionalAnswer(Convert.ToString(line[10]));
-                temp.AddOptionalAnswer(Convert.ToString(line[11]));
-
+                    , Convert.ToString(line[3]), Convert.ToString(line[4]), Convert.ToString(line[5]), Convert.ToString(line[6]), Convert.ToString(line[7]),Convert.ToString(line[8]));
                 ret.Add(temp);
             }
             return ret;
         }
 
-        public int OptionalAnswerCount { set; get; }
-
         public string VID { set; get; }
         public string TestID { set; get; }
+        public string TestType { set; get; }
         public string TestContent { set; get; }
         public string Answer { set; get; }
         public string TestNotice { set; get; }
         public string GiftOffer { set; get; }
         public string GiftPath { set; get; }
-        
-        private List<string> optionalanswerlist = new List<string>();
-        public List<string> AnswerList {
-            set { optionalanswerlist.Clear();optionalanswerlist.AddRange(value); }
-            get { return optionalanswerlist; }
+
+        public bool IsMultiSelect {
+            get {
+                if (!string.IsNullOrEmpty(TestType) && TestType.ToUpper().Contains("MULTI"))
+                { return true; }
+                else { return false; }
+            }
         }
         
+        public string OptionalAnswers { set; get; }
+        public List<string> OpticalAnswerList
+        {
+            get {
+                return (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(OptionalAnswers, (new List<string>()).GetType());
+            }
+        }
+
     }
 }

@@ -24,7 +24,7 @@
         if (ViewBag.ActiveVideo != null && ViewBag.ActiveVideo.TestList.Count > 0)
         {
             <div class="nav navbar-nav navbar-right" style="margin-right:5px;cursor:pointer">
-                <img src="~/Content/images/test.png" width="30" height="30" class="vtest-img" data-toggle="tooltip" title="Access Test" />
+                <img src="~/Content/images/test.png" width="30" height="30" class="vtest-img" data-toggle="tooltip" title="Access Test" onclick="AccessTest()" />
             </div>
         }
     }
@@ -269,3 +269,129 @@
         }, false);
     })
 </script>
+
+@if (ViewBag.ActiveVideo != null && ViewBag.ActiveVideo.TestList.Count > 0)
+{
+    var onetest = ViewBag.ActiveVideo.TestList[0];
+    <script type="text/javascript">
+    $(function () {
+        var video = document.getElementById('play-box');
+        video.addEventListener("pause", function () {
+            if ($('#nomorenotice').val() === '')
+            {
+                $("#test-notice-modal").modal({ backdrop: 'static' });
+            }
+        }, false);
+    })
+
+    function AccessTest() {
+        if ($('#nomorenotice').val() === '') {
+            $("#test-notice-modal").modal({ backdrop: 'static' });
+            //start test
+        }
+    }
+
+    function NoTest() {
+        $('#nomorenotice').val('TRUE');
+        $("#test-notice-modal").modal('hide');
+    }
+
+    function StartTest() {
+        $('#nomorenotice').val('TRUE');
+        $("#test-notice-modal").modal('hide');
+        //start test
+    }
+    </script>
+    <input type="text" value="" id="nomorenotice" name="nomorenotice" class="hide">
+    <div id="test-notice-modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    @if (!string.IsNullOrEmpty(onetest.GiftOffer))
+                    {
+                        <div class="test-notice-container1">
+                            <div class="row" style="margin-bottom:10px;margin-left:2%;">
+                                @if (string.IsNullOrEmpty(onetest.TestNotice))
+                                {
+                                    <label>你心心念念的彩蛋终于来了，来，做个测试吧</label>
+                                }
+                                else
+                                {
+                                    <label>@onetest.TestNotice</label>
+                                }
+                            </div>
+                            <div class="row" style="margin-bottom:10px;margin-left:2%;">
+                                <label>做完测试，您可至 @onetest.GiftOffer 处领取一份小礼品！</label>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-2">
+                                </div>
+                                <div class="col-xs-2">
+                                    <button class="btn btn-danger form-control" onclick="NoTest()">残忍拒绝</button>
+                                </div>
+                                <div class="col-xs-1">
+                                </div>
+                                <div class="col-xs-2">
+                                    <button class="btn btn-warning form-control" data-dismiss="modal">稍等</button>
+                                </div>
+                                <div class="col-xs-1">
+                                </div>
+                                <div class="col-xs-2">
+                                    <button class="btn btn-success form-control" onclick="StartTest()">好</button>
+                                </div>
+                                <div class="col-xs-2">
+                                </div>
+                            </div>
+                            <div class="row" style="text-align:center">
+                                @if (string.IsNullOrEmpty(onetest.GiftPath))
+                                {
+                                    <img src="~/Content/images/gift.png" height="200" width="200">
+                                }
+                                else
+                                {
+                                    <img src="@onetest.GiftPath" height="200" width="200">
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="test-notice-container2">
+                            <div class="row" style="margin-bottom:10px;margin-left:2%;">
+                                @if (string.IsNullOrEmpty(onetest.TestNotice))
+                                {
+                                    <label>你心心念念的彩蛋终于来了，来，做个测试吧</label>
+                                }
+                                else
+                                {
+                                    <label>@onetest.TestNotice</label>
+                                }
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-2">
+                                </div>
+                                <div class="col-xs-2">
+                                    <button class="btn btn-danger form-control" onclick="NoTest()">残忍拒绝</button>
+                                </div>
+                                <div class="col-xs-1">
+                                </div>
+                                <div class="col-xs-2">
+                                    <button class="btn btn-warning form-control" data-dismiss="modal">稍等</button>
+                                </div>
+                                <div class="col-xs-1">
+                                </div>
+                                <div class="col-xs-2">
+                                    <button class="btn btn-success form-control" onclick="StartTest()">好</button>
+                                </div>
+                                <div class="col-xs-2">
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
