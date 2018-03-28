@@ -74,6 +74,21 @@ namespace SmartLinks.Models
             return ret;
         }
 
+        public static List<VTestVM> RetrieveTestByTestID(string testid)
+        {
+            var ret = new List<VTestVM>();
+            var sql = "select VID,TestID,TestType,TestContent,Answer,TestNotice,GiftOffer,GiftPath,OptionalAnswers from VTestVM where TestID = '<TestID>'";
+            sql = sql.Replace("<TestID>", testid);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var temp = new VTestVM(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2])
+                    , Convert.ToString(line[3]), Convert.ToString(line[4]), Convert.ToString(line[5]), Convert.ToString(line[6]), Convert.ToString(line[7]), Convert.ToString(line[8]));
+                ret.Add(temp);
+            }
+            return ret;
+        }
+
         public string VID { set; get; }
         public string TestID { set; get; }
         public string TestType { set; get; }

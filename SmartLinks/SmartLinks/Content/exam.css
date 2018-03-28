@@ -3,12 +3,33 @@
     font-size: 20px;
     margin-bottom: 2%;
 }
+
 .middle-align{
 }
+
 .right-align{
     float: right;
     margin-right: 5%;
 }
+
+.left-align{
+    float: left;
+}
+
 .m-exam-body{
     padding-left: 10%;
+}
+
+.answer{
+    color: green;
+}
+
+.right-ans{
+    color: green;
+    margin-left: 2%;
+}
+
+.wrong-ans{
+    color: red;
+    margin-left: 2%;
 }

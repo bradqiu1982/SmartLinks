@@ -371,6 +371,57 @@ namespace SmartLinks.Controllers
             return RedirectToAction("TechnicalVideo", "TVideoSite", routedict);
         }
 
+        public JsonResult CheckUserAnswer()
+        {
+            var video_id = Request.Form["video_id"];
+            var uname = Request.Form["uname"];
+            var useranswers = (List<UserAnswer>)Newtonsoft.Json.JsonConvert.DeserializeObject(Request.Form["data"], (new List<UserAnswer>()).GetType());
+
+            double score = 0;
+            var answers = new List<object>();
+
+            foreach (var item in useranswers)
+            {
+                var onetest = VTestVM.RetrieveTestByTestID(item.q_id);
+                if (onetest.Count > 0)
+                {
+                    var uanswer = item.answer.Substring(0, item.answer.Length - 1);
+                    var idxanswer = "";
+                    var tempanswer = onetest[0].Answer.Trim().ToUpper()
+                        .Replace(",","").Replace(" ","").Replace(";","").ToCharArray();
+
+                    for (var aidx = 0; aidx < tempanswer.Length; aidx++)
+                    {
+                        idxanswer = idxanswer+tempanswer[aidx].ToString() + ",";
+                    }
+                    idxanswer = idxanswer.Substring(0, idxanswer.Length - 1);
+
+                    if (string.Compare(uanswer.ToUpper(), idxanswer) == 0)
+                    {
+                        score = score + 1;
+                    }
+
+                    answers.Add(new
+                    {
+                        q_id = onetest[0].TestID,
+                        q_type = onetest[0].TestType,
+                        answer = idxanswer,
+                        uanswer = uanswer
+                    });
+                }
+            }
+
+            score = score / useranswers.Count * 100.0;
+
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                score = score,
+                answers = answers
+            };
+            return ret;
+        }
+
 
     }
 }

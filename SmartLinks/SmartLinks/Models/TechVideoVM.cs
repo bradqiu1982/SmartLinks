@@ -95,4 +95,11 @@ namespace SmartLinks.Models
         }
 
     }
+
+    public class UserAnswer {
+        public string q_id { set; get; }
+        public string q_type { set; get; }
+        public string answer { set; get; }
+    }
+
 }
