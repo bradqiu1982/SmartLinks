@@ -1,0 +1,14 @@
+.score{
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 2%;
+}
+.middle-align{
+}
+.right-align{
+    float: right;
+    margin-right: 5%;
+}
+.m-exam-body{
+    padding-left: 10%;
+}

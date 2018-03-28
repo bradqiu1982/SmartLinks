@@ -333,11 +333,9 @@ namespace SmartLinks.Controllers
         public ActionResult UploadVideoTest()
         {
             var vtests = RetrieveExcelTest();
-            
-
+            var vid =  Request.Form["activevid"];            
             if (vtests.Count > 1)
             {
-                var vid =  Request.Form["activevid"];
                 var giftoffer = Request.Form["giftoffer"];
                 var testnotice = Request.Form["testnotice"];
                 var imgpath = RetrieveGiftImg();
@@ -368,7 +366,9 @@ namespace SmartLinks.Controllers
                     }
                 }//end for
             }
-            return RedirectToAction("TechnicalVideo", "TVideoSite");
+            var routedict = new RouteValueDictionary();
+            routedict.Add("activeid",vid);
+            return RedirectToAction("TechnicalVideo", "TVideoSite", routedict);
         }
 
 
