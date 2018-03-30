@@ -21,12 +21,18 @@
                 <img src="~/Content/images/video_log.png" width="30" height="30" class="vlog-img" />
             </a>
         </div>
-        if (ViewBag.ActiveVideo != null && ViewBag.ActiveVideo.TestList.Count > 0)
-        {
-            <div class="nav navbar-nav navbar-right vtest-img-div" style="margin-right:5px;cursor:pointer">
-                <img src="~/Content/images/test.png" width="30" height="30" class="vtest-img" data-toggle="tooltip" title="Access Test" onclick="AccessTest()" />
-            </div>
-        }
+        <div class="nav navbar-nav navbar-right" style="margin-right:5px;cursor:pointer">
+            <a href="/TVideoSite/VUserRank" target="_blank" title="User Rank">
+                <img src="~/Content/images/gifticon.png" width="30" height="30" data-toggle="tooltip" title="User Rank"/>
+            </a>
+        </div>
+    }
+    
+    @if (ViewBag.ActiveVideo != null && ViewBag.ActiveVideo.TestList.Count > 0)
+    {
+    <div class="nav navbar-nav navbar-right vtest-img-div" style="margin-right:5px;cursor:pointer">
+        <img src="~/Content/images/test.png" width="30" height="30" class="vtest-img" data-toggle="tooltip" title="Access Test" onclick="AccessTest()" />
+    </div>
     }
 </div>
 
@@ -302,10 +308,14 @@
     function StartTest() {
         $('#nomorenotice').val('TRUE');
         $("#test-notice-modal").modal('hide');
-        $('input[type=text]').removeAttr('disabled');
 
+        $('input[type=text]').removeAttr('disabled');
         $('input[type=radio]').removeAttr('disabled').prop('checked', false);
         $('input[type=checkbox]').removeAttr('disabled').prop('checked', false);
+
+        $('.right-ans,.wrong-ans,.answer').remove();
+        $('.c_score').html('');
+
         $('#m-btn-closed').val('Submit');
         $('#m-btn-closed').attr('id', 'm-btn-submit');
         $('#m-btn-closed').attr('name', 'm-btn-submit');
@@ -314,7 +324,7 @@
     </script>
 
     <input type="text" value="" id="nomorenotice" name="nomorenotice" class="hide" autocomplete="off">
-    <div id="test-notice-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div id="test-notice-modal" class="modal fade" tabindex="-1" role="dialog" style="margin-top:5%">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-body">
@@ -436,8 +446,8 @@
                                             if (!string.IsNullOrEmpty(asn))
                                             {
                                                 <div>
-                                                    <input type="checkbox" name="ans-val-@testidx" value="@(((char)('A'+ansval)).ToString())">
-                                                    <label>@(((char)('A' + ansval)).ToString())  @asn</label>
+                                                    <input type="checkbox" id="ans-val-@testidx-@ansval" name="ans-val-@testidx" value="@(((char)('A'+ansval)).ToString())">
+                                                    <label for="ans-val-@testidx-@ansval">@(((char)('A' + ansval)).ToString())  @asn</label>
                                                 </div>
                                                 ansval = ansval + 1;
                                             }
@@ -459,8 +469,8 @@
                                             if (!string.IsNullOrEmpty(asn))
                                             {
                                                 <div>
-                                                    <input type="radio" name="ans-val-@testidx" value="@(((char)('A'+ansval)).ToString())">
-                                                    <label>@(((char)('A' + ansval)).ToString())  @asn</label>
+                                                    <input type="radio" id="ans-val-@testidx-@ansval" name="ans-val-@testidx" value="@(((char)('A'+ansval)).ToString())">
+                                                    <label for="ans-val-@testidx-@ansval">@(((char)('A' + ansval)).ToString())  @asn</label>
                                                 </div>
                                                 ansval = ansval + 1;
                                             }

@@ -117,7 +117,7 @@ namespace SmartLinks.Controllers
 
                 if (ViewBag.ActiveVideo != null)
                 {
-                    ViewBag.ActiveVideo.TestList = VTestVM.RetrieveTest(ViewBag.ActiveVideo.VID);
+                    ViewBag.ActiveVideo.TestList = VTestVM.RetrieveRandomTest(ViewBag.ActiveVideo.VID,10);
                 }
             }
 
@@ -201,7 +201,7 @@ namespace SmartLinks.Controllers
         {
             UserAuth();
             var username = Request.Form["username"].ToUpper().Trim();
-            MachineUserMap.UpdateMachineUserMap(ViewBag.compName, username);
+            MachineUserMap.AddMachineUserMap(ViewBag.compName, username);
             var ret = new JsonResult();
             ret.Data = new { sucess = true };
             return ret;
@@ -373,12 +373,17 @@ namespace SmartLinks.Controllers
 
         public JsonResult CheckUserAnswer()
         {
+            UserAuth();
+
             var video_id = Request.Form["video_id"];
             var uname = Request.Form["uname"];
             var useranswers = (List<UserAnswer>)Newtonsoft.Json.JsonConvert.DeserializeObject(Request.Form["data"], (new List<UserAnswer>()).GetType());
 
             double score = 0;
             var answers = new List<object>();
+
+            var uns = "";
+            var cns = "";
 
             foreach (var item in useranswers)
             {
@@ -395,6 +400,9 @@ namespace SmartLinks.Controllers
                         idxanswer = idxanswer+tempanswer[aidx].ToString() + ",";
                     }
                     idxanswer = idxanswer.Substring(0, idxanswer.Length - 1);
+
+                    uns = uns + uanswer.ToUpper()+";";
+                    cns = cns + idxanswer + ";";
 
                     if (string.Compare(uanswer.ToUpper(), idxanswer) == 0)
                     {
@@ -413,6 +421,8 @@ namespace SmartLinks.Controllers
 
             score = score / useranswers.Count * 100.0;
 
+            VTestScore.StoreUserScore(ViewBag.compName, uname, video_id, cns, uns, score.ToString());
+
             var ret = new JsonResult();
             ret.Data = new
             {
@@ -422,6 +432,17 @@ namespace SmartLinks.Controllers
             return ret;
         }
 
+        public ActionResult VUserRank(string username)
+        {
+            var vm = VTestScore.RetrieveSoreWithRank(username);
+            return View(vm);
+        }
+
+        public ActionResult ReceiveGift(string username)
+        {
+            VTestScore.UpdateUserRank(username, "-200");
+            return RedirectToAction("VUserRank", "TVideoSite");
+        }
 
     }
 }

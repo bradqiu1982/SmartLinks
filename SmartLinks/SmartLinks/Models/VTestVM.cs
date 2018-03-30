@@ -74,6 +74,29 @@ namespace SmartLinks.Models
             return ret;
         }
 
+        public static List<VTestVM> RetrieveRandomTest(string vid, int maxtests)
+        {
+            var tests = RetrieveTest(vid);
+
+            if (tests.Count > 0 && maxtests > 0)
+            {
+                var ret = new List<VTestVM>();
+                var max = (tests.Count > maxtests) ? maxtests : tests.Count();
+                var rand = new Random();
+                for (var t = 0; t < max; t++)
+                {
+                    var idx = rand.Next(tests.Count);
+                    ret.Add(tests[idx]);
+                    tests.RemoveAt(idx);
+                }
+                return ret;
+            }
+            else
+            {
+                return tests;
+            }
+        }
+
         public static List<VTestVM> RetrieveTestByTestID(string testid)
         {
             var ret = new List<VTestVM>();

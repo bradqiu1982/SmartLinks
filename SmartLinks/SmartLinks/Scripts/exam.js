@@ -126,7 +126,7 @@ var Exam = function(){
         
         $('body').on('click', '#m-btn-closed', function(){
             $('#modal-exam').modal('hide');
-            $('.vtest-img-div').addClass('hide');
+            //$('.vtest-img-div').addClass('hide');
         })
     }
     return{

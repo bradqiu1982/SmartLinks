@@ -80,6 +80,21 @@ namespace SmartLinks.Models
             return ret;
         }
 
+        public static List<TechVideoVM> RetrieveVideoByID(string vid)
+        {
+             var ret = new List<TechVideoVM>();
+
+             var sql = @"select VID,VSubject,VDescription,VPath,UpdateTime,Updater from TechVideoVM where VID = '<VID>'";
+                sql = sql.Replace("<VID>", vid);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                ret.Add(new TechVideoVM(Convert.ToString(line[0]), Convert.ToString(line[1]), Convert.ToString(line[2]), Convert.ToString(line[3]), Convert.ToDateTime(line[4]).ToString("yyyy-MM-dd"), Convert.ToString(line[5])));
+            }
+            return ret;
+        }
+
+
         public string VID { set; get; }
         public string VSubject { set; get; }
         public string VDescription { set; get; }
