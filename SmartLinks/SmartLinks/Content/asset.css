@@ -141,7 +141,7 @@ body {
     font-size: 14px;
     cursor: pointer;
 }
-.buy-del, .buy-edit, .check-complete {
+.buy-del, .buy-edit, .check-complete{
     cursor: pointer;
 }
 .buy-popover {
@@ -160,4 +160,11 @@ body {
 .asset-check {
     cursor: pointer;
     color: #2a6496;
+}
+.in-borrow {
+    margin-top: -6px;
+}
+
+.excel-template{
+    font-size: 14px;
 }

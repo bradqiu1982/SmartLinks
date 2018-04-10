@@ -46,6 +46,7 @@
             <caption>
                 <span class="tb-cap col-xs-2">Total: @ViewBag.total</span>
                 <div class="col-xs-5 add-container">
+                    <input type="button" class="btn btn-success in-borrow" value="未归还" />
                     <span class="glyphicon glyphicon-plus add-icon"></span>
                 </div>
                 <div class="input-group search-container col-xs-5">
@@ -80,13 +81,15 @@
                         {
                             asset_list += device.CN + " / " + device.EnglishName;
                         }
+                        var sDate = Convert.ToDateTime(item.Value.StartDate).ToString("yyyy-MM-dd");
+                        var eDate = Convert.ToDateTime(item.Value.StartDate).ToString("yyyy-MM-dd");
                         <tr>
                             <td>@item.Value.RequestID</td>
                             <td>@item.Value.BorrowUser.ToUpper().Split(new char[] { '@' })[0]</td>
                             <td>@item.Value.ProjectNo</td>
                             <td>@(item.Value.IsLong == "1" ? "是" : "否")</td>
-                            <td>@Convert.ToDateTime(item.Value.StartDate).ToString("yyyy-MM-dd")</td>
-                            <td>@Convert.ToDateTime(item.Value.EndDate).ToString("yyyy-MM-dd")</td>
+                            <td>@((string.Compare(sDate, "1900-01-01") == 0)?"": sDate)</td>
+                            <td>@((string.Compare(eDate, "1900-01-01") == 0) ? "" : eDate)</td>
                             <td>@(item.Value.AdminConfirm == "1" ? "Yes" : "No")</td>
                             <td>@item.Value.BorrowComment</td>
                             <td>@(item.Value.IsReturn == "1" ? "未归还" :(item.Value.IsReturn == "2" ? "已归还":"无效"))</td>

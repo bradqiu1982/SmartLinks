@@ -1,6 +1,6 @@
 ﻿var Asset = function () {
     var show = function () {
-        $('[data-toggle="popover"]').popover({ html: true });
+        $('[data-toggle="popover"]').popover({ html: true});
         $('body').on('click', '#btn-clear', function () {
             $('.search-filter').find('input[type=text]').val('');
             $('#asset-status').val('');
@@ -127,7 +127,7 @@
     }
 
     var borrow = function () {
-        $('.date').datepicker({autoclose: true});
+        $('.date').datepicker({ autoclose: true});
         $('[data-toggle="popover"]').popover({ html: true });
         $.post('/Asset/GetAutoCompleteData',
         {
@@ -160,6 +160,19 @@
             var sdate = $('#m-sdate').val();
             var edate = $('#m-edate').val();
             var comment = $.trim($('#m-comment').val());
+            if (borrow_user == "") {
+                alert("Please select borrower!");
+                return false;
+            }
+            if (pro_no == "") {
+                alert("Please select project!");
+                return false;
+            }
+            if (islong == undefined) {
+                alert("Please choose islong !");
+                return false;
+            }
+
             var assets = new Array();
             $('.m-assets').each(function () {
                 assets.push($(this).attr('data-val'));
@@ -233,6 +246,10 @@
             }
         })
 
+        $('body').on('click', '.in-borrow', function () {
+            window.location.href = "/Asset/BorrowRequest?p=1&status=1";
+        })
+
         function autoCompleteFill(id, values) {
             $('#' + id).autoComplete({
                 minChars: 0,
@@ -287,7 +304,7 @@
     }
 
     var buy = function () {
-        $('[data-toggle="popover"]').popover({ html: true });
+        $('[data-toggle="popover"]').popover({ html: true, trigger: "hover"});
         $('body').on('click', '.add-icon', function () {
             $('input[type=text]').val("");
             $('textarea').val("");

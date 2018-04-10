@@ -50,10 +50,10 @@ namespace SmartLinks.Controllers
             return View();
         }
 
-        public ActionResult BorrowRequest(int p = 1, string key = "")
+        public ActionResult BorrowRequest(int p = 1, string key = "", string status = "")
         {
             var psize = 10;
-            var borrow_list = AssetBorrowHistoryVM.GetBorrowList(key);
+            var borrow_list = AssetBorrowHistoryVM.GetBorrowList(key, status);
             ViewBag.total = borrow_list.Count;
             ViewBag.data = borrow_list.Skip((p - 1) * psize).Take(psize);
 

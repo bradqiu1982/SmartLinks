@@ -274,7 +274,7 @@ namespace SmartLinks.Models
                 param.Add("@Status", status);
             }
 
-            //sql += " order by ai.UpdateAt Desc";
+            sql += " order by ai.ID Desc";
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, param);
             var res = new Dictionary<string, AssetVM>();
@@ -399,7 +399,7 @@ namespace SmartLinks.Models
             EndDate = "";
             AdminConfirm = "1";
             BorrowComment = "";
-            IsReturn = "0";
+            IsReturn = "1";
             ReturnComment = "";
             ReturnAt = "";
             CreateAt = null;
@@ -423,12 +423,12 @@ namespace SmartLinks.Models
         public string UpdateAt { set; get; }
         public List<AssetVM> AssetList { set; get; }
 
-        public static Dictionary<string, AssetBorrowHistoryVM> GetBorrowList(string key = "")
+        public static Dictionary<string, AssetBorrowHistoryVM> GetBorrowList(string key = "", string status = "")
         {
             var sql = @"select abh.*, ai.CN, ai.EnglishName, ai.ChineseName
                     from AssetBorrowHistory as abh 
                     left join AssetInfo as ai on abh.AssetID = ai.ID
-                    where 1 = 1";
+                    where abh.IsReturn <> 0";
             var param = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(key))
             {
@@ -436,7 +436,13 @@ namespace SmartLinks.Models
                 param.Add("@key", "%" + key + "%");
             }
 
-            sql += " Order by abh.UpdateAt Desc";
+            if (!string.IsNullOrEmpty(status))
+            {
+                sql += " and abh.IsReturn = @Status ";
+                param.Add("@Status", status);
+            }
+
+            sql += " Order by abh.IsReturn, abh.UpdateAt Desc";
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, param);
             var res = new Dictionary<string, AssetBorrowHistoryVM>();
@@ -611,7 +617,7 @@ namespace SmartLinks.Models
                 sql += " and abi.EngName like @key or abi.ChName like @key ";
                 param.Add("@key", "%" + key + "%");
             }
-            sql += " order by abi.UpdateAt Desc";
+            sql += " order by abi.Status, abi.UpdateAt Desc";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, param);
             var res = new List<AssetBuyInfoVM>();
             if(dbret.Count > 0)

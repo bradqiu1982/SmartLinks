@@ -102,7 +102,7 @@
                             </td>
                             <td>
                                 <button class="btn btn-default btn-sm buy-popover" data-toggle="popover"
-                                        data-placement="left" data-trigger="focus" data-container="body"
+                                        data-placement="left" data-container="body"
                                         data-content='<img src="@item.Picture" width="100" height="100" />'>
                                     @item.EngName
                                 </button>
@@ -114,28 +114,28 @@
                             <td>@item.OriginCountry</td>
                             <td>
                                 <button class="btn btn-default btn-sm buy-popover" data-toggle="popover"
-                                        data-placement="left" data-trigger="focus" data-container="body"
+                                        data-placement="left" data-container="body"
                                         data-content="@item.Purpose">
                                     @((item.Purpose.Length <= 10) ? item.Purpose : (item.Purpose.Substring(0, 10) + "..."))
                                 </button>
                             </td>
                             <td>
                                 <button class="btn btn-default btn-sm buy-popover" data-toggle="popover"
-                                        data-placement="left" data-trigger="focus" data-container="body"
+                                        data-placement="left" data-container="body"
                                         data-content="@item.Functions">
                                     @((item.Functions.Length <= 10) ? item.Functions : (item.Functions.Substring(0, 10) + "..."))
                                 </button>
                             </td>
                             <td>
                                 <button class="btn btn-default btn-sm buy-popover" data-toggle="popover"
-                                        data-placement="left" data-trigger="focus" data-container="body"
+                                        data-placement="left" data-container="body"
                                         data-content="@item.WorkPrinciple">
                                     @((item.WorkPrinciple.Length <= 10) ? item.WorkPrinciple : (item.WorkPrinciple.Substring(0, 10) + "..."))
                                 </button>
                             </td>
                             <td>
                                 <button class="btn btn-default btn-sm buy-popover" data-toggle="popover"
-                                        data-placement="left" data-trigger="focus" data-container="body"
+                                        data-placement="left" data-container="body"
                                         data-content="@item.CorporatePurposes">
                                     @((item.CorporatePurposes.Length <= 10) ? item.CorporatePurposes : (item.CorporatePurposes.Substring(0, 10) + "..."))
                                 </button>
@@ -143,8 +143,10 @@
                             <td>@Convert.ToDateTime(item.CreateAt).ToString("yyyy-MM-dd")</td>
                             <td>@(item.Status == SmartLinks.Models.BuyStatus.Buyed.ToString() ? "已购" :"已申请")</td>
                             <td>
-                                <span class="glyphicon glyphicon-pencil buy-edit" data-id="@item.ID"></span>
-                                <span class="glyphicon glyphicon-trash buy-del" data-id="@item.ID"></span>
+                                @if( ! (item.Status == SmartLinks.Models.BuyStatus.Buyed.ToString())) { 
+                                    <span class="glyphicon glyphicon-pencil buy-edit" data-id="@item.ID"></span>
+                                    <span class="glyphicon glyphicon-trash buy-del" data-id="@item.ID"></span>
+                                }
                             </td>
                         </tr>
                     }
