@@ -180,3 +180,75 @@ CREATE TABLE [dbo].[AssetCheckHistory] (
 	  [CreateAt] DATETIME NOT NULL,
 	  [UpdateAt] DATETIME NOT NULL,
 );
+
+CREATE TABLE [dbo].[TechVideoVM] (
+    [VID]   NVARCHAR (200) DEFAULT ('') NOT NULL,
+	[VSubject]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[VDescription]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[VPath]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+	[UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[Updater]   NVARCHAR (200) DEFAULT ('') NOT NULL
+	);
+
+CREATE TABLE [dbo].[machineusermap] (
+    [machine]   NVARCHAR (300)   DEFAULT ('')  NOT NULL,
+    [username]   NVARCHAR (300)   DEFAULT ('')  NOT NULL
+);
+
+CREATE TABLE [dbo].[VTestVM] (
+    [VID]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+    [TestID]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[TestType]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[TestContent]   NVARCHAR (MAX)   DEFAULT ('')  NOT NULL,
+    [Answer]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[TestNotice]   NVARCHAR (MAX)   DEFAULT ('')  NOT NULL,
+    [GiftOffer]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[GiftPath]   NVARCHAR (500)   DEFAULT ('')  NOT NULL,
+    [OptionalAnswers]   NVARCHAR (MAX)   DEFAULT ('')  NOT NULL
+);
+
+/****** Object:  Table [dbo].[VideoLog]    Script Date: 3/21/2018 3:11:10 PM ******/
+
+CREATE TABLE [dbo].[VideoLog](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[UserName] [nvarchar](200) DEFAULT ('') NOT NULL,
+	[Machine] [nvarchar](200) DEFAULT ('') NOT NULL,
+	[Url] [nvarchar](500) DEFAULT ('') NOT NULL,
+	[OperateModule] [nvarchar](200) DEFAULT ('') NOT NULL,
+	[Operate] [nvarchar](200) DEFAULT ('') NOT NULL,
+	[VideoID] [nvarchar](200) DEFAULT ('') NOT NULL,
+	[LogType] [tinyint] DEFAULT (0) NOT NULL,
+	[LogLevel] [nvarchar](200) DEFAULT ('') NOT NULL,
+	[Message] [nvarchar](max) DEFAULT ('') NOT NULL,
+	[CreateAt] [datetime] DEFAULT ('') NOT NULL,
+	[APVal1] [nvarchar](200) DEFAULT ('') NOT NULL,
+	[APVal2] [nvarchar](200) DEFAULT ('') NOT NULL,
+	[APVal3] [nvarchar](200) DEFAULT ('') NOT NULL,
+	CONSTRAINT [PK_VideoLog] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'0: Default 1:TechVideo' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'VideoLog', @level2type=N'COLUMN',@level2name=N'LogType'
+GO
+
+
+CREATE TABLE [dbo].[VTestScore] (
+	[MACHINE]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[UserName]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+    [VID]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[VSubject]   NVARCHAR (MAX) DEFAULT ('') NOT NULL,
+    [CorrectiveAnswer]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[UserAnswer]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[UserScore]   NVARCHAR (64)   DEFAULT ('')  NOT NULL,
+    [UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);
+
+CREATE TABLE [dbo].[VTestRank] (
+	[UserName]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[UserRank]   NVARCHAR (64)   DEFAULT ('0')  NOT NULL,
+    [UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);

@@ -1,0 +1,297 @@
+﻿html, body {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+}
+
+.body-header {
+    height: 15%;
+    margin-bottom: 1%;
+    border-bottom: 1px solid #00539F;
+}
+
+.logo-img {
+    height: 100%;
+    width: 30%;
+    padding: 2% 5%;
+}
+
+.body-content {
+    height: 85%;
+    margin-left:10%;
+    margin-right:10%;
+}
+
+.Tvideo-container {
+    height: 480px;
+    border-top: 1px #aaa solid;
+    border-left: 1px #aaa solid;
+    border-right: 1px #aaa solid;
+
+}
+
+.item-show{
+    margin-left: 5px;
+}
+
+.item-panels{
+    height: 510px;
+    padding-left:8px;
+    padding-right:8px;
+    border-right: 1px #aaa solid;
+    display: inline-block;
+    overflow-y: auto;
+}
+
+.item-details-show{
+    height:400px;
+    width:61.8%;
+    display: inline-block;
+    text-align:center;
+    margin-top:2px;
+}
+
+.item-panel{
+    min-height: 110px;
+    margin-top: 10px;
+    border: 1px #aaa solid;
+    border-left-width: 5px;
+}
+
+.item-panel-active{
+    min-height: 110px;
+    margin-top: 5px;
+    border: 1px #337ab7 solid;
+    border-left-width: 5px;
+}
+
+.item-details{
+    height: 100%;
+    padding-top: 10px;
+    border-left: 1px #aaa solid;
+}
+
+.item-title{
+    padding: 5px;
+    background-color: #eee;
+    border-bottom: 1px #aaa dashed;
+}
+
+.item-name{
+    display: inline-block;
+    width: 50%;
+}
+
+.item-content {
+    cursor:pointer;
+    min-height:90px;
+}
+
+.item-op{
+    display: inline-block;
+    float: right;
+}
+
+.item-content{
+    padding: 5px;
+}
+
+.item-date{
+    display: inline-block;
+    width: 50%
+}
+
+.item-panel-toolbar {
+    min-height: 35px;
+    margin-top: 5px;
+}
+
+.toolbar-img{
+    height: 20px;
+    width: 20px;
+    margin: 5px;
+}
+.search-input {
+    width:85%;
+    display:inline-block;
+}
+
+.search-img{
+    width: 30px;
+    height: 30px;
+    background-color: #5C2576; 
+    opacity: 0.8;
+    -moz-opacity: 0.8;
+    filter: alpha(opacity=80);
+    cursor: pointer;
+    display:inline-block;
+}
+
+.search-video{
+    width:80%;
+    display:inline-block;
+    height:30px;
+    float:right;
+    text-align:right;
+}
+
+.add-video-btn {
+    display:inline-block;
+    width: 30px;
+    height: 30px;
+    background-color: #00539F; 
+    opacity: 0.8;
+    -moz-opacity: 0.8;
+    filter: alpha(opacity=80);
+    cursor: pointer;
+    float:right;
+    margin-left:2px;
+}
+
+.add-test-btn {
+    display:inline-block;
+    width: 30px;
+    height: 30px;
+    background-color:#FF7400;
+    opacity: 0.8;
+    -moz-opacity: 0.8;
+    filter: alpha(opacity=80);
+    cursor: pointer;
+    float:right;
+    margin-left:2px;
+}
+
+.search-keywords{
+    width:100%;
+    height: 30px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border: #5C2576 1px solid;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius:  3px;
+    background-color: transparent;
+}
+
+.upload-video-container {
+    margin-top:10px;
+    height:250px;
+}
+
+.upload-test-container {
+    margin-top:10px;
+    height:320px;
+}
+
+.upload-video-footer{
+    margin: -30px -15px -15px -15px;
+    height: 60px;
+    padding: 10px;
+    border-top: 1px #aaa solid;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    background-color: #afafaf;
+    opacity: 0.8;
+}
+
+.upload-play {
+    text-align:center;
+}
+
+.upload-video-op{
+    height: 40px;
+    width: 40px;
+    cursor:pointer;
+}
+
+
+.wel-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.wel-bg {
+    padding-top: 10%;
+    padding-left: 10%;
+    padding-right: 10%;
+    opacity: 0.5;
+    -moz-opacity: 0.5;
+    filter: alpha(opacity=50);
+}
+
+.wel-bg-img{
+    width: 100%;
+}
+
+.wel-body {
+    position: absolute;
+    top: 25%;
+    left: 15%;
+    right: 15%;
+    width: 70%;
+    color: #000;
+}
+
+.wel-title {
+    padding-top: 5%;
+    font-size: 48px;
+}
+
+.wel-subtitle {
+    padding-top: 5%;
+    font-size: 24px;
+}
+
+.wel-op{
+    padding-top: 2%;
+    width: 40%;
+}
+
+.wel-input{
+    height: 35px;
+    background-color: transparent;
+    color: #000;
+    border: #000 solid 1px;
+}
+
+.wel-eg {
+    padding-top: 2%;
+    font-size: 16px;
+    font-style: italic;
+    text-decoration: underline;
+}
+
+.wel-submit{
+    padding-top: 5%;
+    font-size: 35px;
+    width: 30%;
+}
+
+.btn-wel-submit{
+    width: 100%;
+}
+
+.vlog-container {
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+.vlog-img{
+    cursor: pointer;
+}
+
+.test-notice-container1 {
+    margin-top:10px;
+    height:300px;
+}
+
+.test-notice-container2 {
+    margin-top:10px;
+    height:80px;
+}

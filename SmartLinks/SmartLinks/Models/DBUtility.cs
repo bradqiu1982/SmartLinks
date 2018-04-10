@@ -64,6 +64,7 @@ namespace SmartLinks.Models
             var conn = new SqlConnection();
             try
             {
+                //conn.ConnectionString = "Server=WUX-D80008792;User ID=dbg;Password=dbgpwd;Database=DebugDB;Connection Timeout=120;";
                 conn.ConnectionString = "Server=wuxinpi;User ID=NPI;Password=NPI@NPI;Database=NPITrace;Connection Timeout=120;";
                 conn.Open();
                 return conn;
