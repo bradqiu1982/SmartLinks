@@ -1,0 +1,251 @@
+﻿
+@{
+    ViewBag.Title = "BuyRequest";
+    Layout = "~/Views/Shared/_Layout4Asset.cshtml";
+}
+
+<link type="text/css" rel="stylesheet" href="~/Content/asset.css" />
+<script type="text/javascript" src="~/Scripts/asset.js"></script>
+<script>
+    $(function () {
+        Asset.buy();
+    })
+    function ShowFileNames(oFile) {
+        $('#m-showfile').text(oFile.value);
+    }
+</script>
+<nav class="col-xs-2 nav-sidebar">
+    <ul class="nav">
+        <li>
+            <a href="/Asset/Index">
+                <span class="glyphicon glyphicon-th-list" title="Assets Overview"></span>
+                <span class="item-show">Assets Overview</span>
+            </a>
+        </li>
+        <li>
+            <a href="/Asset/BorrowRequest">
+                <span class="glyphicon glyphicon-share-alt" title="Borrow Request"></span>
+                <span class="item-show">Borrow Request</span>
+            </a>
+        </li>
+        <li class="active">
+            <a href="/Asset/BuyRequest">
+                <span class="glyphicon glyphicon-plus-sign" title="Buy Request"></span>
+                <span class="item-show">Buy Request</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+<div class="col-xs-10">
+    <ol class="breadcrumb">
+        <li><a href="/Asset/Index">Asset</a></li>
+        <li class="active">Buy Request</li>
+    </ol>
+    <div class="device-container">
+        <table class="table table-striped table-hover">
+            <caption>
+                <span class="tb-cap col-xs-2">Total: @ViewBag.total</span>
+                <div class="col-xs-5 add-container">
+                    <span class="glyphicon glyphicon-plus add-icon"></span>
+                </div>
+                <div class="input-group search-container col-xs-5">
+                    <input type="text" id="searchkey" name="searchkey" 
+                           value="@ViewBag.keywords" class="form-control" placeholder="Search for..." />
+                    <span class="input-group-addon" id="btn-search">Search</span>
+                </div>
+            </caption>
+            <colgroup>
+                <col style="width: 2%;" />
+                <col style="width: 10%;" />
+                <col style="width: 10%;" />
+                <col style="width: 7%;" />
+                <col style="width: 8%;" />
+                <col style="width: 8%;" />
+                <col style="width: 7%;" />
+                <col style="width: 10%;" />
+                <col style="width: 8%;" />
+                <col style="width: 8%;" />
+                <col style="width: 8%;" />
+                <col style="width: 8%;" />
+                <col style="width: 6%;" />
+                <col style="width: 5%;" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th><input type="checkbox" class="check-all" /></th>
+                    <th>EngName</th>
+                    <th>ChName</th>
+                    <th>Unit Price</th>
+                    <th>Brand</th>
+                    <th>Model</th>
+                    <th>Origin Country</th>
+                    <th>Purpose</th>
+                    <th>Function</th>
+                    <th>Work Principle</th>
+                    <th>Corporate Purposes</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Operation</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if(ViewBag.data != null)
+                {
+                    foreach(var item in ViewBag.data)
+                    {
+                        <tr>
+                            <td>
+                                @if (item.Status != SmartLinks.Models.BuyStatus.Buyed.ToString())
+                                {
+                                    <input type="checkbox" class="check-item" data-id="@item.ID" />
+                                }
+                            </td>
+                            <td>
+                                <button class="btn btn-default btn-sm buy-popover" data-toggle="popover"
+                                        data-placement="left" data-trigger="focus" data-container="body"
+                                        data-content='<img src="@item.Picture" width="100" height="100" />'>
+                                    @item.EngName
+                                </button>
+                            </td>
+                            <td>@item.ChName</td>
+                            <td>@item.UnitPrice</td>
+                            <td>@item.Brand</td>
+                            <td>@item.Model</td>
+                            <td>@item.OriginCountry</td>
+                            <td>
+                                <button class="btn btn-default btn-sm buy-popover" data-toggle="popover"
+                                        data-placement="left" data-trigger="focus" data-container="body"
+                                        data-content="@item.Purpose">
+                                    @((item.Purpose.Length <= 10) ? item.Purpose : (item.Purpose.Substring(0, 10) + "..."))
+                                </button>
+                            </td>
+                            <td>
+                                <button class="btn btn-default btn-sm buy-popover" data-toggle="popover"
+                                        data-placement="left" data-trigger="focus" data-container="body"
+                                        data-content="@item.Functions">
+                                    @((item.Functions.Length <= 10) ? item.Functions : (item.Functions.Substring(0, 10) + "..."))
+                                </button>
+                            </td>
+                            <td>
+                                <button class="btn btn-default btn-sm buy-popover" data-toggle="popover"
+                                        data-placement="left" data-trigger="focus" data-container="body"
+                                        data-content="@item.WorkPrinciple">
+                                    @((item.WorkPrinciple.Length <= 10) ? item.WorkPrinciple : (item.WorkPrinciple.Substring(0, 10) + "..."))
+                                </button>
+                            </td>
+                            <td>
+                                <button class="btn btn-default btn-sm buy-popover" data-toggle="popover"
+                                        data-placement="left" data-trigger="focus" data-container="body"
+                                        data-content="@item.CorporatePurposes">
+                                    @((item.CorporatePurposes.Length <= 10) ? item.CorporatePurposes : (item.CorporatePurposes.Substring(0, 10) + "..."))
+                                </button>
+                            </td>
+                            <td>@Convert.ToDateTime(item.CreateAt).ToString("yyyy-MM-dd")</td>
+                            <td>@(item.Status == SmartLinks.Models.BuyStatus.Buyed.ToString() ? "已购" :"已申请")</td>
+                            <td>
+                                <span class="glyphicon glyphicon-pencil buy-edit" data-id="@item.ID"></span>
+                                <span class="glyphicon glyphicon-trash buy-del" data-id="@item.ID"></span>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        @Html.Partial("~/Views/shared/_Pagination.cshtml")
+        <div class="op-container">
+            <input type="button" class="btn btn-success" value="Update Status" id="btn-op-update" />
+            <input type="button" class="btn btn-warning" value="Delete" id="btn-op-del" />
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal-buy" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <input type="hidden" id="m-id" name="m-id" />
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">New Buy Request</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row margin-bottom">
+                    <label class="col-xs-2 label-right">English Name</label>
+                    <div class="col-xs-8">
+                        <input type="text" class="form-control" id="m-ename" name="m-ename" />
+                    </div>
+                </div>
+                <div class="row margin-bottom">
+                    <label class="col-xs-2 label-right">Chinese Name</label>
+                    <div class="col-xs-8">
+                        <input type="text" class="form-control" id="m-cname" name="m-cname" />
+                    </div>
+                </div>
+                <div class="row margin-bottom">
+                    <label class="col-xs-2 label-right">Unit Price</label>
+                    <div class="col-xs-8">
+                        <input type="text" class="form-control" id="m-price" name="m-price" />
+                    </div>
+                </div>
+                <div class="row margin-bottom">
+                    <label class="col-xs-2 label-right">Brand</label>
+                    <div class="col-xs-8">
+                        <input type="text" class="form-control" id="m-brand" name="m-brand" />
+                    </div>
+                </div>
+                <div class="row margin-bottom">
+                    <label class="col-xs-2 label-right">Model</label>
+                    <div class="col-xs-8">
+                        <input type="text" class="form-control" id="m-model" name="m-model" />
+                    </div>
+                </div>
+                <div class="row margin-bottom">
+                    <label class="col-xs-2 label-right">Country of Origin</label>
+                    <div class="col-xs-8">
+                        <input type="text" class="form-control" id="m-country" name="m-country" />
+                    </div>
+                </div>
+                <div class="row margin-bottom">
+                    <label class="col-xs-2 label-right">Picture</label>
+                    <div class="col-xs-8">
+                        <div class="col-xs-4">
+                            <span class="btn btn-success btn-file" id="choosefile3" data-intro="Click to upload picture.">
+                                <strong>Good's Picture</strong>
+                                <input type="file" id="m-picture" name="m-picture" runat="server" onchange="ShowFileNames(this)" />
+                            </span>
+                        </div>
+                        <div class="col-xs-7 label-right">
+                            <label class="control-label" id="m-showfile" name="m-showfile"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row margin-bottom">
+                    <label class="col-xs-2 label-right">Purpose</label>
+                    <div class="col-xs-8">
+                        <textarea class="form-control" rows="2" id="m-purpose" name="m-purpose"></textarea>
+                    </div>
+                </div>
+                <div class="row margin-bottom">
+                    <label class="col-xs-2 label-right">Function</label>
+                    <div class="col-xs-8">
+                        <textarea class="form-control" rows="2" id="m-funcs" name="m-funcs"></textarea>
+                    </div>
+                </div>
+                <div class="row margin-bottom">
+                    <label class="col-xs-2 label-right">Work Principle</label>
+                    <div class="col-xs-8">
+                        <textarea class="form-control" rows="2" id="m-principle" name="m-principle"></textarea>
+                    </div>
+                </div>
+                <div class="row margin-bottom">
+                    <label class="col-xs-2 label-right">Corporate purposes</label>
+                    <div class="col-xs-8">
+                        <textarea class="form-control" rows="2" id="m-corpurpose" name="m-corpurpose"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-warning" id="btn-clear" name="btn-clear" data-dismiss="modal" value="Cancel" />
+                <input type="button" class="btn btn-success" id="btn-submit" name="btn-submit" value="Submit" />
+            </div>
+        </div>
+    </div>
+</div>

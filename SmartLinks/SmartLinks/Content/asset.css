@@ -1,0 +1,163 @@
+﻿html, body {
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+}
+
+.body-header {
+    margin-bottom: 1%;
+    border-bottom: 1px solid #00539F;
+}
+
+.logo-img {
+    height: 100%;
+    width: 30%;
+    padding: 2% 5%;
+}
+
+.body-content {
+    height: 75%;
+}
+
+.nav-sidebar {
+    display: inline-block;
+    height: 100%;
+    padding: 8px 0;
+    border-right: 1px solid #ddd;
+}
+
+.nav-sidebar-narrow {
+    width: 3%;
+}
+
+.nav-sidebar a {
+    color: #333;
+    -webkit-transition: all 0.08s linear;
+    -moz-transition: all 0.08s linear;
+    -o-transition: all 0.08s linear;
+    transition: all 0.08s linear;
+}
+
+.nav-sidebar .active a {
+    background-color: #428bca;
+    color: #fff;
+    text-shadow: 1px 1px 1px #666;
+}
+
+.nav-sidebar .active a:hover {
+    background-color: #428bca;
+}
+
+.nav-sidebar-icon {
+    text-align: center;
+    background-color: #aaa;
+    padding: 10px 15px;
+}
+
+.search-filter {
+    margin-bottom: 5px;
+}
+
+.margin-bottom {
+    margin-bottom: 5px;
+}
+
+.op-btn {
+    float: right;
+    margin-right: 2%;
+}
+
+.tb-cap{
+    text-align: left;
+    font-size: 20px;
+    color: #aaa;
+}
+
+.pages{
+    cursor: pointer;
+}
+
+.search-container{
+    float: right;
+}
+
+.add-container {
+    font-size: 25px;
+    text-align: right;
+}
+
+.label-right{
+    margin-left: 8%;
+    text-align: right;
+}
+
+.add-icon, .import-icon, #btn-search {
+    cursor: pointer;
+}
+
+.img-return{
+    cursor: pointer;
+}
+
+.device-container{
+    width: 100%;
+    font-size: 12px;
+    overflow-x: auto;
+}
+
+.m-confirm {
+    cursor: pointer;
+    color: #00CC00;
+    font-size: 16px;
+}
+
+.m-assets {
+    color: #fff;
+    min-width: 100px;
+    background-color: #5cb85c;
+    border-color: #4cae4c;
+    border-radius: 3px;
+    padding: 5px 10px;
+    margin: 2px;
+    display: inline-block;
+}
+
+.m-add-list {
+    height: 150px;
+    background-color: #efefef;
+    border-radius: 4px;
+    padding-top: 6px;
+    overflow-y: auto;
+}
+
+.del-m-asset {
+    float: right;
+    margin-left: 5px;
+    margin-top: 2px;
+    font-size: 14px;
+    cursor: pointer;
+}
+.buy-del, .buy-edit, .check-complete {
+    cursor: pointer;
+}
+.buy-popover {
+    padding: 0;
+    border: 0;
+    color: #2a6496;
+    text-decoration: underline;
+}
+.asset-tb-popover{
+    font-size: 10px;
+}
+.table-assetoverview{
+    font-size: 12px;
+}
+
+.asset-check {
+    cursor: pointer;
+    color: #2a6496;
+}

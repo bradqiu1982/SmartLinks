@@ -1,0 +1,199 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout4Asset.cshtml";
+}
+<link type="text/css" rel="stylesheet" href="~/Content/asset.css" />
+<script type="text/javascript" src="~/Scripts/asset.js"></script>
+<script>
+    $(function () {
+        Asset.init();
+    })
+</script>
+<nav class="col-xs-2 nav-sidebar">
+    <ul class="nav">
+        <li class="active">
+            <a href="/Asset/Index">
+                <span class="glyphicon glyphicon-th-list" title="Assets Overview"></span>
+                <span class="item-show">Assets Overview</span>
+            </a>
+        </li>
+        <li>
+            <a href="/Asset/BorrowRequest">
+                <span class="glyphicon glyphicon-share-alt" title="Borrow Request"></span>
+                <span class="item-show">Borrow Request</span>
+            </a>
+        </li>
+        <li>
+            <a href="/Asset/BuyRequest">
+                <span class="glyphicon glyphicon-plus-sign" title="Buy Request"></span>
+                <span class="item-show">Buy Request</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+<div class="col-xs-10">
+    <ol class="breadcrumb">
+        <li><a href="/Asset/Index">Asset</a></li>
+        <li class="active">Overview</li>
+    </ol>
+    <div class="search-filter">
+        <div class="col-xs-4 margin-bottom">
+            <label class="col-xs-3">CN</label>
+            <div class="col-xs-9">
+                <input type="text" id="s-cn" name="s-cn" class="form-control" value="@ViewBag.cn" />
+            </div>
+        </div>
+        <div class="col-xs-4 margin-bottom">
+            <label class="col-xs-3">Name</label>
+            <div class="col-xs-9">
+                <input type="text" id="s-name" name="s-name" class="form-control" value="@ViewBag.name" />
+            </div>
+        </div>
+        <div class="col-xs-4 margin-bottom">
+            <label class="col-xs-3">Status</label>
+            <div class="col-xs-9">
+                <select class="form-control" id="s-status">
+                    <option value="">-- All --</option>
+                    <option value="Idle" @(string.Compare(ViewBag.status, "Idle") == 0 ? "selected": "" )>Idle</option>
+                    <option value="Stop" @(string.Compare(ViewBag.status, "Stop") == 0 ? "selected": "" )>Stop</option>
+                    <option value="Serviced" @(string.Compare(ViewBag.status, "Serviced") == 0 ? "selected": "" )>Serviced</option>
+                    <option value="In Calibration" @(string.Compare(ViewBag.status, "In Calibration") == 0 ? "selected": "" )>In Calibration</option>
+                    <option value="Active" @(string.Compare(ViewBag.status, "Active") == 0 ? "selected": "" )>Active</option>
+                </select>
+            </div>
+        </div>
+        <div class="margin-bottom op-btn">
+            <input type="button" class="btn btn-warning" id="btn-clear" name="btn-clear" value="Clear" />
+            <input type="button" class="btn btn-success" id="btn-search" name="btn-search" value="Search" />
+        </div>
+    </div>
+    <div>
+        <div class="device-container">
+            <table class="table table-striped table-hover table-assetoverview">
+                <caption>
+                    <span class="tb-cap col-xs-2">Total: @ViewBag.total</span>
+                    <div class="col-xs-10 add-container">
+                        @*<span class="glyphicon glyphicon-plus add-icon" title="Add Asset"></span>*@
+                        <span class="glyphicon glyphicon-cloud-upload import-icon btn-file" title="Import">
+                            <input type="file" name="upload" id="upload" runat="server" />
+                        </span>
+                    </div>
+                </caption>
+                <thead>
+                    <tr>
+                        @foreach (var item in ViewBag.showColumn)
+                        {
+                            <th>@item</th>
+                        }
+                        <th>Borrow</th>
+                        <th>Check</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.data != null)
+                    {
+                        foreach (var item in ViewBag.data)
+                        {
+                            var borrow_history = "";
+                            if (!(item.Value.BorrowHistory.Count == 1 && string.IsNullOrEmpty(item.Value.BorrowHistory[0].ID)))
+                            {
+                                borrow_history = @"<table class='table table-striped table-hover asset-tb-popover'>
+                                    <tr>
+                                        <th>Borrower</th>
+                                        <th>Status</th>
+                                        <th>Borrow Date</th>
+                                        <th>Return Date</th>
+                                    </tr>";
+                                foreach (var val in item.Value.BorrowHistory)
+                                {
+                                    borrow_history += "<tr>" +
+                                        "<td>" + val.BorrowUser.ToUpper().Split(new char[] { '@' })[0] + "</td>" +
+                                        "<td>" + (!string.IsNullOrEmpty(val.IsReturn) ? "已归还" : "在借") + "</td>" +
+                                        "<td>" + Convert.ToDateTime(val.StartDate).ToString("yyyy-MM-dd") + "</td>" +
+                                        "<td>" + Convert.ToDateTime(val.EndDate).ToString("yyyy-MM-dd") + "</td>" +
+                                    "</tr>";
+                                }
+                                borrow_history += "</table>";
+                            }
+                            var check_history = "";
+                            if(item.Value.CheckHistory.Count > 0)
+                            {
+                                foreach(var line in item.Value.CheckHistory)
+                                {
+                                    check_history = @"<table class='table table-striped table-hover asset-tb-popover'>
+                                    <tr>
+                                        <th>Check Date</th>
+                                        <th>Status</th>
+                                        <th>Complete Date</th>
+                                        <th>Operation</th>
+                                    </tr>";
+                                    foreach (var val in item.Value.CheckHistory)
+                                    {
+                                        var status = Convert.ToInt32(val.Status);
+                                        check_history += "<tr>" +
+                                                    "<td>" + Convert.ToDateTime(val.CreateAt).ToString("yyyy-MM-dd") + "</td>" +
+                                                    "<td>" + ((status == SmartLinks.Models.CheckStatus.Complete) ? "已完成" : (status == SmartLinks.Models.CheckStatus.Valid ? "送检" : "无效")) + "</td>" +
+                                                    "<td>" + (status == SmartLinks.Models.CheckStatus.Complete ? Convert.ToDateTime(val.UpdateAt).ToString("yyyy-MM-dd") : "") + "</td>" +
+                                                    "<td>" + (status == SmartLinks.Models.CheckStatus.Valid ? "<span class='glyphicon glyphicon-ok check-complete' data-id='" + val.ID + "' title='Complete'></span>" : "") + "</td>" +
+                                                "</tr>";
+                                    }
+                                    check_history += "</table>";
+                                }
+                            }
+                            <tr>
+                                @foreach (var vm in ViewBag.showColumn)
+                                {
+                                    <td>@SmartLinks.Models.AssetVM.GetPropertyValue(vm, item.Value)</td>
+                                }
+                                <td>
+                                    @if (!string.IsNullOrEmpty(borrow_history))
+                                    {
+                                        <button class="btn btn-default btn-sm buy-popover" data-toggle="popover"
+                                                data-placement="left" data-container="body"
+                                                data-content='@borrow_history' title="Borrow History">
+                                            Detail
+                                        </button>
+                                    }
+                                </td>
+                                <td>@if (!string.IsNullOrEmpty(check_history))
+                                    {
+                                        <button class="btn btn-default btn-sm buy-popover" data-toggle="popover"
+                                                data-placement="left" data-container="body"
+                                                data-content='@check_history' title="Check History">
+                                            <span class="glyphicon glyphicon-list"></span>
+                                        </button>
+                                    }
+                                    <span class="glyphicon glyphicon-retweet asset-check" data-id="@item.Value.ID" title="Check Record"></span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        @Html.Partial("~/Views/shared/_Pagination.cshtml")
+    </div>
+</div>
+<div class="modal fade" id="modal-check" tabindex="-1" role="dialog" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Check</h4>
+            </div>
+            <div class="modal-body">
+                <input class="hidden" id="mc-id" name="mc-id" />
+                <div class="row margin-bottom">
+                    <label class="col-xs-2 label-right">Comment</label>
+                    <div class="col-xs-8">
+                        <textarea class="form-control" rows="3" id="mc-comment" name="mc-comment"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-warning" id="btn-mclear" name="btn-mclear" data-dismiss="modal" value="Cancel" />
+                <input type="button" class="btn btn-success" id="btn-msubmit" name="btn-msubmit" value="Check" />
+            </div>
+        </div>
+    </div>
+</div>
