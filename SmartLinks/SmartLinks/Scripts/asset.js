@@ -194,7 +194,6 @@
                     window.location.reload();
                 }
             })
-            $('#modal-borrow').modal('hide');
         })
 
         $('body').on('click', '.img-return', function () {
@@ -219,7 +218,6 @@
             }, function (output) {
                 if (output.success) {
                     window.location.reload();
-                    $('#modal-return').modal('hide');
                 }
             });
         })
