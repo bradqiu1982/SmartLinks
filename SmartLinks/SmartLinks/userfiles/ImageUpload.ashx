@@ -103,7 +103,8 @@ public class ImageUpload : IHttpHandler {
 
             if (string.Compare(bimage,"IMG")== 0)
             {
-                context.Response.Write("<p><img src='" + url + "'/></p>");
+                //context.Response.Write("<p><img src='" + url + "'/></p>");
+                context.Response.Write( url );
             }
             else if (string.Compare(bimage,"VIDEO")== 0)
             {
