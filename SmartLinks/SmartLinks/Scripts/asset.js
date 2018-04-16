@@ -84,7 +84,7 @@
                     {
                         path: data.url
                     }, function () {
-                        //window.location.reload();
+                        window.location.reload();
                     })
                 },
                 error: function (e) {
