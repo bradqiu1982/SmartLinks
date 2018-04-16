@@ -13,9 +13,34 @@ namespace SmartLinks.Controllers
 {
     public class AssetController : Controller
     {
+        public static string DetermineCompName(string IP)
+        {
+            try
+            {
+                IPAddress myIP = IPAddress.Parse(IP);
+                IPHostEntry GetIPHost = Dns.GetHostEntry(myIP);
+                List<string> compName = GetIPHost.HostName.ToString().Split('.').ToList();
+                return compName.First();
+            }
+            catch (Exception ex)
+            { return string.Empty; }
+        }
+        private void UserAuth()
+        {
+            string IP = Request.UserHostName;
+            var compName = DetermineCompName(IP);
+            ViewBag.compName = compName.ToUpper();
+            ViewBag.AssetAdmin = false;
+            var glbcfg = CfgUtility.GetSysConfig(this);
+            if (glbcfg["ASSETADMIN"].ToUpper().Contains(ViewBag.compName))
+            {
+                ViewBag.AssetAdmin = true;
+            }
+        }
         // GET: Asset
         public ActionResult Index(int p = 1, string cn = "", string name = "", string status = "")
         {
+            UserAuth();
             var psize = 10;
             var asset_list = AssetVM.GetAssetList(cn, name, status);
             ViewBag.total = asset_list.Count;
@@ -39,6 +64,7 @@ namespace SmartLinks.Controllers
 
         public ActionResult BuyRequest(int p = 1, string key = "")
         {
+            UserAuth();
             var psize = 10;
             var buy_list = AssetBuyInfoVM.GetAssetBuyInfo(key);
             ViewBag.total = buy_list.Count;
@@ -52,6 +78,7 @@ namespace SmartLinks.Controllers
 
         public ActionResult BorrowRequest(int p = 1, string key = "", string status = "")
         {
+            UserAuth();
             var psize = 10;
             var borrow_list = AssetBorrowHistoryVM.GetBorrowList(key, status);
             ViewBag.total = borrow_list.Count;

@@ -12,4 +12,5 @@ WUX-L80008413:::Yan.Shi
 VideoAdmin:::Windy.Ju;Shawn.Zhang;Brad.Qiu;Yan.Shi;JingShu.Xu
 UseLog4Net=False
 
-ASSETADMIN:::Zhao.Liu;Kenny.Cheng;
+ASSETADMIN:::WUX-L80004231;WUX-L80003994;WUX-D80008019;WUX-D80008852;
+

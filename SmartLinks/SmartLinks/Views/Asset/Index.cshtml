@@ -72,12 +72,15 @@
             <table class="table table-striped table-hover table-assetoverview">
                 <caption>
                     <span class="tb-cap col-xs-2">Total: @ViewBag.total</span>
-                    <div class="col-xs-10 add-container">
-                        <a class="excel-template" href="~/Scripts/asset_test.xlsx">eg: Upload File Template</a>
-                        <span class="glyphicon glyphicon-cloud-upload import-icon btn-file" title="Import">
-                            <input type="file" name="upload" id="upload" runat="server" />
-                        </span>
-                    </div>
+                    @if (ViewBag.AssetAdmin)
+                    {
+                        <div class="col-xs-10 add-container">
+                            <a class="excel-template" href="~/Scripts/asset_test.xlsx">eg: Upload File Template</a>
+                            <span class="glyphicon glyphicon-cloud-upload import-icon btn-file" title="Import">
+                                <input type="file" name="upload" id="upload" runat="server" />
+                            </span>
+                        </div>
+                    }
                 </caption>
                 <thead>
                     <tr>
@@ -134,7 +137,7 @@
                                                     "<td>" + Convert.ToDateTime(val.CreateAt).ToString("yyyy-MM-dd") + "</td>" +
                                                     "<td>" + ((status == SmartLinks.Models.CheckStatus.Complete) ? "已完成" : (status == SmartLinks.Models.CheckStatus.Valid ? "送检" : "无效")) + "</td>" +
                                                     "<td>" + (status == SmartLinks.Models.CheckStatus.Complete ? Convert.ToDateTime(val.UpdateAt).ToString("yyyy-MM-dd") : "") + "</td>" +
-                                                    "<td>" + (status == SmartLinks.Models.CheckStatus.Valid ? "<span class='glyphicon glyphicon-ok check-complete' data-id='" + val.ID + "' title='Complete'></span>" : "") + "</td>" +
+                                                    "<td>" + ((ViewBag.AssetAdmin &&status == SmartLinks.Models.CheckStatus.Valid) ? "<span class='glyphicon glyphicon-ok check-complete' data-id='" + val.ID + "' title='Complete'></span>" : "") + "</td>" +
                                                 "</tr>";
                                     }
                                     check_history += "</table>";
@@ -163,7 +166,9 @@
                                             <span class="glyphicon glyphicon-list"></span>
                                         </button>
                                     }
-                                    <span class="glyphicon glyphicon-retweet asset-check" data-id="@item.Value.ID" title="Check Record"></span>
+                                    @if (ViewBag.AssetAdmin) {
+                                        <span class="glyphicon glyphicon-retweet asset-check" data-id="@item.Value.ID" title="Check Record"></span>
+                                    }
                                 </td>
                             </tr>
                         }

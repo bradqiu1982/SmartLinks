@@ -47,7 +47,10 @@
                 <span class="tb-cap col-xs-2">Total: @ViewBag.total</span>
                 <div class="col-xs-5 add-container">
                     <input type="button" class="btn btn-success in-borrow" value="未归还" />
-                    <span class="glyphicon glyphicon-plus add-icon"></span>
+                    @if (ViewBag.AssetAdmin)
+                    {
+                        <span class="glyphicon glyphicon-plus add-icon"></span>
+                    }
                 </div>
                 <div class="input-group search-container col-xs-5">
                     <input type="text" id="searchkey" name="searchkey"
@@ -96,8 +99,12 @@
                             <td>@item.Value.ReturnComment</td>
                             <td>@asset_list</td>
                             <td>
-                                @if(item.Value.IsReturn == "1") { 
-                                    <img title="Return" src="~/Content/images/return.png" data-id="@item.Value.ID" data-assetid="@item.Value.AssetID" width="30" height="25" class="img-return" />
+                                @if (ViewBag.AssetAdmin)
+                                {
+                                    if (item.Value.IsReturn == "1")
+                                    {
+                                        <img title="Return" src="~/Content/images/return.png" data-id="@item.Value.ID" data-assetid="@item.Value.AssetID" width="30" height="25" class="img-return" />
+                                    }
                                 }
                             </td>
                         </tr>

@@ -46,7 +46,10 @@
             <caption>
                 <span class="tb-cap col-xs-2">Total: @ViewBag.total</span>
                 <div class="col-xs-5 add-container">
-                    <span class="glyphicon glyphicon-plus add-icon"></span>
+                    @if (ViewBag.AssetAdmin)
+                    {
+                        <span class="glyphicon glyphicon-plus add-icon"></span>
+                    }
                 </div>
                 <div class="input-group search-container col-xs-5">
                     <input type="text" id="searchkey" name="searchkey" 
@@ -72,7 +75,12 @@
             </colgroup>
             <thead>
                 <tr>
-                    <th><input type="checkbox" class="check-all" /></th>
+                    <th>
+                        @if (ViewBag.AssetAdmin)
+                        {
+                            <input type="checkbox" class="check-all" />
+                        }
+                    </th>
                     <th>EngName</th>
                     <th>ChName</th>
                     <th>Unit Price</th>
@@ -95,7 +103,7 @@
                     {
                         <tr>
                             <td>
-                                @if (item.Status != SmartLinks.Models.BuyStatus.Buyed.ToString())
+                                @if (ViewBag.AssetAdmin && item.Status != SmartLinks.Models.BuyStatus.Buyed.ToString())
                                 {
                                     <input type="checkbox" class="check-item" data-id="@item.ID" />
                                 }
@@ -143,9 +151,13 @@
                             <td>@Convert.ToDateTime(item.CreateAt).ToString("yyyy-MM-dd")</td>
                             <td>@(item.Status == SmartLinks.Models.BuyStatus.Buyed.ToString() ? "已购" :"已申请")</td>
                             <td>
-                                @if( ! (item.Status == SmartLinks.Models.BuyStatus.Buyed.ToString())) { 
-                                    <span class="glyphicon glyphicon-pencil buy-edit" data-id="@item.ID"></span>
-                                    <span class="glyphicon glyphicon-trash buy-del" data-id="@item.ID"></span>
+                                @if (ViewBag.AssetAdmin)
+                                {
+                                    if (!(item.Status == SmartLinks.Models.BuyStatus.Buyed.ToString()))
+                                    {
+                                        <span class="glyphicon glyphicon-pencil buy-edit" data-id="@item.ID"></span>
+                                        <span class="glyphicon glyphicon-trash buy-del" data-id="@item.ID"></span>
+                                    }
                                 }
                             </td>
                         </tr>
@@ -154,10 +166,13 @@
             </tbody>
         </table>
         @Html.Partial("~/Views/shared/_Pagination.cshtml")
-        <div class="op-container">
-            <input type="button" class="btn btn-success" value="Update Status" id="btn-op-update" />
-            <input type="button" class="btn btn-warning" value="Delete" id="btn-op-del" />
-        </div>
+        @if (ViewBag.AssetAdmin)
+        {
+            <div class="op-container">
+                <input type="button" class="btn btn-success" value="Update Status" id="btn-op-update" />
+                <input type="button" class="btn btn-warning" value="Delete" id="btn-op-del" />
+            </div>
+        }
     </div>
 </div>
 <div class="modal fade" id="modal-buy" tabindex="-1" role="dialog">
