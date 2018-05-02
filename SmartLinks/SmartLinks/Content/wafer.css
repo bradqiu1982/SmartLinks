@@ -150,4 +150,17 @@ body {
     padding-right: 0;
 }
 
+.NGBKG {
+    color:black;
+background-color:red!important;
+}
 
+.NABKG {
+    color:black;
+background-color:yellow!important;
+}
+
+.GOODBKG {
+    color:black;
+background-color:green!important;
+}

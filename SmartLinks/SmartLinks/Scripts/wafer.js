@@ -78,10 +78,14 @@
                  {
                      var line = output.data[idx];
                      if (line.Status === "NG") {
-                         $("#WaferTableID").append('<tr class="danger"><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>' + line.WaferNum + '</td><td>' + line.PN + '</td><td>' + line.Status + '</td></tr>');
+                         $("#WaferTableID").append('<tr class="NGBKG"><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>' + line.WaferNum + '</td><td>' + line.PN + '</td><td>' + line.Status + '</td></tr>');
+                     }
+                     else if (line.Status === 'NA')
+                     {
+                         $("#WaferTableID").append('<tr class="NABKG"><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>' + line.WaferNum + '</td><td>' + line.PN + '</td><td>' + line.Status + '</td></tr>');
                      }
                      else {
-                         $("#WaferTableID").append('<tr><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>' + line.WaferNum + '</td><td>' + line.PN + '</td><td>' + line.Status + '</td></tr>');
+                         $("#WaferTableID").append('<tr class="GOODBKG"><td>' + line.SN + '</td><td>' + line.DateCode + '</td><td>' + line.WaferNum + '</td><td>' + line.PN + '</td><td>' + line.Status + '</td></tr>');
                      }
                  }
                  $.bootstrapLoading.end();

@@ -62,13 +62,19 @@ namespace SmartLinks.Controllers
                 }
             }
 
-            WaferPackVM.RetrieveWaferBySN(wafertable);
+            var fwafertable = WaferPackVM.SolveCableSN(wafertable);
+
+            WaferPackVM.RetrieveWaferBySN(fwafertable);
             var ngwaferdict = WaferPackVM.RetrieveNGWaferDict();
-            foreach (var item in wafertable)
+            foreach (var item in fwafertable)
             {
                 if (ngwaferdict.ContainsKey(item.WaferNum))
                 {
                     item.Status = WAFERSTATUS.NG;
+                }
+                else if (string.IsNullOrEmpty(item.WaferNum))
+                {
+                    item.Status = WAFERSTATUS.NA;
                 }
                 else
                 {
@@ -76,7 +82,7 @@ namespace SmartLinks.Controllers
                 }
             }
 
-            return wafertable;
+            return fwafertable;
         }
 
         public JsonResult QueryWafer()

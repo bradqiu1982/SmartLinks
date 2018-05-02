@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 
 namespace SmartLinks.Models
@@ -9,6 +10,7 @@ namespace SmartLinks.Models
     {
         public static string GOOD = "GOOD";
         public static string NG = "NG";
+        public static string NA = "NA";
     }
 
     public class WaferTableItem
@@ -58,15 +60,73 @@ namespace SmartLinks.Models
             return ret;
         }
 
-        public static void RetrieveWaferBySN(List<WaferTableItem> desdata)
+        public static List<WaferTableItem> SolveCableSN(List<WaferTableItem> desdata)
         {
-            var sncond = " ('";
+            var ret = new List<WaferTableItem>();
+
+            var sndict = new Dictionary<string, bool>();
+            var tempres = new List<WaferTableItem>();
+
+            StringBuilder sb = new StringBuilder(10 * (desdata.Count + 5));
+            sb.Append("('");
             foreach (var item in desdata)
             {
-                sncond = sncond + item.SN + "','";
+                sb.Append(item.SN + "','");
             }
-            sncond = sncond.Substring(0, sncond.Length - 2);
-            sncond = sncond + ") ";
+            var tempstr = sb.ToString();
+            var sncond = tempstr.Substring(0, tempstr.Length - 2) + ")";
+
+            var sql = @"select a.ToContainer,a.FromContainer from [PDMS].[dbo].[ComponentIssueSummary] a 
+                  inner join (SELECT COUNT(*) as tcnt,ToContainer FROM [PDMS].[dbo].[ComponentIssueSummary] where ToContainer  in <sncond> and LEN(FromContainer) = 7 group by ToContainer) b on a.ToContainer = b.ToContainer
+                  where b.tcnt >= 2 and LEN(a.FromContainer) = 7 order by a.ToContainer";
+            sql = sql.Replace("<sncond>", sncond);
+            var dbret = DBUtility.ExeMESReportSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var tempvm = new WaferTableItem();
+                tempvm.SN = Convert.ToString(line[1]);
+                tempvm.DateCode = Convert.ToString(line[0]);
+                tempres.Add(tempvm);
+
+                if (!sndict.ContainsKey(tempvm.SN)) {
+                    sndict.Add(tempvm.SN, true);
+                }
+                if (!sndict.ContainsKey(tempvm.DateCode))
+                {
+                    sndict.Add(tempvm.DateCode, true);
+                }
+            }
+
+            foreach (var item in desdata)
+            {
+                if (!sndict.ContainsKey(item.SN))
+                {
+                    ret.Add(item);
+                }
+            }
+            ret.AddRange(tempres);
+
+            return ret;
+        }
+
+        public static void RetrieveWaferBySN(List<WaferTableItem> desdata)
+        {
+            //var sncond = " ('";
+            //foreach (var item in desdata)
+            //{
+            //    sncond = sncond + item.SN + "','";
+            //}
+            //sncond = sncond.Substring(0, sncond.Length - 2);
+            //sncond = sncond + ") ";
+
+            StringBuilder sb = new StringBuilder(10 * (desdata.Count + 5));
+            sb.Append("('");
+            foreach (var item in desdata)
+            {
+                sb.Append(item.SN + "','");
+            }
+            var tempstr = sb.ToString();
+            var sncond = tempstr.Substring(0, tempstr.Length - 2) + ")";
 
             var queryedsndict = new Dictionary<string, bool>();
             var tetmpres = new List<WaferTableItem>();
@@ -113,31 +173,65 @@ namespace SmartLinks.Models
 
             if (leftsnlist.Count > 0)
             {
-                sncond = " ('";
-                foreach (var item in leftsnlist)
-                {
-                    sncond = sncond + item + "','";
-                }
-                sncond = sncond.Substring(0, sncond.Length - 2);
-                sncond = sncond + ") ";
+                //sncond = " ('";
+                //foreach (var item in leftsnlist)
+                //{
+                //    sncond = sncond + item + "','";
+                //}
+                //sncond = sncond.Substring(0, sncond.Length - 2);
+                //sncond = sncond + ") ";
 
-                sql = "SELECT distinct c.ContainerName as SN,dc.[ParamValueString] as wafer,pb.productname MaterialPN FROM insite.container c with(nolock)"
-                    + " inner join insite.currentStatus cs(nolock) on c.currentStatusId = cs.currentStatusId "
-                    + "inner join insite.workflowstep ws(nolock) on cs.WorkflowStepId = ws.WorkflowStepId "
-                    + "inner join insite.historyMainline hml with (nolock) on c.containerId = hml.containerId "
-                    + "inner join insite.componentIssueHistory cih with (nolock) on hml.historyMainlineId=cih.historyMainlineId "
-                    + "inner join insite.issueHistoryDetail ihd with (nolock) on cih.componentIssueHistoryId = ihd.componentIssueHistoryId "
-                    + "inner join insite.issueActualsHistory iah with (nolock) on ihd.issueHistoryDetailId = iah.issueHistoryDetailId "
-                    + "inner join insite.container cFrom with (nolock) on iah.fromContainerId = cFrom.containerId "
-                    + "inner join insite.product p with (nolock) on cFrom.productId = p.productId "
-                    + "inner join insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId "
-                    + "inner join insite.historyMainline hmll with (nolock)on cFrom.containerId=hmll.historyid "
-                    + "inner join insite.product pp with (nolock) on c.productid=pp.productid "
-                    + "left outer join insite.productfamily pf (nolock) on pp.productFamilyId = pf.productFamilyId "
-                    + "inner join insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid "
-                    + "inner join[InsiteDB].[insite].[dc_AOC_ManualInspection] dc (nolock) on hmll.[HistoryMainlineId]= dc.[HistoryMainlineId] "
-                    + "where dc.parametername= 'Trace_ID'  and p.description like '%VCSEL%'  and c.containername in <SNCOND> order by c.ContainerName,pb.productname ";
-                sql = sql.Replace("<SNCOND>", sncond);
+                StringBuilder sb1 = new StringBuilder(10 * (leftsnlist.Count + 5));
+                sb1.Append("('");
+                foreach (var line in leftsnlist)
+                {
+                    sb1.Append(line + "','");
+                }
+                var tempstr1 = sb1.ToString();
+                var sncond1 = tempstr1.Substring(0, tempstr1.Length - 2) + ")";
+
+                //sql = "SELECT distinct c.ContainerName as SN,dc.[ParamValueString] as wafer,pb.productname MaterialPN FROM insite.container c with(nolock)"
+                //    + " inner join insite.currentStatus cs(nolock) on c.currentStatusId = cs.currentStatusId "
+                //    + "inner join insite.workflowstep ws(nolock) on cs.WorkflowStepId = ws.WorkflowStepId "
+                //    + "inner join insite.historyMainline hml with (nolock) on c.containerId = hml.containerId "
+                //    + "inner join insite.componentIssueHistory cih with (nolock) on hml.historyMainlineId=cih.historyMainlineId "
+                //    + "inner join insite.issueHistoryDetail ihd with (nolock) on cih.componentIssueHistoryId = ihd.componentIssueHistoryId "
+                //    + "inner join insite.issueActualsHistory iah with (nolock) on ihd.issueHistoryDetailId = iah.issueHistoryDetailId "
+                //    + "inner join insite.container cFrom with (nolock) on iah.fromContainerId = cFrom.containerId "
+                //    + "inner join insite.product p with (nolock) on cFrom.productId = p.productId "
+                //    + "inner join insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId "
+                //    + "inner join insite.historyMainline hmll with (nolock)on cFrom.containerId=hmll.historyid "
+                //    + "inner join insite.product pp with (nolock) on c.productid=pp.productid "
+                //    + "left outer join insite.productfamily pf (nolock) on pp.productFamilyId = pf.productFamilyId "
+                //    + "inner join insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid "
+                //    + "inner join[InsiteDB].[insite].[dc_AOC_ManualInspection] dc (nolock) on hmll.[HistoryMainlineId]= dc.[HistoryMainlineId] "
+                //    + "where dc.parametername= 'Trace_ID'  and p.description like '%VCSEL%'  and c.containername in <SNCOND> order by c.ContainerName,pb.productname ";
+
+                sql = @"SELECT distinct c.ContainerName as SerialName,isnull(dc.[ParamValueString],'') as WaferLot,pb.productname MaterialPN ,hml.MfgDate
+                        FROM InsiteDB.insite.container c with (nolock) 
+                        left join InsiteDB.insite.currentStatus cs (nolock) on c.currentStatusId = cs.currentStatusId 
+                        left join InsiteDB.insite.workflowstep ws(nolock) on  cs.WorkflowStepId = ws.WorkflowStepId 
+                        left join InsiteDB.insite.componentRemoveHistory crh with (nolock) on crh.historyId = c.containerId 
+                        left join InsiteDB.insite.removeHistoryDetail rhd on rhd.componentRemoveHistoryId = crh.componentRemoveHistoryId 
+                        left join InsiteDB.insite.starthistorydetail  shd(nolock) on c.containerid=shd.containerId and shd.historyId <> shd.containerId 
+                        left join InsiteDB.insite.container co (nolock) on co.containerid=shd.historyId 
+                        left join InsiteDB.insite.historyMainline hml with (nolock) on c.containerId = hml.containerId 
+                        left join InsiteDB.insite.componentIssueHistory cih with (nolock) on  hml.historyMainlineId=cih.historyMainlineId 
+                        left join InsiteDB.insite.issueHistoryDetail ihd with (nolock) on cih.componentIssueHistoryId = ihd.componentIssueHistoryId 
+                        left join InsiteDB.insite.issueActualsHistory iah with (nolock) on  ihd.issueHistoryDetailId = iah.issueHistoryDetailId 
+                        left join InsiteDB.insite.RemoveHistoryDetail rem with (nolock) on iah.IssueActualsHistoryId = rem.IssueActualsHistoryId 
+                        left join InsiteDB.insite.RemovalReason re with (nolock) on rem.RemovalReasonId = re.RemovalReasonId 
+                        left join InsiteDB.insite.container cFrom with (nolock) on iah.fromContainerId = cFrom.containerId 
+                        left join InsiteDB.insite.product p with (nolock) on  cFrom.productId = p.productId 
+                        left join InsiteDB.insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId 
+                        left join InsiteDB.insite.historyMainline hmll with (nolock)on cFrom.OriginalcontainerId=hmll.historyid 
+                        left join InsiteDB.insite.product pp with (nolock) on c.productid=pp.productid 
+                        left join InsiteDB.insite.productfamily pf (nolock) on  pp.productFamilyId = pf.productFamilyId 
+                        left join InsiteDB.insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid 
+                        left join InsiteDB.insite.dc_AOC_ManualInspection dc (nolock) on hmll.[HistoryMainlineId]=dc.[HistoryMainlineId] 
+                        WHERE dc.parametername='Trace_ID' and p.description like '%VCSEL%' and dc.[ParamValueString] like '%-%'and c.containername in <SNCOND> order by pb.productname,c.ContainerName,hml.MfgDate DESC";
+
+                sql = sql.Replace("<SNCOND>", sncond1);
                 dbret = DBUtility.ExeRealMESSqlWithRes(sql);
                 foreach (var line in dbret)
                 {
