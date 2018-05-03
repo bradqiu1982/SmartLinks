@@ -62,7 +62,8 @@ namespace SmartLinks.Controllers
                 }
             }
 
-            var fwafertable = WaferPackVM.SolveCableSN(wafertable);
+            var cablesndict = new Dictionary<string, bool>(); 
+            var fwafertable = WaferPackVM.SolveCableSN(wafertable,cablesndict);
 
             WaferPackVM.RetrieveWaferBySN(fwafertable);
             var ngwaferdict = WaferPackVM.RetrieveNGWaferDict();
@@ -71,6 +72,12 @@ namespace SmartLinks.Controllers
                 if (ngwaferdict.ContainsKey(item.WaferNum))
                 {
                     item.Status = WAFERSTATUS.NG;
+                    //set NG for cable SN
+                    if (!string.IsNullOrEmpty(item.DateCode) 
+                        && cablesndict.ContainsKey(item.DateCode))
+                    {
+                        cablesndict[item.DateCode] = false;
+                    }
                 }
                 else if (string.IsNullOrEmpty(item.WaferNum))
                 {
@@ -82,6 +89,17 @@ namespace SmartLinks.Controllers
                 }
             }
 
+            //smame cable sn ,if one sub module is NG, whole module is NG
+            foreach (var item in fwafertable)
+            {
+                if (!string.IsNullOrEmpty(item.DateCode)
+                    && cablesndict.ContainsKey(item.DateCode)
+                    && !cablesndict[item.DateCode])
+                {
+                    item.Status = WAFERSTATUS.NG;
+                }
+            }
+            
             return fwafertable;
         }
 

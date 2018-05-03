@@ -60,11 +60,10 @@ namespace SmartLinks.Models
             return ret;
         }
 
-        public static List<WaferTableItem> SolveCableSN(List<WaferTableItem> desdata)
+        public static List<WaferTableItem> SolveCableSN(List<WaferTableItem> desdata,Dictionary<string, bool> cablesndict)
         {
             var ret = new List<WaferTableItem>();
 
-            var sndict = new Dictionary<string, bool>();
             var tempres = new List<WaferTableItem>();
 
             StringBuilder sb = new StringBuilder(10 * (desdata.Count + 5));
@@ -88,18 +87,18 @@ namespace SmartLinks.Models
                 tempvm.DateCode = Convert.ToString(line[0]);
                 tempres.Add(tempvm);
 
-                if (!sndict.ContainsKey(tempvm.SN)) {
-                    sndict.Add(tempvm.SN, true);
+                if (!cablesndict.ContainsKey(tempvm.SN)) {
+                    cablesndict.Add(tempvm.SN, true);
                 }
-                if (!sndict.ContainsKey(tempvm.DateCode))
+                if (!cablesndict.ContainsKey(tempvm.DateCode))
                 {
-                    sndict.Add(tempvm.DateCode, true);
+                    cablesndict.Add(tempvm.DateCode, true);
                 }
             }
 
             foreach (var item in desdata)
             {
-                if (!sndict.ContainsKey(item.SN))
+                if (!cablesndict.ContainsKey(item.SN))
                 {
                     ret.Add(item);
                 }
