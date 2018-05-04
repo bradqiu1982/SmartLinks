@@ -22,6 +22,7 @@ namespace SmartLinks.Models
             WaferNum = "";
             PN = "";
             Status = "";
+            AppendInfo = "";
         }
 
         public string SN { set; get; }
@@ -29,11 +30,12 @@ namespace SmartLinks.Models
         public string WaferNum { set; get; }
         public string PN { set; get; }
         public string Status { set; get; }
+        public string AppendInfo { set; get; }
     }
 
     public class WaferPackVM
     {
-        public static List<WaferTableItem> RetrieveSNByDateCode(List<string> datecodelist)
+        public static List<WaferTableItem> RetrieveSNByDateCode(List<string> datecodelist,Dictionary<string,string> appenddict)
         {
             var ret = new List<WaferTableItem>();
             var datecond = " ('";
@@ -44,24 +46,57 @@ namespace SmartLinks.Models
             datecond = datecond.Substring(0, datecond.Length - 2);
             datecond = datecond + ") ";
 
-            var sql = "select ContainerName,DateCode FROM [InsiteDB].[insite].[Container] where DateCode in <datecond>";
+            var sql = "select ContainerName,DateCode,CustomerSerialNum FROM [InsiteDB].[insite].[Container] where DateCode in <datecond> or CustomerSerialNum in <datecond>";
             sql = sql.Replace("<datecond>", datecond);
+
+            var excludsndict = new Dictionary<string, bool>();
 
             var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
             foreach (var line in dbret) {
-                var tempvm = new WaferTableItem();
-                tempvm.SN = Convert.ToString(line[0]);
-                tempvm.DateCode = Convert.ToString(line[1]);
-                if (!string.IsNullOrEmpty(tempvm.SN))
-                {
-                    ret.Add(tempvm);
-                }
+                try {
+
+                    var tempvm = new WaferTableItem();
+                    tempvm.SN = Convert.ToString(line[0]);
+
+                    if (!excludsndict.ContainsKey(tempvm.SN))
+                    {
+                        excludsndict.Add(tempvm.SN, true);
+
+                        var appendinfo = "";
+                        if (line[1].Equals(null))
+                        {
+                            tempvm.DateCode = "";
+                        }
+                        else
+                        {
+                            tempvm.DateCode = Convert.ToString(line[1]);
+                            appendinfo = tempvm.DateCode;
+                        }
+                        if (!line[2].Equals(null))
+                        {
+                            appendinfo = Convert.ToString(line[2]);
+                        }
+                
+                        if (!string.IsNullOrEmpty(tempvm.SN))
+                        {
+                            if (!appenddict.ContainsKey(tempvm.SN)) {
+                                appenddict.Add(tempvm.SN, appendinfo);
+                            }
+                            ret.Add(tempvm);
+                        }
+                    }//check sn
+
+
+                } catch (Exception ex) { }
+
             }
             return ret;
         }
 
         public static List<WaferTableItem> SolveCableSN(List<WaferTableItem> desdata,Dictionary<string, bool> cablesndict)
         {
+            var excludsndict = new Dictionary<string, bool>();
+
             var ret = new List<WaferTableItem>();
 
             var tempres = new List<WaferTableItem>();
@@ -82,18 +117,25 @@ namespace SmartLinks.Models
             var dbret = DBUtility.ExeMESReportSqlWithRes(sql);
             foreach (var line in dbret)
             {
+                
                 var tempvm = new WaferTableItem();
                 tempvm.SN = Convert.ToString(line[1]);
                 tempvm.DateCode = Convert.ToString(line[0]);
-                tempres.Add(tempvm);
-
-                if (!cablesndict.ContainsKey(tempvm.SN)) {
-                    cablesndict.Add(tempvm.SN, true);
-                }
-                if (!cablesndict.ContainsKey(tempvm.DateCode))
+                if (!excludsndict.ContainsKey(tempvm.SN))
                 {
-                    cablesndict.Add(tempvm.DateCode, true);
-                }
+                    excludsndict.Add(tempvm.SN, true);
+
+                    tempres.Add(tempvm);
+
+                    if (!cablesndict.ContainsKey(tempvm.SN)) {
+                        cablesndict.Add(tempvm.SN, true);
+                    }
+                    if (!cablesndict.ContainsKey(tempvm.DateCode))
+                    {
+                        cablesndict.Add(tempvm.DateCode, true);
+                    }
+                }//check sn
+
             }
 
             foreach (var item in desdata)
