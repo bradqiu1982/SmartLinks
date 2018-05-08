@@ -111,10 +111,19 @@ namespace SmartLinks.Controllers
             var comment = Request.Form["comment"];
             var assets = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(Request.Form["assets"], (new List<string>()).GetType());
             var borrowlist = new List<AssetBorrowHistoryVM>();
-            foreach(var item in assets)
+            var rid = DateTime.Now.ToString("yyyyMMddHHmmss");
+            var table = new List<List<string>>();
+            var e_tmp = new List<string>();
+            e_tmp.Add("RequestID");
+            e_tmp.Add("CN");
+            e_tmp.Add("English Name");
+            e_tmp.Add("Chinese Name");
+            e_tmp.Add("Model");
+            table.Add(e_tmp);
+            foreach (var item in assets)
             {
                 var tmp = new AssetBorrowHistoryVM();
-                tmp.RequestID = DateTime.Now.ToString("yyyyMMddHHmmss");
+                tmp.RequestID = rid;
                 tmp.AssetID = item;
                 tmp.BorrowUser = borrow_user;
                 tmp.ProjectNo = pro_no;
@@ -125,6 +134,31 @@ namespace SmartLinks.Controllers
                 borrowlist.Add(tmp);
             }
             AssetBorrowHistoryVM.NewBorrow(borrowlist);
+            //send confirm email
+            var asset_info = AssetVM.GetAssetList("", "", "", "('" + string.Join("','", assets) + "')");
+            foreach(var item in asset_info)
+            {
+                e_tmp = new List<string>();
+                e_tmp.Add(rid);
+                e_tmp.Add(item.Value.CN);
+                e_tmp.Add(item.Value.EnglishName);
+                e_tmp.Add(item.Value.ChineseName);
+                e_tmp.Add(item.Value.Supplier);
+                table.Add(e_tmp);
+            }
+            var towho = borrow_user.Split(new char[] { '@' })[0];
+            var greeting = "Hi, " + towho;
+            var description = "The following device(s) have been borrowed by you on "+DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            var content = EmailUtility.CreateTableHtml(greeting, description, null, table);
+            var glbcfg = CfgUtility.GetSysConfig(this);
+            var towholist = new List<string>();
+            towholist.Add(borrow_user);
+            if (!string.IsNullOrEmpty(glbcfg["ASSETADMINUSER"]))
+            {
+                var user_list = glbcfg["ASSETADMINUSER"].Split(new char[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                towholist.AddRange(user_list);
+            }
+            EmailUtility.SendEmail(this, "Borrow Device(s) -- " + DateTime.Now.ToString("MM/dd/yyyy"), towholist, content, true);
 
             var res = new JsonResult();
             res.Data = new { success = true };

@@ -251,7 +251,7 @@ namespace SmartLinks.Models
             DBUtility.ExeLocalSqlNoRes(sql, param);
         }
 
-        public static Dictionary<string, AssetVM> GetAssetList(string cn = "", string name = "", string status = "" )
+        public static Dictionary<string, AssetVM> GetAssetList(string cn = "", string name = "", string status = "", string ids = "" )
         {
             var sql = @"select ai.*, abh.*
                     from AssetInfo as ai 
@@ -272,6 +272,11 @@ namespace SmartLinks.Models
             {
                 sql += " and ai.EquipmentStatus = @Status ";
                 param.Add("@Status", status);
+            }
+            if (!string.IsNullOrEmpty(ids))
+            {
+                sql += " and ai.ID in <#ids>";
+                sql = sql.Replace("<#ids>", ids);
             }
 
             sql += " order by ai.ID Desc";
