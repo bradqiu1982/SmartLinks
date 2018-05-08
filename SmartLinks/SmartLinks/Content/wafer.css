@@ -152,15 +152,18 @@ body {
 
 .NGBKG {
     color:black;
+    font-weight:bold;
 background-color:red!important;
 }
 
 .NABKG {
     color:black;
+    font-weight:bold;
 background-color:yellow!important;
 }
 
 .GOODBKG {
-    color:black;
+    color:white;
+    font-weight:bold;
 background-color:green!important;
 }

@@ -33,12 +33,14 @@ namespace SmartLinks.Controllers
                 }
             }
 
+            var appendinfodict = new Dictionary<string, string>();
+
             var sndict = new Dictionary<string, bool>();
             var wafertable = new List<WaferTableItem>();
 
             if (DateCodeList.Count > 0)
             {
-                var datesnlist = WaferPackVM.RetrieveSNByDateCode(DateCodeList);
+                var datesnlist = WaferPackVM.RetrieveSNByDateCode(DateCodeList, appendinfodict);
                 foreach (var item in datesnlist)
                 {
                     var sn = item.SN.Replace("'", "").Trim().ToUpper();
@@ -97,6 +99,18 @@ namespace SmartLinks.Controllers
                     && !cablesndict[item.DateCode])
                 {
                     item.Status = WAFERSTATUS.NG;
+                }
+
+                if (!string.IsNullOrEmpty(item.SN)
+                    && appendinfodict.ContainsKey(item.SN))
+                {
+                    item.AppendInfo = appendinfodict[item.SN];
+                }
+
+                if (!string.IsNullOrEmpty(item.DateCode)
+                    && appendinfodict.ContainsKey(item.DateCode))
+                {
+                    item.AppendInfo = appendinfodict[item.DateCode];
                 }
             }
             
