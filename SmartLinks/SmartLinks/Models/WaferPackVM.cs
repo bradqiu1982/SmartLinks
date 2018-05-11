@@ -112,7 +112,7 @@ namespace SmartLinks.Models
 
             var sql = @"select a.ToContainer,a.FromContainer from [PDMS].[dbo].[ComponentIssueSummary] a 
                   inner join (SELECT COUNT(*) as tcnt,ToContainer FROM [PDMS].[dbo].[ComponentIssueSummary] where ToContainer  in <sncond> and LEN(FromContainer) = 7 group by ToContainer) b on a.ToContainer = b.ToContainer
-                  where b.tcnt >= 2 and LEN(a.FromContainer) = 7 order by a.ToContainer";
+                  where b.tcnt >= 2 and LEN(a.FromContainer) = 7 and a.ToContainer in <sncond> order by a.ToContainer";
             sql = sql.Replace("<sncond>", sncond);
             var dbret = DBUtility.ExeMESReportSqlWithRes(sql);
             foreach (var line in dbret)
@@ -188,7 +188,11 @@ namespace SmartLinks.Models
                     tempvm.WaferNum = Convert.ToString(line[1]);
                     if (tempvm.WaferNum.Length > 3)
                     {
-                        tempvm.WaferNum = tempvm.WaferNum.Substring(0, tempvm.WaferNum.Length - 3);
+                        var fidx = tempvm.WaferNum.IndexOf("-");
+                        if (fidx != -1 && tempvm.WaferNum.Length >= (fidx + 3))
+                        {
+                            tempvm.WaferNum = tempvm.WaferNum.Substring(0, fidx + 3);
+                        }
                     }
                     tempvm.PN = Convert.ToString(line[2]);
                     tetmpres.Add(tempvm);
@@ -281,7 +285,11 @@ namespace SmartLinks.Models
                     tempvm.WaferNum = Convert.ToString(line[1]);
                     if (tempvm.WaferNum.Length > 3)
                     {
-                        tempvm.WaferNum = tempvm.WaferNum.Substring(0, tempvm.WaferNum.Length - 3);
+                        var fidx = tempvm.WaferNum.IndexOf("-");
+                        if (fidx != -1 && tempvm.WaferNum.Length >= (fidx + 3))
+                        {
+                            tempvm.WaferNum = tempvm.WaferNum.Substring(0, fidx + 3);
+                        }
                     }
                     tempvm.PN = Convert.ToString(line[2]);
                     tetmpres.Add(tempvm);
