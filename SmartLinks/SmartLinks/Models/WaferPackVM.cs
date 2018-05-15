@@ -46,50 +46,90 @@ namespace SmartLinks.Models
             datecond = datecond.Substring(0, datecond.Length - 2);
             datecond = datecond + ") ";
 
-            var sql = "select ContainerName,DateCode,CustomerSerialNum FROM [InsiteDB].[insite].[Container] where DateCode in <datecond> or CustomerSerialNum in <datecond>";
+            var sql = "select ContainerName,DateCode,CustomerSerialNum,ContainerId FROM [InsiteDB].[insite].[Container] where DateCode in <datecond> or CustomerSerialNum in <datecond>";
             sql = sql.Replace("<datecond>", datecond);
 
             var excludsndict = new Dictionary<string, bool>();
+            var pkgdict = new Dictionary<string, string>();
 
             var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
             foreach (var line in dbret) {
                 try {
 
-                    var tempvm = new WaferTableItem();
-                    tempvm.SN = Convert.ToString(line[0]);
-
-                    if (!excludsndict.ContainsKey(tempvm.SN))
+                    var sn = Convert.ToString(line[0]);
+                    if (sn.Length > 7 
+                        && !line[1].Equals(null) 
+                        && !pkgdict.ContainsKey(sn)) {
+                        pkgdict.Add(Convert.ToString(line[3]), Convert.ToString(line[1]));
+                    }
+                    else
                     {
-                        excludsndict.Add(tempvm.SN, true);
+                            var tempvm = new WaferTableItem();
+                            tempvm.SN = Convert.ToString(line[0]);
 
-                        var appendinfo = "";
-                        if (line[1].Equals(null))
-                        {
-                            tempvm.DateCode = "";
-                        }
-                        else
-                        {
-                            tempvm.DateCode = Convert.ToString(line[1]);
-                            appendinfo = tempvm.DateCode;
-                        }
-                        if (!line[2].Equals(null))
-                        {
-                            appendinfo = Convert.ToString(line[2]);
-                        }
+                            if (!excludsndict.ContainsKey(tempvm.SN))
+                            {
+                                excludsndict.Add(tempvm.SN, true);
+
+                                var appendinfo = "";
+                                if (line[1].Equals(null))
+                                {
+                                    tempvm.DateCode = "";
+                                }
+                                else
+                                {
+                                    tempvm.DateCode = Convert.ToString(line[1]);
+                                    appendinfo = tempvm.DateCode;
+                                }
+                                if (!line[2].Equals(null))
+                                {
+                                    appendinfo = Convert.ToString(line[2]);
+                                }
                 
-                        if (!string.IsNullOrEmpty(tempvm.SN))
-                        {
-                            if (!appenddict.ContainsKey(tempvm.SN)) {
-                                appenddict.Add(tempvm.SN, appendinfo);
-                            }
-                            ret.Add(tempvm);
-                        }
-                    }//check sn
-
-
+                                if (!string.IsNullOrEmpty(tempvm.SN))
+                                {
+                                    if (!appenddict.ContainsKey(tempvm.SN)) {
+                                        appenddict.Add(tempvm.SN, appendinfo);
+                                    }
+                                    ret.Add(tempvm);
+                                }
+                            }//check sn
+                    }
                 } catch (Exception ex) { }
-
             }
+
+
+            if (pkgdict.Count > 0)
+            {
+                try
+                {
+                    datecond = " ('";
+                    foreach (var item in pkgdict)
+                    {
+                        datecond = datecond + item.Key + "','";
+                    }
+                    datecond = datecond.Substring(0, datecond.Length - 2);
+                    datecond = datecond + ") ";
+
+                    sql = "select ContainerName,ParentContainerId FROM [InsiteDB].[insite].[Container] where ParentContainerId in <datecond>";
+                    sql = sql.Replace("<datecond>", datecond);
+                    dbret = DBUtility.ExeRealMESSqlWithRes(sql, null);
+                    foreach (var line in dbret)
+                    {
+                        var sn = Convert.ToString(line[0]);
+                        var pid = Convert.ToString(line[1]);
+                        if (sn.Length <= 7 && !excludsndict.ContainsKey(sn) && pkgdict.ContainsKey(pid))
+                        {
+                            excludsndict.Add(sn, true);
+                            var tempvm = new WaferTableItem();
+                            tempvm.SN = Convert.ToString(line[0]);
+                            tempvm.DateCode = pkgdict[pid];
+                            ret.Add(tempvm);
+                        }//end if
+                    }//end foreach
+                } catch (Exception ex) { }
+            }//end if
+
             return ret;
         }
 
