@@ -7,6 +7,7 @@ var lightBox = function () {
             $('.img-computer').removeClass('img-computer').addClass('img-computer-ie8');
         }
 
+        $('.carousel').carousel({ interval: false });
         var default_imgs = new Array();
         var default_imgs_ie8 = new Array();
         var default_links_ie8 = new Array();
