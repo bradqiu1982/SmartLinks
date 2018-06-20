@@ -303,7 +303,7 @@ namespace SmartLinks.Models
                         {
                             if (!string.IsNullOrEmpty(rule.Param))
                             {
-                                if (MatchRuleWithParam(item,rule,ctrl))
+                                if (MatchRuleWithParam(item, rule, ctrl))
                                 {
                                     item.Result = rule.RuleRes;
                                     item.MatchedRule = item.PN + "_" + item.WhichTest + "_" + item.TestData.ErrAbbr + "_" + rule.Param;
@@ -325,6 +325,15 @@ namespace SmartLinks.Models
                         }
                     }
                 }//end if
+                else
+                {
+                    if (pndefresdict.ContainsKey(item.PN))
+                    {
+                        item.Result = pndefresdict[item.PN];
+                        item.MatchedRule = "DEFAULT";
+                    }
+                }
+
             }//foreach
         }
 

@@ -128,8 +128,23 @@ namespace SmartLinks.Models
 
         public static void RemoveRule(string ruleid)
         {
-            var sql = "delete from PnRulesVM where RuleID = @RuleID";
+            var sql = "select PnKey,WhichTest from PnRulesVM where WhichTest+PnKey in (select WhichTest+PnKey from PnRulesVM where RuleID = @RuleID)";
             var param = new Dictionary<string, string>();
+            param.Add("@RuleID", ruleid);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            if (dbret.Count == 1)
+            {
+                var pnkey = Convert.ToString(dbret[0][0]);
+                var test = Convert.ToString(dbret[0][1]);
+                sql = "update PnMESVM set Bind = '' where PNKey = @PNKey and WhichTest = @WhichTest";
+                param = new Dictionary<string, string>();
+                param.Add("@PNKey", pnkey);
+                param.Add("@WhichTest", test);
+                DBUtility.ExeLocalSqlNoRes(sql);
+            }
+
+            sql = "delete from PnRulesVM where RuleID = @RuleID";
+            param = new Dictionary<string, string>();
             param.Add("@RuleID", ruleid);
             DBUtility.ExeLocalSqlNoRes(sql,param);
         }
