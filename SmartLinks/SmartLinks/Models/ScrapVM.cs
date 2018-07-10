@@ -284,6 +284,9 @@ namespace SmartLinks.Models
         public static void FinalSetResult(List<ScrapTableItem> scraptable, Controller ctrl)
         {
             var pndefresdict = PnMainVM.PNDefaultResMap();
+            var syscfg = CfgUtility.GetSysConfig(ctrl);
+            var processlist = syscfg["SCRAP4PROCESSNAME"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
             foreach (var item in scraptable)
             {
                 if (!string.IsNullOrEmpty(item.TestData.DataID)
@@ -327,16 +330,155 @@ namespace SmartLinks.Models
                 }//end if
                 else
                 {
-                    if (pndefresdict.ContainsKey(item.PN))
+                    var testdatalist = RetrieveLatestSNStep(item.SN);
+                    if (testdatalist.Count > 0)
                     {
-                        item.Result = pndefresdict[item.PN];
-                        item.MatchedRule = "DEFAULT";
+                        item.TestData.DataID = testdatalist[0].DataID;
+                        item.WhichTest = testdatalist[0].WhichTest;
+                        item.TestData.ErrAbbr = testdatalist[0].ErrAbbr;
+                        item.TestData.TestTime = testdatalist[0].TestTime;
+                        var matchprocess = false;
+                        foreach (var p in processlist)
+                        {
+                            if (item.WhichTest.ToUpper().Contains(p.ToUpper()))
+                            {
+                                item.TestData.ErrAbbr = "PROCESS";
+                                matchprocess = true;
+                                break;
+                            }
+                        }//end foreach
+
+                        if (matchprocess)
+                        {
+                            item.Result = SCRAPRESULT.DSCRAP;
+                            item.MatchedRule = "PROCESS SCRAP";
+                        }
+                        else
+                        {
+                            if (pndefresdict.ContainsKey(item.PN))
+                            {
+                                item.Result = pndefresdict[item.PN];
+                                item.MatchedRule = "DEFAULT";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (pndefresdict.ContainsKey(item.PN))
+                        {
+                            item.Result = pndefresdict[item.PN];
+                            item.MatchedRule = "DEFAULT";
+                        }
                     }
                 }
 
             }//foreach
         }
 
+        private static string Convert2Str(object obj)
+        {
+            try
+            {
+                return Convert.ToString(obj);
+            }
+            catch (Exception ex) { return string.Empty; }
+        }
+
+        public static List<string> RetrieveDCTableFromSn(string sn)
+        {
+            var ret = new List<string>();
+            var dctabledict = new Dictionary<string, bool>();
+
+            var sql = @" select ddr.DataCollectionDefName from insitedb.insite.DataCollectionDefBase ddr  (nolock)
+	                    inner join insitedb.insite.TxnMap tm with(noloCK) ON tm.DataCollectionDefinitionBaseId = ddr.DataCollectionDefBaseId
+	                    inner join insitedb.insite.spec sp with(nolock) on sp.specid =  tm.specid
+	                    inner join InsiteDB.insite.WorkflowStep ws (nolock)on  ws.specbaseid = sp.specbaseid
+	                    inner join InsiteDB.insite.Workflow w (nolock)on w.WorkflowID = ws.WorkflowID
+                        inner join InsiteDB.insite.Product p(nolock) on w.WorkflowBaseId = p.WorkflowBaseId
+	                    inner join [InsiteDB].[insite].[Container] c(nolock) on c.ProductId = p.ProductId
+                        where c.ContainerName = '<ContainerName>' and ddr.DataCollectionDefName is not null";
+            sql = sql.Replace("<ContainerName>", sn);
+            var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var dc = Convert2Str(line[0]).ToUpper();
+                if (dc.Length > 4 && dc.Substring(0, 4).Contains("DCD_"))
+                {
+                    var realdc = "";
+                    if (dc.Contains("DCD_Module_Initialization_0811".ToUpper()))
+                    { realdc = "dc_initial"; }
+                    else
+                    { realdc = "dc_" + dc.Substring(4); }
+
+                    if (!dctabledict.ContainsKey(realdc))
+                    {
+                        dctabledict.Add(realdc, true);
+                    }
+                }//end if
+            }//end foreach
+            ret.AddRange(dctabledict.Keys);
+            return ret;
+        }
+
+        public static List<SnTestDataVM> RetrieveLatestSNTestResult(string sn)
+        {
+            var dctablelist = RetrieveDCTableFromSn(sn);
+            var testdatalist = new List<SnTestDataVM>();
+
+            foreach (var dctable in dctablelist)
+            {
+                if (dctable.Contains("OQCPARALLEL")
+                    || dctable.Contains("AOC_MANUALINSPECTION"))
+                { continue; }
+
+                var sql = @"select top 1 a.<DCTABLE>HistoryId,a.ModuleSerialNum, a.WhichTest, a.ModuleType, a.ErrAbbr, a.TestTimeStamp, a.TestStation,a.assemblypartnum 
+                               from insite.<DCTABLE> a (nolock) where a.ModuleSerialNum = '<ModuleSerialNum>' order by  testtimestamp DESC";
+                sql = sql.Replace("<DCTABLE>", dctable).Replace("<ModuleSerialNum>", sn);
+                var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+                foreach (var item in dbret)
+                {
+                    var tempdata = new SnTestDataVM(Convert.ToString(item[0]), Convert.ToString(item[1]), Convert.ToString(item[7]), Convert.ToString(item[2])
+                        , Convert.ToString(item[4]),dctable,Convert.ToDateTime(item[5]),Convert.ToString(item[6]));
+
+                    testdatalist.Add(tempdata);
+                }
+            }
+
+            testdatalist.Sort(delegate (SnTestDataVM obj1, SnTestDataVM obj2)
+            {
+                return obj2.TestTime.CompareTo(obj1.TestTime);
+            });
+
+            var ret = new List<SnTestDataVM>();
+            ret.Add(testdatalist[0]);
+            return ret;
+        }
+
+        public static List<SnTestDataVM> RetrieveLatestSNStep(string sn)
+        {
+            var testdatalist = new List<SnTestDataVM>();
+
+            var sql = @"select top 1 ProductId,MoveOutTime,WorkflowStepName,Comments,TxnTypeName
+                        from PDMSMaster.dbo.HistStepMoveSummary (nolock) where ContainerName = '<ContainerName>'  and MFGOrderId is not null order by MoveOutTime desc";
+            sql = sql.Replace("<ContainerName>", sn.Replace("'", ""));
+            var dbret = DBUtility.ExeMESReportSqlWithRes(sql, null);
+            if (dbret.Count > 0)
+            {
+                var line = dbret[0];
+                var data = new SnTestDataVM();
+                data.ModuleSerialNum = sn;
+                data.DataID = Convert.ToString(line[0]);
+                data.TestTime = Convert.ToDateTime(line[1]);
+                data.WhichTest = Convert.ToString(line[2]);
+                data.ErrAbbr = "";
+                if (!string.IsNullOrEmpty(Convert2Str(line[3])))
+                {
+                    data.ErrAbbr = Convert2Str(line[3]);
+                }
+                testdatalist.Add(data);
+            }
+            return testdatalist;
+        }
 
     }
 
