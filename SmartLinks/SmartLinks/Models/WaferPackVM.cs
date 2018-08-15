@@ -150,7 +150,7 @@ namespace SmartLinks.Models
             var tempstr = sb.ToString();
             var sncond = tempstr.Substring(0, tempstr.Length - 2) + ")";
 
-            var sql = @"select a.ToContainer,a.FromContainer from [PDMS].[dbo].[ComponentIssueSummary] a 
+            var sql = @"select a.ToContainer,a.FromContainer,a.FromPNDescription from [PDMS].[dbo].[ComponentIssueSummary] a 
                   inner join (SELECT COUNT(*) as tcnt,ToContainer FROM [PDMS].[dbo].[ComponentIssueSummary] where ToContainer  in <sncond> and LEN(FromContainer) = 7 group by ToContainer) b on a.ToContainer = b.ToContainer
                   where b.tcnt >= 2 and LEN(a.FromContainer) = 7 and a.ToContainer in <sncond> order by a.ToContainer";
             sql = sql.Replace("<sncond>", sncond);
@@ -161,6 +161,11 @@ namespace SmartLinks.Models
                 var tempvm = new WaferTableItem();
                 tempvm.SN = Convert.ToString(line[1]);
                 tempvm.DateCode = Convert.ToString(line[0]);
+
+                var fromdesc = Convert.ToString(line[2]);
+                if (fromdesc.ToUpper().Contains("DIE,LF,ASIC"))
+                { continue; }
+
                 if (!excludsndict.ContainsKey(tempvm.SN))
                 {
                     excludsndict.Add(tempvm.SN, true);
