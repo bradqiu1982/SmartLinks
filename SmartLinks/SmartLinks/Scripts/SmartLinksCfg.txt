@@ -19,4 +19,4 @@ APPEMAILADRESS:::WXNPI.Trace@finisar.com
 APPEMAILPWD:::abc@12345
 EMAILSERVER:::wmail.finisar.com
 
-SCRAP4PROCESSNAME:::Post_Burn_in;Pre_Burn_in;Die attach;UnderFill;Lens_Alignment;Post_Re_flow Inspection;PCBA initial;PCBA_Baking;SilverEpoxyCure;Wire Bond;VCSEL_Burn_in;PostDieAttachIns;Flip-chip;Dieattach;upload flex;structure_epoxy;WireBonding;_VMI;Reflow;IPQC;LES check;Power check;Wafer VMI;VCSEL ID Check;Packing_D/C;Wafercheck;Repacking_Label;Module Assembly;Packing_Check
+SCRAP4PROCESSNAME:::Post_Burn_in;Pre_Burn_in;Die attach;UnderFill;Lens_Alignment;Post_Re_flow Inspection;PCBA initial;PCBA_Baking;SilverEpoxyCure;Wire Bond;VCSEL_Burn_in;PostDieAttachIns;Flip-chip;Dieattach;upload flex;structure_epoxy;WireBonding;_VMI;Reflow;IPQC;LES check;Power check;Wafer VMI;VCSEL ID Check;Packing_D/C;Wafercheck;Repacking_Label;Module Assembly;Packing_Check;SCRAP_;

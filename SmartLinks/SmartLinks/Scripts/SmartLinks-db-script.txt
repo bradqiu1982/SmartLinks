@@ -252,3 +252,9 @@ CREATE TABLE [dbo].[VTestRank] (
 	[UserRank]   NVARCHAR (64)   DEFAULT ('0')  NOT NULL,
     [UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
 );
+
+CREATE TABLE [dbo].[SmartLinkLog] (
+	[UserName]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[Link]   NVARCHAR (MAX)   DEFAULT ('')  NOT NULL,
+    [UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
+);

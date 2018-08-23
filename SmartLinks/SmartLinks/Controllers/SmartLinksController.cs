@@ -70,6 +70,15 @@ namespace SmartLinks.Controllers
                 ViewBag.isie8 = true;
             }
 
+            //var logonnames = Request.LogonUserIdentity.Name;
+            //if (!string.IsNullOrEmpty(logonnames))
+            //{
+            //    var splitnames = logonnames.Split(new string[] { "/","\\" }, StringSplitOptions.RemoveEmptyEntries);
+            //    ViewBag.logonname = splitnames[splitnames.Length - 1];
+            //}
+
+            ViewBag.logonname = HttpContext.User.Identity.Name;
+
             var machine = string.Empty;
             var ckdict = CookieUtility.UnpackCookie(this);
             if (!ckdict.ContainsKey("reqmachine"))
@@ -234,8 +243,17 @@ namespace SmartLinks.Controllers
                     break;
                 }
             }
+
             if (!string.IsNullOrEmpty(validlink))
             {
+                var logonnames = Request.LogonUserIdentity.Name;
+                if (!string.IsNullOrEmpty(logonnames))
+                {
+                    var splitnames = logonnames.Split(new string[] { "/", "\\" }, StringSplitOptions.RemoveEmptyEntries);
+                    ViewBag.logonname = splitnames[splitnames.Length - 1];
+                    LinkVM.UpdateSmartLinkLog(ViewBag.logonname, validlink);
+                }
+
                 if (validlink.Contains("wuxinpi"))
                 {
                     var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
