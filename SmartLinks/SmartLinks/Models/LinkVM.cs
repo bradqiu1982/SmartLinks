@@ -170,11 +170,12 @@ namespace SmartLinks.Models
             DBUtility.ExeLocalSqlNoRes(sql);
         }
 
-        public static void UpdateSmartLinkLog(string user, string link)
+        public static void UpdateSmartLinkLog(string user,string machine, string link)
         {
-            var sql = "insert SmartLinkLog(UserName,Link,UpdateTime) values(@UserName,@Link,@UpdateTime)";
+            var sql = "insert SmartLinkLog(UserName,Machine,Link,UpdateTime) values(@UserName,@Machine,@Link,@UpdateTime)";
             var dict = new Dictionary<string, string>();
             dict.Add("@UserName", user);
+            dict.Add("@Machine", machine);
             dict.Add("@Link", link);
             dict.Add("@UpdateTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             DBUtility.ExeLocalSqlNoRes(sql, dict);

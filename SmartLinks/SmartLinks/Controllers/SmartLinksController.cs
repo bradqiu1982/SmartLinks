@@ -73,11 +73,9 @@ namespace SmartLinks.Controllers
             //var logonnames = Request.LogonUserIdentity.Name;
             //if (!string.IsNullOrEmpty(logonnames))
             //{
-            //    var splitnames = logonnames.Split(new string[] { "/","\\" }, StringSplitOptions.RemoveEmptyEntries);
+            //    var splitnames = logonnames.Split(new string[] { "/", "\\" }, StringSplitOptions.RemoveEmptyEntries);
             //    ViewBag.logonname = splitnames[splitnames.Length - 1];
             //}
-
-            ViewBag.logonname = HttpContext.User.Identity.Name;
 
             var machine = string.Empty;
             var ckdict = CookieUtility.UnpackCookie(this);
@@ -90,12 +88,19 @@ namespace SmartLinks.Controllers
                     var tempdict = new Dictionary<string, string>();
                     tempdict.Add("reqmachine", compName);
                     CookieUtility.SetCookie(this, tempdict);
-                    machine = compName;
+                    machine = compName.ToUpper();
                 }//end if
             }//end
             else
             {
-                machine = ckdict["reqmachine"];
+                machine = ckdict["reqmachine"].ToUpper();
+            }
+
+            ViewBag.logonname = machine;
+            var mudict = MachineUserMap.RetrieveUserMap(machine);
+            if (mudict.ContainsKey(machine))
+            {
+                ViewBag.logonname = mudict[machine];
             }
 
             if (!string.IsNullOrEmpty(machine))
@@ -218,7 +223,7 @@ namespace SmartLinks.Controllers
                 {
                     var tempdict = new Dictionary<string, string>();
                     tempdict.Add("reqmachine", compName);
-                    machine = compName;
+                    machine = compName.ToUpper();
                     CookieUtility.SetCookie(this, tempdict);
                 }//end if
                 vm = LinkVM.RetrieveLinks();
@@ -226,7 +231,7 @@ namespace SmartLinks.Controllers
             else
             {
                 vm = RetrieveAllLinks(ckdict["reqmachine"]);
-                machine = ckdict["reqmachine"];
+                machine = ckdict["reqmachine"].ToUpper();
             }
 
 
@@ -246,13 +251,22 @@ namespace SmartLinks.Controllers
 
             if (!string.IsNullOrEmpty(validlink))
             {
-                var logonnames = Request.LogonUserIdentity.Name;
-                if (!string.IsNullOrEmpty(logonnames))
+                //var logonnames = Request.LogonUserIdentity.Name;
+                //if (!string.IsNullOrEmpty(logonnames))
+                //{
+                //    var splitnames = logonnames.Split(new string[] { "/", "\\" }, StringSplitOptions.RemoveEmptyEntries);
+                //    ViewBag.logonname = splitnames[splitnames.Length - 1];
+                //    LinkVM.UpdateSmartLinkLog(ViewBag.logonname,machine, validlink);
+                //}
+
+                ViewBag.logonname = machine;
+                var mudict = MachineUserMap.RetrieveUserMap(machine);
+                if (mudict.ContainsKey(machine))
                 {
-                    var splitnames = logonnames.Split(new string[] { "/", "\\" }, StringSplitOptions.RemoveEmptyEntries);
-                    ViewBag.logonname = splitnames[splitnames.Length - 1];
-                    LinkVM.UpdateSmartLinkLog(ViewBag.logonname, validlink);
+                    ViewBag.logonname = mudict[machine];
+                    LinkVM.UpdateSmartLinkLog(ViewBag.logonname, machine, validlink);
                 }
+
 
                 if (validlink.Contains("wuxinpi"))
                 {

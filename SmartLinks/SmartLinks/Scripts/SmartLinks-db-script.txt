@@ -192,7 +192,8 @@ CREATE TABLE [dbo].[TechVideoVM] (
 
 CREATE TABLE [dbo].[machineusermap] (
     [machine]   NVARCHAR (300)   DEFAULT ('')  NOT NULL,
-    [username]   NVARCHAR (300)   DEFAULT ('')  NOT NULL
+    [username]   NVARCHAR (300)   DEFAULT ('')  NOT NULL,
+	[level] NVARCHAR (100)    DEFAULT ('') NOT NULL
 );
 
 CREATE TABLE [dbo].[VTestVM] (
@@ -255,6 +256,7 @@ CREATE TABLE [dbo].[VTestRank] (
 
 CREATE TABLE [dbo].[SmartLinkLog] (
 	[UserName]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[Machine]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
 	[Link]   NVARCHAR (MAX)   DEFAULT ('')  NOT NULL,
     [UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
 );
