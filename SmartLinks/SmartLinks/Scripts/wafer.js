@@ -94,7 +94,9 @@
                      'aLengthMenu': [[20, 50, 100, -1],
                      [20, 50, 100, "All"]],
                      "aaSorting": [],
-                     "order": []
+                     "order": [],
+                     dom: 'lBfrtip',
+                     buttons: ['copyHtml5', 'csv', 'excelHtml5']
                  });
 
                  if (output.waferdup)

@@ -13,16 +13,19 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/22/2013 08:43:40</publishTime>
     </File>
     <File Include="bin/App_global.asax.compiled">
-      <publishTime>09/07/2017 16:28:58</publishTime>
+      <publishTime>08/27/2018 14:47:30</publishTime>
     </File>
     <File Include="bin/App_global.asax.dll">
-      <publishTime>09/07/2017 16:28:57</publishTime>
+      <publishTime>08/27/2018 14:47:30</publishTime>
     </File>
     <File Include="bin/EntityFramework.dll">
       <publishTime>03/02/2015 09:32:26</publishTime>
     </File>
     <File Include="bin/EntityFramework.SqlServer.dll">
       <publishTime>03/02/2015 09:32:26</publishTime>
+    </File>
+    <File Include="bin/log4net.dll">
+      <publishTime>03/21/2018 16:48:08</publishTime>
     </File>
     <File Include="bin/Microsoft.AspNet.Identity.Core.dll">
       <publishTime>04/03/2015 17:07:22</publishTime>
@@ -69,6 +72,9 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="bin/Newtonsoft.Json.dll">
       <publishTime>08/03/2014 20:33:56</publishTime>
     </File>
+    <File Include="bin/NReco.VideoConverter.dll">
+      <publishTime>01/14/2017 11:56:12</publishTime>
+    </File>
     <File Include="bin/Owin.dll">
       <publishTime>11/27/2012 13:00:52</publishTime>
     </File>
@@ -109,7 +115,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/18/2015 20:19:46</publishTime>
     </File>
     <File Include="bin/SmartLinks.dll">
-      <publishTime>09/07/2017 16:26:37</publishTime>
+      <publishTime>08/27/2018 14:47:08</publishTime>
     </File>
     <File Include="bin/System.Web.Helpers.dll">
       <publishTime>01/28/2015 04:04:30</publishTime>
@@ -135,8 +141,140 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="bin/WebGrease.dll">
       <publishTime>09/10/2013 17:28:38</publishTime>
     </File>
+    <File Include="Content/asset.css">
+      <publishTime>04/10/2018 10:53:18</publishTime>
+    </File>
+    <File Include="Content/bootstrap-3.3.7/css/bootstrap-theme.css">
+      <publishTime>11/08/2017 11:11:23</publishTime>
+    </File>
+    <File Include="Content/bootstrap-3.3.7/css/bootstrap-theme.css.map">
+      <publishTime>11/08/2017 11:11:23</publishTime>
+    </File>
+    <File Include="Content/bootstrap-3.3.7/css/bootstrap-theme.min.css">
+      <publishTime>11/08/2017 11:11:23</publishTime>
+    </File>
+    <File Include="Content/bootstrap-3.3.7/css/bootstrap-theme.min.css.map">
+      <publishTime>11/08/2017 11:11:23</publishTime>
+    </File>
+    <File Include="Content/bootstrap-3.3.7/css/bootstrap.css">
+      <publishTime>11/08/2017 11:11:23</publishTime>
+    </File>
+    <File Include="Content/bootstrap-3.3.7/css/bootstrap.css.map">
+      <publishTime>11/08/2017 11:11:23</publishTime>
+    </File>
+    <File Include="Content/bootstrap-3.3.7/css/bootstrap.min.css">
+      <publishTime>11/08/2017 11:11:23</publishTime>
+    </File>
+    <File Include="Content/bootstrap-3.3.7/css/bootstrap.min.css.map">
+      <publishTime>11/08/2017 11:11:23</publishTime>
+    </File>
+    <File Include="Content/bootstrap-3.3.7/fonts/glyphicons-halflings-regular.eot">
+      <publishTime>11/08/2017 11:11:23</publishTime>
+    </File>
+    <File Include="Content/bootstrap-3.3.7/fonts/glyphicons-halflings-regular.svg">
+      <publishTime>11/08/2017 11:11:23</publishTime>
+    </File>
+    <File Include="Content/bootstrap-3.3.7/fonts/glyphicons-halflings-regular.ttf">
+      <publishTime>11/08/2017 11:11:23</publishTime>
+    </File>
+    <File Include="Content/bootstrap-3.3.7/fonts/glyphicons-halflings-regular.woff">
+      <publishTime>11/08/2017 11:11:23</publishTime>
+    </File>
+    <File Include="Content/bootstrap-3.3.7/fonts/glyphicons-halflings-regular.woff2">
+      <publishTime>11/08/2017 11:11:23</publishTime>
+    </File>
+    <File Include="Content/bootstrap-3.3.7/js/bootstrap.js">
+      <publishTime>11/08/2017 11:11:23</publishTime>
+    </File>
+    <File Include="Content/bootstrap-3.3.7/js/bootstrap.min.js">
+      <publishTime>11/08/2017 11:11:23</publishTime>
+    </File>
+    <File Include="Content/bootstrap-3.3.7/js/npm.js">
+      <publishTime>11/08/2017 11:11:23</publishTime>
+    </File>
+    <File Include="Content/bootstrap-datepicker/bootstrap-datepicker.css">
+      <publishTime>04/10/2018 10:51:15</publishTime>
+    </File>
+    <File Include="Content/bootstrap-datepicker/bootstrap-datepicker.css.map">
+      <publishTime>04/10/2018 10:51:15</publishTime>
+    </File>
+    <File Include="Content/bootstrap-datepicker/bootstrap-datepicker.min.css">
+      <publishTime>04/10/2018 10:51:15</publishTime>
+    </File>
+    <File Include="Content/bootstrap-datepicker/bootstrap-datepicker.min.css.map">
+      <publishTime>04/10/2018 10:51:15</publishTime>
+    </File>
+    <File Include="Content/bootstrap-datepicker/bootstrap-datepicker.standalone.css">
+      <publishTime>04/10/2018 10:51:15</publishTime>
+    </File>
+    <File Include="Content/bootstrap-datepicker/bootstrap-datepicker.standalone.css.map">
+      <publishTime>04/10/2018 10:51:15</publishTime>
+    </File>
+    <File Include="Content/bootstrap-datepicker/bootstrap-datepicker.standalone.min.css">
+      <publishTime>04/10/2018 10:51:15</publishTime>
+    </File>
+    <File Include="Content/bootstrap-datepicker/bootstrap-datepicker.standalone.min.css.map">
+      <publishTime>04/10/2018 10:51:15</publishTime>
+    </File>
+    <File Include="Content/bootstrap-datepicker/bootstrap-datepicker3.css">
+      <publishTime>04/10/2018 10:51:15</publishTime>
+    </File>
+    <File Include="Content/bootstrap-datepicker/bootstrap-datepicker3.css.map">
+      <publishTime>04/10/2018 10:51:15</publishTime>
+    </File>
+    <File Include="Content/bootstrap-datepicker/bootstrap-datepicker3.min.css">
+      <publishTime>04/10/2018 10:51:15</publishTime>
+    </File>
+    <File Include="Content/bootstrap-datepicker/bootstrap-datepicker3.min.css.map">
+      <publishTime>04/10/2018 10:51:15</publishTime>
+    </File>
+    <File Include="Content/bootstrap-datepicker/bootstrap-datepicker3.standalone.css">
+      <publishTime>04/10/2018 10:51:15</publishTime>
+    </File>
+    <File Include="Content/bootstrap-datepicker/bootstrap-datepicker3.standalone.css.map">
+      <publishTime>04/10/2018 10:51:15</publishTime>
+    </File>
+    <File Include="Content/bootstrap-datepicker/bootstrap-datepicker3.standalone.min.css">
+      <publishTime>04/10/2018 10:51:16</publishTime>
+    </File>
+    <File Include="Content/bootstrap-datepicker/bootstrap-datepicker3.standalone.min.css.map">
+      <publishTime>04/10/2018 10:51:16</publishTime>
+    </File>
     <File Include="Content/bootstrap.min.css">
       <publishTime>09/01/2017 16:02:04</publishTime>
+    </File>
+    <File Include="Content/bootstrap.min.css.map">
+      <publishTime>09/04/2017 13:54:05</publishTime>
+    </File>
+    <File Include="Content/bootstrap3.0.0/css/bootstrap-theme.css">
+      <publishTime>02/06/2018 10:31:05</publishTime>
+    </File>
+    <File Include="Content/bootstrap3.0.0/css/bootstrap-theme.min.css">
+      <publishTime>02/06/2018 10:31:05</publishTime>
+    </File>
+    <File Include="Content/bootstrap3.0.0/css/bootstrap.css">
+      <publishTime>02/06/2018 10:31:05</publishTime>
+    </File>
+    <File Include="Content/bootstrap3.0.0/css/bootstrap.min.css">
+      <publishTime>02/06/2018 10:31:05</publishTime>
+    </File>
+    <File Include="Content/bootstrap3.0.0/fonts/glyphicons-halflings-regular.eot">
+      <publishTime>02/06/2018 10:31:05</publishTime>
+    </File>
+    <File Include="Content/bootstrap3.0.0/fonts/glyphicons-halflings-regular.svg">
+      <publishTime>02/06/2018 10:31:05</publishTime>
+    </File>
+    <File Include="Content/bootstrap3.0.0/fonts/glyphicons-halflings-regular.ttf">
+      <publishTime>02/06/2018 10:31:06</publishTime>
+    </File>
+    <File Include="Content/bootstrap3.0.0/fonts/glyphicons-halflings-regular.woff">
+      <publishTime>02/06/2018 10:31:06</publishTime>
+    </File>
+    <File Include="Content/bootstrap3.0.0/js/bootstrap.js">
+      <publishTime>02/06/2018 10:31:06</publishTime>
+    </File>
+    <File Include="Content/bootstrap3.0.0/js/bootstrap.min.js">
+      <publishTime>02/06/2018 10:31:06</publishTime>
     </File>
     <File Include="Content/bootstrapfileinput.css">
       <publishTime>09/01/2017 10:55:28</publishTime>
@@ -145,19 +283,49 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/06/2017 09:19:00</publishTime>
     </File>
     <File Include="Content/common_1.css">
-      <publishTime>09/07/2017 15:48:17</publishTime>
+      <publishTime>05/30/2018 14:57:13</publishTime>
+    </File>
+    <File Include="Content/dataloading.css">
+      <publishTime>02/07/2018 11:15:55</publishTime>
+    </File>
+    <File Include="Content/exam.css">
+      <publishTime>03/28/2018 13:00:22</publishTime>
+    </File>
+    <File Include="Content/images/addtest.png">
+      <publishTime>03/26/2018 10:10:18</publishTime>
+    </File>
+    <File Include="Content/images/add_column.png">
+      <publishTime>03/21/2018 12:25:06</publishTime>
     </File>
     <File Include="Content/images/Agile.png">
       <publishTime>09/07/2017 15:52:34</publishTime>
     </File>
+    <File Include="Content/images/Assets.png">
+      <publishTime>04/11/2018 10:03:02</publishTime>
+    </File>
     <File Include="Content/images/BR.png">
       <publishTime>09/07/2017 15:52:34</publishTime>
+    </File>
+    <File Include="Content/images/CloudUpload.png">
+      <publishTime>03/21/2018 12:27:31</publishTime>
+    </File>
+    <File Include="Content/images/clover.png">
+      <publishTime>09/08/2017 13:30:07</publishTime>
+    </File>
+    <File Include="Content/images/component.png">
+      <publishTime>02/26/2018 09:28:40</publishTime>
     </File>
     <File Include="Content/images/computer.png">
       <publishTime>09/06/2017 09:19:00</publishTime>
     </File>
+    <File Include="Content/images/daisy.png">
+      <publishTime>09/08/2017 13:30:07</publishTime>
+    </File>
     <File Include="Content/images/data.png">
       <publishTime>09/06/2017 09:19:00</publishTime>
+    </File>
+    <File Include="Content/images/distribution.png">
+      <publishTime>05/17/2018 15:28:13</publishTime>
     </File>
     <File Include="Content/images/Domino.png">
       <publishTime>09/07/2017 15:52:34</publishTime>
@@ -177,20 +345,182 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="Content/images/FinisarLogo.jpg">
       <publishTime>09/01/2017 09:15:42</publishTime>
     </File>
+    <File Include="Content/images/gift.png">
+      <publishTime>03/26/2018 13:12:29</publishTime>
+    </File>
+    <File Include="Content/images/gifticon.png">
+      <publishTime>03/30/2018 16:10:07</publishTime>
+    </File>
+    <File Include="Content/images/HPUTREND.png">
+      <publishTime>07/25/2018 08:03:58</publishTime>
+    </File>
+    <File Include="Content/images/ie8/Agile.png">
+      <publishTime>09/11/2017 10:58:39</publishTime>
+    </File>
+    <File Include="Content/images/ie8/Assets.png">
+      <publishTime>04/11/2018 10:03:02</publishTime>
+    </File>
+    <File Include="Content/images/ie8/BR.png">
+      <publishTime>09/11/2017 10:58:39</publishTime>
+    </File>
+    <File Include="Content/images/ie8/clover.png">
+      <publishTime>09/11/2017 10:58:39</publishTime>
+    </File>
+    <File Include="Content/images/ie8/component.png">
+      <publishTime>02/26/2018 09:29:05</publishTime>
+    </File>
+    <File Include="Content/images/ie8/computer.png">
+      <publishTime>09/11/2017 11:07:50</publishTime>
+    </File>
+    <File Include="Content/images/ie8/daisy.png">
+      <publishTime>09/11/2017 10:58:39</publishTime>
+    </File>
+    <File Include="Content/images/ie8/data.png">
+      <publishTime>09/11/2017 10:58:39</publishTime>
+    </File>
+    <File Include="Content/images/ie8/distribution.png">
+      <publishTime>05/17/2018 15:27:34</publishTime>
+    </File>
+    <File Include="Content/images/ie8/Domino.png">
+      <publishTime>09/11/2017 10:58:39</publishTime>
+    </File>
+    <File Include="Content/images/ie8/ERP.png">
+      <publishTime>09/11/2017 10:58:39</publishTime>
+    </File>
+    <File Include="Content/images/ie8/etc.png">
+      <publishTime>09/11/2017 10:58:39</publishTime>
+    </File>
+    <File Include="Content/images/ie8/FA.png">
+      <publishTime>09/11/2017 10:58:39</publishTime>
+    </File>
+    <File Include="Content/images/ie8/HPUTREND.png">
+      <publishTime>07/25/2018 08:04:22</publishTime>
+    </File>
+    <File Include="Content/images/ie8/lego.png">
+      <publishTime>03/28/2018 16:30:04</publishTime>
+    </File>
+    <File Include="Content/images/ie8/link.png">
+      <publishTime>09/11/2017 10:58:39</publishTime>
+    </File>
+    <File Include="Content/images/ie8/OA.png">
+      <publishTime>09/20/2017 09:44:38</publishTime>
+    </File>
+    <File Include="Content/images/ie8/peace.png">
+      <publishTime>09/11/2017 10:58:39</publishTime>
+    </File>
+    <File Include="Content/images/ie8/scrap.png">
+      <publishTime>02/23/2018 08:26:34</publishTime>
+    </File>
+    <File Include="Content/images/ie8/scraprate.png">
+      <publishTime>07/10/2018 10:21:06</publishTime>
+    </File>
+    <File Include="Content/images/ie8/SmartLinks.png">
+      <publishTime>09/11/2017 10:58:39</publishTime>
+    </File>
+    <File Include="Content/images/ie8/snteststatus.png">
+      <publishTime>08/15/2018 13:26:54</publishTime>
+    </File>
+    <File Include="Content/images/ie8/TraceView.png">
+      <publishTime>09/11/2017 10:58:39</publishTime>
+    </File>
+    <File Include="Content/images/ie8/VCSEL.png">
+      <publishTime>08/22/2018 14:37:12</publishTime>
+    </File>
+    <File Include="Content/images/ie8/video.png">
+      <publishTime>03/16/2018 09:09:24</publishTime>
+    </File>
+    <File Include="Content/images/ILearnIcons.png">
+      <publishTime>03/21/2018 11:33:38</publishTime>
+    </File>
+    <File Include="Content/images/imgupload.png">
+      <publishTime>03/26/2018 10:44:16</publishTime>
+    </File>
+    <File Include="Content/images/lego.png">
+      <publishTime>03/28/2018 16:29:26</publishTime>
+    </File>
     <File Include="Content/images/link.png">
       <publishTime>09/06/2017 09:19:00</publishTime>
+    </File>
+    <File Include="Content/images/loading.gif">
+      <publishTime>02/07/2018 11:39:31</publishTime>
     </File>
     <File Include="Content/images/logo.png">
       <publishTime>09/06/2017 09:19:00</publishTime>
     </File>
+    <File Include="Content/images/mainpage.jpg">
+      <publishTime>09/09/2017 14:43:10</publishTime>
+    </File>
+    <File Include="Content/images/OA.png">
+      <publishTime>09/20/2017 09:41:39</publishTime>
+    </File>
+    <File Include="Content/images/peace.png">
+      <publishTime>09/08/2017 13:30:07</publishTime>
+    </File>
     <File Include="Content/images/plus.png">
       <publishTime>09/01/2017 14:17:43</publishTime>
+    </File>
+    <File Include="Content/images/return.png">
+      <publishTime>04/10/2018 10:51:16</publishTime>
+    </File>
+    <File Include="Content/images/scrap.png">
+      <publishTime>02/23/2018 08:27:10</publishTime>
+    </File>
+    <File Include="Content/images/scraprate.png">
+      <publishTime>07/10/2018 10:20:40</publishTime>
+    </File>
+    <File Include="Content/images/search.png">
+      <publishTime>03/21/2018 12:25:06</publishTime>
     </File>
     <File Include="Content/images/SmartLinks.png">
       <publishTime>09/07/2017 15:41:28</publishTime>
     </File>
+    <File Include="Content/images/SmartLinks_1.png">
+      <publishTime>09/09/2017 14:25:56</publishTime>
+    </File>
+    <File Include="Content/images/snteststatus.png">
+      <publishTime>08/15/2018 13:26:36</publishTime>
+    </File>
+    <File Include="Content/images/test.png">
+      <publishTime>03/26/2018 09:22:14</publishTime>
+    </File>
+    <File Include="Content/images/TraceView.png">
+      <publishTime>09/08/2017 12:53:12</publishTime>
+    </File>
+    <File Include="Content/images/upload.png">
+      <publishTime>03/21/2018 12:28:11</publishTime>
+    </File>
+    <File Include="Content/images/userrank.png">
+      <publishTime>03/30/2018 15:15:26</publishTime>
+    </File>
+    <File Include="Content/images/VCSEL.png">
+      <publishTime>08/22/2018 14:36:48</publishTime>
+    </File>
+    <File Include="Content/images/video.png">
+      <publishTime>03/16/2018 09:10:05</publishTime>
+    </File>
+    <File Include="Content/images/video_log.png">
+      <publishTime>03/30/2018 16:09:54</publishTime>
+    </File>
+    <File Include="Content/images/welcome.png">
+      <publishTime>03/21/2018 12:55:58</publishTime>
+    </File>
+    <File Include="Content/jquery.dataTables.min.css">
+      <publishTime>02/07/2018 08:37:22</publishTime>
+    </File>
+    <File Include="Content/scrap.css">
+      <publishTime>02/26/2018 16:52:12</publishTime>
+    </File>
     <File Include="Content/Site.css">
       <publishTime>09/01/2017 08:41:03</publishTime>
+    </File>
+    <File Include="Content/technicalvideo.css">
+      <publishTime>03/30/2018 14:25:55</publishTime>
+    </File>
+    <File Include="Content/videorecorder.css">
+      <publishTime>03/21/2018 11:34:21</publishTime>
+    </File>
+    <File Include="Content/wafer.css">
+      <publishTime>05/03/2018 08:15:03</publishTime>
     </File>
     <File Include="favicon.ico">
       <publishTime>09/01/2017 08:41:03</publishTime>
@@ -208,10 +538,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/01/2017 08:41:17</publishTime>
     </File>
     <File Include="packages.config">
-      <publishTime>09/01/2017 08:41:38</publishTime>
+      <publishTime>03/21/2018 11:18:34</publishTime>
     </File>
     <File Include="PrecompiledApp.config">
-      <publishTime>09/07/2017 16:28:26</publishTime>
+      <publishTime>08/27/2018 14:47:10</publishTime>
     </File>
     <File Include="Scripts/ajaxfileupload.js">
       <publishTime>09/04/2017 08:28:10</publishTime>
@@ -220,10 +550,25 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/05/2017 07:44:07</publishTime>
     </File>
     <File Include="Scripts/alllinks_1.js">
-      <publishTime>09/07/2017 16:03:48</publishTime>
+      <publishTime>08/23/2018 16:53:32</publishTime>
+    </File>
+    <File Include="Scripts/asset.js">
+      <publishTime>04/16/2018 14:18:55</publishTime>
+    </File>
+    <File Include="Scripts/asset_test.xlsx">
+      <publishTime>04/10/2018 10:53:18</publishTime>
+    </File>
+    <File Include="Scripts/bootstrap-datepicker/bootstrap-datepicker.js">
+      <publishTime>04/10/2018 10:51:16</publishTime>
+    </File>
+    <File Include="Scripts/bootstrap-datepicker/bootstrap-datepicker.min.js">
+      <publishTime>04/10/2018 10:51:16</publishTime>
     </File>
     <File Include="Scripts/bootstrap.min.js">
       <publishTime>09/01/2017 15:57:22</publishTime>
+    </File>
+    <File Include="Scripts/exam.js">
+      <publishTime>03/28/2018 16:51:40</publishTime>
     </File>
     <File Include="Scripts/jquery-1.10.2.js">
       <publishTime>09/01/2017 08:41:17</publishTime>
@@ -233,6 +578,21 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     </File>
     <File Include="Scripts/jquery-1.10.2.min.map">
       <publishTime>09/01/2017 08:41:17</publishTime>
+    </File>
+    <File Include="Scripts/jquery-autocomplete/jquery.auto-complete.css">
+      <publishTime>02/09/2018 13:47:10</publishTime>
+    </File>
+    <File Include="Scripts/jquery-autocomplete/jquery.auto-complete.js">
+      <publishTime>02/09/2018 13:47:10</publishTime>
+    </File>
+    <File Include="Scripts/jquery-autocomplete/jquery.auto-complete.min.js">
+      <publishTime>02/09/2018 13:47:10</publishTime>
+    </File>
+    <File Include="Scripts/jquery-bootstrap-loading.js">
+      <publishTime>03/15/2018 09:30:46</publishTime>
+    </File>
+    <File Include="Scripts/jquery.dataTables.min.js">
+      <publishTime>02/07/2018 08:37:46</publishTime>
     </File>
     <File Include="Scripts/jquery.validate.js">
       <publishTime>09/01/2017 08:41:24</publishTime>
@@ -255,17 +615,50 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="Scripts/respond.min.js">
       <publishTime>09/01/2017 08:41:24</publishTime>
     </File>
+    <File Include="Scripts/scrap.js">
+      <publishTime>02/24/2018 11:07:39</publishTime>
+    </File>
     <File Include="Scripts/SmartLinks-db-script.txt">
-      <publishTime>09/04/2017 10:51:10</publishTime>
+      <publishTime>08/24/2018 15:12:30</publishTime>
     </File>
     <File Include="Scripts/SmartLinksCfg.txt">
-      <publishTime>09/01/2017 08:51:00</publishTime>
+      <publishTime>08/27/2018 14:38:46</publishTime>
+    </File>
+    <File Include="Scripts/technicalvideo.js">
+      <publishTime>03/26/2018 11:16:23</publishTime>
+    </File>
+    <File Include="Scripts/video-test.xlsx">
+      <publishTime>04/08/2018 08:46:04</publishTime>
+    </File>
+    <File Include="Scripts/wafer.js">
+      <publishTime>05/04/2018 16:28:12</publishTime>
     </File>
     <File Include="Scripts/_references.js">
-      <publishTime>09/06/2017 09:19:00</publishTime>
+      <publishTime>04/11/2018 09:18:17</publishTime>
     </File>
     <File Include="userfiles/ImageUpload.ashx">
-      <publishTime>09/04/2017 13:08:20</publishTime>
+      <publishTime>04/11/2018 10:03:02</publishTime>
+    </File>
+    <File Include="userfiles/Upload.ashx">
+      <publishTime>04/10/2018 10:51:16</publishTime>
+    </File>
+    <File Include="Views/Asset/BorrowRequest.cshtml">
+      <publishTime>04/17/2018 09:14:54</publishTime>
+    </File>
+    <File Include="Views/Asset/BuyRequest.cshtml">
+      <publishTime>04/17/2018 09:14:54</publishTime>
+    </File>
+    <File Include="Views/Asset/Index.cshtml">
+      <publishTime>04/17/2018 09:14:54</publishTime>
+    </File>
+    <File Include="Views/Asset/MyAsset.cshtml">
+      <publishTime>04/10/2018 10:51:16</publishTime>
+    </File>
+    <File Include="Views/ScrapHelper/Index.cshtml">
+      <publishTime>02/23/2018 13:16:36</publishTime>
+    </File>
+    <File Include="Views/ScrapHelper/SettingScrapRule.cshtml">
+      <publishTime>02/22/2018 08:52:00</publishTime>
     </File>
     <File Include="Views/Shared/Error.cshtml">
       <publishTime>09/01/2017 08:41:29</publishTime>
@@ -273,20 +666,56 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="Views/Shared/Lockout.cshtml">
       <publishTime>09/01/2017 08:41:29</publishTime>
     </File>
+    <File Include="Views/Shared/_dataloading.cshtml">
+      <publishTime>02/07/2018 11:17:41</publishTime>
+    </File>
     <File Include="Views/Shared/_Layout.cshtml">
-      <publishTime>09/06/2017 09:19:00</publishTime>
+      <publishTime>02/08/2018 09:31:48</publishTime>
+    </File>
+    <File Include="Views/Shared/_Layout4Asset.cshtml">
+      <publishTime>04/10/2018 10:51:16</publishTime>
+    </File>
+    <File Include="Views/Shared/_Layout4ProdLine.cshtml">
+      <publishTime>02/08/2018 09:55:05</publishTime>
+    </File>
+    <File Include="Views/Shared/_Layout4Scrap.cshtml">
+      <publishTime>02/08/2018 09:31:41</publishTime>
+    </File>
+    <File Include="Views/Shared/_Layout4Video.cshtml">
+      <publishTime>03/28/2018 14:35:33</publishTime>
     </File>
     <File Include="Views/Shared/_LoginPartial.cshtml">
       <publishTime>09/01/2017 08:41:29</publishTime>
+    </File>
+    <File Include="Views/Shared/_Pagination.cshtml">
+      <publishTime>04/10/2018 10:51:16</publishTime>
     </File>
     <File Include="Views/SmartLinks/AddLink.cshtml">
       <publishTime>09/04/2017 10:20:09</publishTime>
     </File>
     <File Include="Views/SmartLinks/All.cshtml">
-      <publishTime>09/07/2017 15:39:20</publishTime>
+      <publishTime>08/23/2018 15:57:41</publishTime>
     </File>
     <File Include="Views/SmartLinks/All_bak.cshtml">
       <publishTime>09/06/2017 09:19:00</publishTime>
+    </File>
+    <File Include="Views/SmartLinks/ViewForIE8.cshtml">
+      <publishTime>09/08/2017 15:17:37</publishTime>
+    </File>
+    <File Include="Views/TVideoSite/TechnicalVideo.cshtml">
+      <publishTime>03/30/2018 16:13:02</publishTime>
+    </File>
+    <File Include="Views/TVideoSite/VideoLogHistory.cshtml">
+      <publishTime>03/21/2018 16:48:08</publishTime>
+    </File>
+    <File Include="Views/TVideoSite/VUserRank.cshtml">
+      <publishTime>03/30/2018 15:43:51</publishTime>
+    </File>
+    <File Include="Views/TVideoSite/Welcome.cshtml">
+      <publishTime>03/21/2018 12:56:29</publishTime>
+    </File>
+    <File Include="Views/WaferPack/Index.cshtml">
+      <publishTime>05/04/2018 16:25:35</publishTime>
     </File>
     <File Include="Views/Web.config">
       <publishTime>09/01/2017 08:41:03</publishTime>
@@ -295,7 +724,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/01/2017 08:41:03</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>09/07/2017 16:28:23</publishTime>
+      <publishTime>08/24/2018 15:13:29</publishTime>
     </File>
   </ItemGroup>
 </Project>
