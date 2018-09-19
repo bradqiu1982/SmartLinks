@@ -394,9 +394,10 @@ namespace SmartLinks.Controllers
         {
             var marks = Request.Form["marks"];
             List<string> snlist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
+            var cwdm4info = CWDM4Data.LoadCWDM4Info(snlist,this);
             var ret = new JsonResult();
             ret.Data = new {
-                success = true
+                cwdm4info = cwdm4info
             };
             return ret;
         }

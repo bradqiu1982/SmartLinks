@@ -221,7 +221,7 @@ namespace SmartLinks.Models
                     return ret;
 
                 var command = conn.CreateCommand();
-                command.CommandTimeout = 120;
+                command.CommandTimeout = 180;
                 command.CommandText = sql;
                 if (parameters != null)
                 {

@@ -76,7 +76,7 @@ bool updateLinks)
               "IA","IB","IC","ID","IE","IF","IG","IH","II","IJ","IK","IL","IM","IN","IO","IP","IQ","IR","IS","IT","IU","IV","IW","IX","IY","IZ",
               "JA","JB","JC","JD","JE","JF","JG","JH","JI","JJ","JK","JL","JM","JN","JO","JP","JQ","JR","JS","JT","JU","JV","JW","JX","JY","JZ"};
 
-        private static List<List<string>> RetrieveDataFromExcel2(Excel.Worksheet sheet)
+        private static List<List<string>> RetrieveDataFromExcel2(Excel.Worksheet sheet,int columns = 101)
         {
             var ret = new List<List<string>>();
             var totalrow = 100000;
@@ -91,7 +91,7 @@ bool updateLinks)
                     var range = sheet.get_Range(columnFlag[0] + rowidx.ToString(), columnFlag[99] + rowidx.ToString());
                     var saRet = (System.Object[,])range.get_Value(Type.Missing);
 
-                    for (var colidx = 1; colidx < 101; colidx++)
+                    for (var colidx = 1; colidx < columns; colidx++)
                     {
                         if (saRet[1, colidx] != null)
                         {
@@ -133,7 +133,7 @@ bool updateLinks)
             return ret;
         }
 
-        public static List<List<string>> RetrieveDataFromExcel(string wholefn, string sheetname)
+        public static List<List<string>> RetrieveDataFromExcel(string wholefn, string sheetname, int columns = 101)
         {
             var data = new List<List<string>>();
 
@@ -158,7 +158,7 @@ bool updateLinks)
                     sheet = wkb.Sheets[sheetname] as Excel.Worksheet;
                 }
 
-                var ret = RetrieveDataFromExcel2(sheet);
+                var ret = RetrieveDataFromExcel2(sheet, columns);
 
                 wkb.Close();
                 excel.Quit();
