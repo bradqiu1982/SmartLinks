@@ -23,9 +23,38 @@ namespace SmartLinks.Models
                 {
                     var sn = line[0].ToUpper().Trim();
                     var date = line[1];
+                    try
+                    {
+                        date = DateTime.Parse(date).ToString("yyyy-MM-dd");
+                    }
+                    catch (Exception ex) { }
                     if (!ret.ContainsKey(sn))
                     {
                         ret.Add(sn, date);
+                    }
+                }
+            }
+            return ret;
+        }
+
+        public static Dictionary<string, string> LoadORLData(Controller ctrl)
+        {
+            var ret = new Dictionary<string, string>();
+            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+            var htolfile = syscfgdict["CWDM4ORL"];
+            var desfile = DownloadShareFile(htolfile, ctrl);
+            if (desfile != null && FileExist(ctrl, desfile))
+            {
+                var rawdata = RetrieveDataFromExcelWithAuth(ctrl, desfile,null, 5);
+                foreach (var line in rawdata)
+                {
+                    var sn = line[0].ToUpper().Trim();
+                    var txval = line[1];
+                    var rxval = line[2];
+
+                    if (!ret.ContainsKey(sn))
+                    {
+                        ret.Add(sn, "TX:"+txval+"/RX:"+rxval);
                     }
                 }
             }

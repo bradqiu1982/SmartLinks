@@ -62,30 +62,35 @@
            {
                marks: JSON.stringify(cur_marks)
            }, function (output) {
-               var idx = 0;
-               var datacont = output.data.length;
 
                if (mywafertable) {
                    mywafertable.destroy();
                }
                $("#WaferTableID").empty();
 
-               //$.each(output.cwdm4list, function (i, val) {
-               //    var appendstr = '<tr>';
-               //    appendstr += '<td>' + val.param + '</td>';
-               //    appendstr += '<td>' + val.datafrom + '</td>';
-               //    appendstr += '<td>' + val.isnormal + '</td>';
-               //    appendstr += '<td>' + val.mean + '</td>';
-               //    appendstr += '<td>' + val.stddev + '</td>';
-               //    appendstr += '<td>' + val.realcpk + '</td>';
-               //    appendstr += '<td>' + val.dppm + '</td>';
-               //    appendstr += '<td>' + '<button class="btn btn-primary cpkmorecla" mydataid="' + i + '">More</button>' + '</td>';
-               //    appendstr += '<td>' + '<a class="btn btn-primary" href="' + val.sourcedata + '" id="sourcedata" name="sourcedata" target="_blank">Source Data</a>' + '</td>';
-               //    appendstr += '</tr>';
-               //    $("#WaferTableID").append(appendstr);
-               //});
-
                $.bootstrapLoading.end();
+
+               $.each(output.cwdm4list, function (i, val) {
+                   var appendstr = '<tr>';
+                   appendstr += '<td>' + val.SN + '</td>';
+                   appendstr += '<td>' + val.PN + '</td>';
+                   appendstr += '<td>' + val.PCBARev + '</td>';
+                   appendstr += '<td>' + val.FW + '</td>';
+                   appendstr += '<td>' + val.CurrentStep + '</td>';
+                   appendstr += '<td>' + val.SHTOL + '</td>';
+                   appendstr += '<td>' + val.TCBert + '</td>';
+                   appendstr += '<td>' + val.Spec + '</td>';
+                   appendstr += '<td>' + val.PLCVendor + '</td>';
+                   appendstr += '<td>' + val.COCCOS + '</td>';
+                   appendstr += '<td>' + val.ORLTX + '</td>';
+                   appendstr += '<td>' + val.ORLRX + '</td>';
+                   appendstr += '<td></td>';
+                   appendstr += '<td></td>';
+                   appendstr += '</tr>';
+                   $("#WaferTableID").append(appendstr);
+               });
+
+
                mywafertable = $('#mywafertable').DataTable({
                    'iDisplayLength': 50,
                    'aLengthMenu': [[20, 50, 100, -1],

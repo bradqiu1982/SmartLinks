@@ -28,6 +28,7 @@ namespace SmartLinks.Models
             RXEye = "";
             PNDesc = "";
             IsCWDM4 = false;
+            ORL = "";
         }
 
         private static Dictionary<string, CWDM4Data> LoadCurrentStepAndPN(string sncond)
@@ -136,16 +137,109 @@ namespace SmartLinks.Models
         }
 
 
-        private static Dictionary<string, string> LoadFWData(List<CWDM4Data> retdata)
+        private static Dictionary<string, string> LoadFWData(string sncond,Controller ctrl)
         {
+            var ret = new Dictionary<string, string>();
+            var sndict = new Dictionary<string, bool>();
+            var sql = @"select ModuleSerialNum,TestStation,TestTimeStamp FROM [InsiteDB].[insite].[dc_QuickTest] where ModuleSerialNum in <SNCOND> order by TestTimeStamp desc";
+            sql = sql.Replace("<SNCOND>", sncond);
+            var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var sn = Convert.ToString(line[0]).ToUpper().Trim();
+                var station = Convert.ToString(line[1]).ToUpper().Trim();
+                var testtime = Convert.ToDateTime(line[2]).ToString("yyyy-MM-dd HH:mm:ss");
+                if (!sndict.ContainsKey(sn))
+                {
+                    sndict.Add(sn, true);
+                    var filelist = TraceViewVM.LoadAllTraceView2Local(station, sn, "QUICKTEST", ctrl);
+                    if (filelist.Count > 0)
+                    {
+                        filelist.Sort(delegate(string obj1,string obj2) {
+                            var time1 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj1));
+                            var time2 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj2));
+                            return time2.CompareTo(time1);
+                        });
+                        foreach(var f in filelist)
+                        {
+                            var allline = System.IO.File.ReadAllLines(f);
+                            foreach (var l in allline)
+                            {
+                                if (l.ToUpper().Contains("Firmware Version:".ToUpper()) || l.ToUpper().Contains("QSFP28_eCWDM FW Rev".ToUpper()))
+                                {
+                                    var fws = l.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                                    if (!ret.ContainsKey(sn))
+                                    {
+                                        ret.Add(sn, fws[fws.Length - 1].Replace("<","").Replace(">", "").Replace("(", "").Replace(")", ""));
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }//end if
+                }//end if
+           }//end foreach
+
+            return ret;
+        }
+
+        private static void LoadTCBertInfo(List<CWDM4Data> retdata,Controller ctrl)
+        {
+            var syscfg = CfgUtility.GetSysConfig(ctrl);
+            var stationlist = syscfg["CWDM4FINAL1STATION"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
             foreach (var item in retdata)
             {
                 if (!item.IsCWDM4)
                 { continue; }
 
+                var allfiles = new List<string>();
+                foreach (var station in stationlist)
+                {
+                    var tempf = TraceViewVM.LoadAllTraceView2Local(station, item.SN, "Final1", ctrl);
+                    allfiles.AddRange(tempf);
+                }
 
+                if (allfiles.Count > 0)
+                {
+                    item.TCBert = "";
+                    var tcbertpass = false;
+
+                    allfiles.Sort(delegate (string obj1, string obj2) {
+                        var time1 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj1));
+                        var time2 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj2));
+                        return time2.CompareTo(time1);
+                    });
+
+                    foreach (var f in allfiles)
+                    {
+                        bool validfile = false;
+
+                        var allline = System.IO.File.ReadAllLines(f);
+                        foreach (var l in allline)
+                        {
+                            if (l.ToUpper().Contains("SoakTest".ToUpper()))
+                            { validfile = true; }
+
+                            if (l.ToUpper().Contains("Sequence Main Passed".ToUpper()) && validfile)
+                            {
+                                tcbertpass = true;
+                                break;
+                            }
+
+                        }//end foreach
+
+                        if (validfile)
+                            { break; }
+                    }//end foreach
+
+                    if (tcbertpass)
+                    { item.TCBert += "PASS"; }
+                    else
+                    { item.TCBert += "FAIL"; }
+                }
             }
         }
+
 
         public static List<CWDM4Data> LoadCWDM4Info(List<string> snlist, Controller ctrl)
         {
@@ -175,7 +269,7 @@ namespace SmartLinks.Models
                     }
                     else
                     {
-                        item.PCBARev = "NOT CWDM4 Module";
+                        item.PCBARev = "NOT CWDM4";
                     }
                 }
             }
@@ -236,12 +330,46 @@ namespace SmartLinks.Models
                     { item.SHTOL = HTOLDict[item.SN]; }
                 }
 
-                
+                //load ORL SN dict
+                var ORLDict = ExternalDataCollector.LoadORLData(ctrl);
+                foreach (var item in retdata)
+                {
+                    if (!item.IsCWDM4)
+                    { continue; }
+                    if (ORLDict.ContainsKey(item.SN))
+                    { item.ORL = ORLDict[item.SN]; }
+                }
+
+                //load FW
+                var FWDict = LoadFWData(sncond,ctrl);
+                foreach (var item in retdata)
+                {
+                    if (!item.IsCWDM4)
+                    { continue; }
+                    if (FWDict.ContainsKey(item.SN))
+                    { item.FW = FWDict[item.SN]; }
+                }
+
+                //load tcbert
+                LoadTCBertInfo(retdata, ctrl);
+
+                var PNDict = CfgUtility.GetSysConfig(ctrl);
+                foreach (var item in retdata)
+                {
+                    if (!item.IsCWDM4)
+                    { continue; }
+
+                    if (PNDict.ContainsKey("PLC-" + item.PLCPN))
+                    { item.PLCVendor = PNDict["PLC-" + item.PLCPN]; }
+
+                    if (PNDict.ContainsKey("SPEC-" + item.PN))
+                    { item.Spec = PNDict["SPEC-" + item.PN]; }
+
+                    if (PNDict.ContainsKey("COCCOS-" + item.PN))
+                    { item.COCCOS = PNDict["COCCOS-" + item.PN]; }
+                }
 
             }//end if (hascwdm4module)
-
-
-
 
             return retdata;
         }
@@ -261,6 +389,35 @@ namespace SmartLinks.Models
         public string PLCVendor { set; get; }
 
         public string SHTOL { set; get; }
+        public string ORL { set; get; }
+
+        public string ORLTX {
+            get {
+                if (ORL.Contains("/"))
+                {
+                    return ORL.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace("TX:", "").Replace("RX:", "");
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+
+        public string ORLRX
+        {
+            get
+            {
+                if (ORL.Contains("/"))
+                {
+                    return ORL.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries)[1].Replace("TX:", "").Replace("RX:", "");
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
 
         public string FW { set; get; }
         public string TCBert { set; get; }
