@@ -361,7 +361,10 @@ namespace SmartLinks.Models
             {
                 var syscfgdict = CfgUtility.GetSysConfig(ctrl);
                 var traceviewscrfolder = syscfgdict["TRACEVIEWFOLDER"] + "\\" + tester;
+                var traceviewscrfolder2 = syscfgdict["TRACEVIEWFOLDER"] + "\\" + tester + "\\" + tester;
                 var allsrcfiles = DirectoryEnumerateFiles(ctrl, traceviewscrfolder);
+                var allsrcfiles2 = DirectoryEnumerateFiles(ctrl, traceviewscrfolder2);
+                allsrcfiles.AddRange(allsrcfiles2);
 
                 string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\TraceView\\";
                 if (!DirectoryExists(ctrl, imgdir))

@@ -183,6 +183,41 @@ namespace SmartLinks.Models
             return ret;
         }
 
+        private static string LoadFWData2(string sn, Controller ctrl)
+        {
+            var ret = "";
+            var stationlist = CfgUtility.GetSysConfig(ctrl)["CWDM4QUICKTESTSTATION"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            foreach (var station in stationlist)
+            {
+                    var filelist = TraceViewVM.LoadAllTraceView2Local(station, sn, "QUICKTEST", ctrl);
+                    if (filelist.Count > 0)
+                    {
+                        filelist.Sort(delegate (string obj1, string obj2) {
+                            var time1 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj1));
+                            var time2 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj2));
+                            return time2.CompareTo(time1);
+                        });
+
+                        foreach (var f in filelist)
+                        {
+                            var allline = System.IO.File.ReadAllLines(f);
+                            foreach (var l in allline)
+                            {
+                                if (l.ToUpper().Contains("Firmware Version:".ToUpper()) || l.ToUpper().Contains("QSFP28_eCWDM FW Rev".ToUpper()))
+                                {
+                                    var fws = l.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                                    ret = fws[fws.Length - 1].Replace("<", "").Replace(">", "").Replace("(", "").Replace(")", "");
+                                    return ret;
+                                }
+                            }
+                        }
+                    }//end if
+
+            }//end foreach
+
+            return ret;
+        }
+
         private static void LoadTCBertInfo(List<CWDM4Data> retdata,Controller ctrl)
         {
             var syscfg = CfgUtility.GetSysConfig(ctrl);
@@ -367,6 +402,11 @@ namespace SmartLinks.Models
 
                     if (PNDict.ContainsKey("COCCOS-" + item.PN))
                     { item.COCCOS = PNDict["COCCOS-" + item.PN]; }
+
+                    if (string.IsNullOrEmpty(item.FW))
+                    {
+                        item.FW = LoadFWData2(item.SN, ctrl);
+                    }
                 }
 
             }//end if (hascwdm4module)
@@ -374,6 +414,80 @@ namespace SmartLinks.Models
             return retdata;
         }
 
+        //private static void DownloadOETestStation(Controller ctrl)
+        //{
+        //    //station , date ,input/output
+        //    var retdata = new Dictionary<string, Dictionary<string, Dictionary<string, int>>>();
+        //    var dict = new Dictionary<string, bool>();
+
+
+        //    var sql = "SELECT [ModuleSerialNum],[ErrAbbr],[TestStation],TestTimeStamp FROM [NPITrace].[dbo].[ProjectTestData] where ProjectKey = 'OE25LPFN' and WhichTest='Final_RX' and TestTimeStamp > '2018-03-01 00:00:00' order by TestStation,TestTimeStamp desc";
+        //    var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+        //    foreach (var line in dbret)
+        //    {
+        //        var sn = Convert.ToString(line[0]);
+        //        var fail = Convert.ToString(line[1]);
+        //        var station = Convert.ToString(line[2]);
+        //        var date = Convert.ToDateTime(line[3]).ToString("yyyy-MM-dd");
+
+        //        var uniq = sn + station + date;
+        //        if (dict.ContainsKey(uniq))
+        //        {
+        //            continue;
+        //        }
+        //        dict.Add(uniq, true);
+                
+        //        if (retdata.ContainsKey(station))
+        //        {
+        //            var sdict = retdata[station];
+        //            if (sdict.ContainsKey(date))
+        //            {
+        //                var ddict = sdict[date];
+        //                ddict["INPUT"] += 1;
+        //                if (string.Compare(fail, "PASS", true) == 0)
+        //                { ddict["OUTPUT"] += 1;}
+        //            }
+        //            else
+        //            {
+        //                var tempdict = new Dictionary<string, int>();
+        //                tempdict.Add("INPUT", 1);
+        //                if (string.Compare(fail, "PASS", true) == 0)
+        //                { tempdict.Add("OUTPUT", 1); }
+        //                else
+        //                { tempdict.Add("OUTPUT", 0); }
+        //                sdict.Add(date, tempdict);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            var vdict = new Dictionary<string, int>();
+        //            vdict.Add("INPUT", 1);
+        //            if (string.Compare(fail, "PASS", true) == 0)
+        //            { vdict.Add("OUTPUT", 1); }
+        //            else
+        //            { vdict.Add("OUTPUT", 0); }
+                    
+        //            var datedict = new Dictionary<string, Dictionary<string, int>>();
+        //            datedict.Add(date, vdict);
+        //            retdata.Add(station, datedict);
+        //        }
+        //    }//end foreach
+
+        //    var sb = new System.Text.StringBuilder((dbret.Count + 1) * 120);
+
+        //    var lines = new List<string>();
+        //    foreach (var skv in retdata)
+        //    {
+        //        foreach (var dkv in skv.Value)
+        //        {
+        //            sb.Append(skv.Key + "," + dkv.Key);
+        //            sb.Append("," + dkv.Value["INPUT"]);
+        //            sb.Append("," + dkv.Value["OUTPUT"]+",\r\n");
+        //        }
+        //    }
+
+        //    System.IO.File.WriteAllText("d:\\OEFN_RX.csv", sb.ToString());
+        //}
 
         public string SN { set; get; }
         public string PN { set; get; }
