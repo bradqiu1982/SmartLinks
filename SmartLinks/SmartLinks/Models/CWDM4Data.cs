@@ -70,9 +70,13 @@ namespace SmartLinks.Models
 
             var PCBADict = new Dictionary<string, string>();
             var PLCDict = new Dictionary<string, string>();
+            var COCCOSDict = new Dictionary<string, string>();
+
             var sql = @"select ToContainer,FromContainer,FromPNDescription,FromProductName  FROM [PDMS].[dbo].[ComponentIssueSummary]  
                            where ToContainer in <SNCOND> 
-                           and (FromPNDescription like '%PCBA%' or FromPNDescription like '%PLC%') order by FromPNDescription";
+                           and (FromPNDescription like '%PCBA%' or FromPNDescription like '%PLC%'  
+                           or FromPNDescription like '%ON SUBMOUNT%' or  FromPNDescription like '%ON-SUBMOUNT%' or  FromPNDescription like '%ON-SILICON%') order by FromPNDescription";
+
             sql = sql.Replace("<SNCOND>", sncond);
             var dbret = DBUtility.ExeMESReportSqlWithRes(sql);
             foreach (var line in dbret)
@@ -96,10 +100,26 @@ namespace SmartLinks.Models
                         PLCDict.Add(sn, frompn);
                     }
                 }
+                else if (pndesc.Contains("ON SUBMOUNT"))
+                {
+                    if (!COCCOSDict.ContainsKey(sn))
+                    { COCCOSDict.Add(sn, "DUAL PAD COC"); }
+                }
+                else if (pndesc.Contains("ON-SUBMOUNT"))
+                {
+                    if (!COCCOSDict.ContainsKey(sn))
+                    { COCCOSDict.Add(sn, "NORMAL COC"); }
+                }
+                else if (pndesc.Contains("ON-SILICON"))
+                {
+                    if (!COCCOSDict.ContainsKey(sn))
+                    { COCCOSDict.Add(sn, "COS"); }
+                }
             }//end foreach
 
             ret.Add(PCBADict);
             ret.Add(PLCDict);
+            ret.Add(COCCOSDict);
             return ret;
         }
 
@@ -137,48 +157,57 @@ namespace SmartLinks.Models
         }
 
 
-        private static Dictionary<string, string> LoadFWData(string sncond,Controller ctrl)
+        private static Dictionary<string, string> LoadFWData(List<string> snlist,Controller ctrl)
         {
             var ret = new Dictionary<string, string>();
-            var sndict = new Dictionary<string, bool>();
-            var sql = @"select ModuleSerialNum,TestStation,TestTimeStamp FROM [InsiteDB].[insite].[dc_QuickTest] where ModuleSerialNum in <SNCOND> order by TestTimeStamp desc";
-            sql = sql.Replace("<SNCOND>", sncond);
-            var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
-            foreach (var line in dbret)
+            var stationlist = CfgUtility.GetSysConfig(ctrl)["CWDM4QUICKTESTSTATION"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            foreach (var station in stationlist)
             {
-                var sn = Convert.ToString(line[0]).ToUpper().Trim();
-                var station = Convert.ToString(line[1]).ToUpper().Trim();
-                var testtime = Convert.ToDateTime(line[2]).ToString("yyyy-MM-dd HH:mm:ss");
-                if (!sndict.ContainsKey(sn))
+                var filelist = TraceViewVM.LoadAllTraceView2Local(station, snlist, "QUICKTEST", ctrl);
+                if (filelist.Count > 0)
                 {
-                    sndict.Add(sn, true);
-                    var filelist = TraceViewVM.LoadAllTraceView2Local(station, sn, "QUICKTEST", ctrl);
-                    if (filelist.Count > 0)
+                    filelist.Sort(delegate (string obj1, string obj2)
                     {
-                        filelist.Sort(delegate(string obj1,string obj2) {
-                            var time1 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj1));
-                            var time2 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj2));
-                            return time2.CompareTo(time1);
-                        });
-                        foreach(var f in filelist)
+                        var time1 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj1));
+                        var time2 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj2));
+                        return time2.CompareTo(time1);
+                    });
+
+                    foreach (var f in filelist)
+                    {
+                        var currentsn = "";
+                        foreach (var tempsn in snlist)
                         {
-                            var allline = System.IO.File.ReadAllLines(f);
-                            foreach (var l in allline)
+                            if (f.ToUpper().Contains(tempsn))
                             {
-                                if (l.ToUpper().Contains("Firmware Version:".ToUpper()) || l.ToUpper().Contains("QSFP28_eCWDM FW Rev".ToUpper()))
-                                {
-                                    var fws = l.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                                    if (!ret.ContainsKey(sn))
-                                    {
-                                        ret.Add(sn, fws[fws.Length - 1].Replace("<","").Replace(">", "").Replace("(", "").Replace(")", ""));
-                                    }
-                                    break;
-                                }
+                                currentsn = tempsn;
+                                break;
                             }
                         }
-                    }//end if
+
+                        if (string.IsNullOrEmpty(currentsn))
+                        { continue; }
+
+                        if (ret.ContainsKey(currentsn))
+                        { continue; }
+
+                        var allline = System.IO.File.ReadAllLines(f);
+                        foreach (var l in allline)
+                        {
+                            if (l.ToUpper().Contains("Firmware Version:".ToUpper()) || l.ToUpper().Contains("QSFP28_eCWDM FW Rev".ToUpper()))
+                            {
+
+                                var fws = l.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                                if (!ret.ContainsKey(currentsn))
+                                {
+                                    ret.Add(currentsn, fws[fws.Length - 1].Replace("<", "").Replace(">", "").Replace("(", "").Replace(")", ""));
+                                }
+                                break;
+                            }
+                        }
+                    }
                 }//end if
-           }//end foreach
+            }
 
             return ret;
         }
@@ -218,61 +247,75 @@ namespace SmartLinks.Models
             return ret;
         }
 
-        private static void LoadTCBertInfo(List<CWDM4Data> retdata,Controller ctrl)
+        private static Dictionary<string,string> LoadTCBertInfo(List<string> snlist,Controller ctrl)
         {
+            var ret = new Dictionary<string, string>();
             var syscfg = CfgUtility.GetSysConfig(ctrl);
             var stationlist = syscfg["CWDM4FINAL1STATION"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            foreach (var item in retdata)
+
+
+            var allfiles = new List<string>();
+            foreach (var station in stationlist)
             {
-                if (!item.IsCWDM4)
-                { continue; }
+                var tempf = TraceViewVM.LoadAllTraceView2Local(station, snlist, "Final1", ctrl);
+                allfiles.AddRange(tempf);
+            }
 
-                var allfiles = new List<string>();
-                foreach (var station in stationlist)
-                {
-                    var tempf = TraceViewVM.LoadAllTraceView2Local(station, item.SN, "Final1", ctrl);
-                    allfiles.AddRange(tempf);
-                }
+            if (allfiles.Count > 0)
+            {
+                allfiles.Sort(delegate (string obj1, string obj2) {
+                    var time1 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj1));
+                    var time2 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj2));
+                    return time2.CompareTo(time1);
+                });
 
-                if (allfiles.Count > 0)
+                foreach (var f in allfiles)
                 {
-                    item.TCBert = "";
                     var tcbertpass = false;
 
-                    allfiles.Sort(delegate (string obj1, string obj2) {
-                        var time1 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj1));
-                        var time2 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj2));
-                        return time2.CompareTo(time1);
-                    });
+                    if (ret.Count == snlist.Count)
+                    { return ret; }
 
-                    foreach (var f in allfiles)
+                    var currentsn = "";
+                    foreach (var tempsn in snlist)
                     {
-                        bool validfile = false;
-
-                        var allline = System.IO.File.ReadAllLines(f);
-                        foreach (var l in allline)
+                        if (f.ToUpper().Contains(tempsn))
                         {
-                            if (l.ToUpper().Contains("SoakTest".ToUpper()))
-                            { validfile = true; }
+                            currentsn = tempsn;
+                            break;
+                        }
+                    }
+                    if (string.IsNullOrEmpty(currentsn))
+                    { continue; }
 
-                            if (l.ToUpper().Contains("Sequence Main Passed".ToUpper()) && validfile)
-                            {
-                                tcbertpass = true;
-                                break;
-                            }
+                    if (ret.ContainsKey(currentsn))
+                    { continue; }
 
-                        }//end foreach
+                    bool validfile = false;
 
-                        if (validfile)
-                            { break; }
+                    var allline = System.IO.File.ReadAllLines(f);
+                    foreach (var l in allline)
+                    {
+                        if (l.ToUpper().Contains("SoakTest".ToUpper()))
+                        { validfile = true; }
+
+                        if (l.ToUpper().Contains("Sequence Main Passed".ToUpper()) && validfile)
+                        {
+                            tcbertpass = true;
+                            break;
+                        }
+
                     }//end foreach
 
-                    if (tcbertpass)
-                    { item.TCBert += "PASS"; }
-                    else
-                    { item.TCBert += "FAIL"; }
-                }
+                    if (validfile)
+                    {
+                        if (!ret.ContainsKey(currentsn))
+                        { ret.Add(currentsn, tcbertpass ? "PASS" : "FAIL"); }
+                    }
+                }//end foreach
             }
+
+            return ret;
         }
 
 
@@ -326,6 +369,7 @@ namespace SmartLinks.Models
                 var pcbaplcdata = LoadPCBAPLCFromReport(sncond);
                 var PCBADict = (Dictionary<string, string>)pcbaplcdata[0];
                 var PLCDict = (Dictionary<string, string>)pcbaplcdata[1];
+                var COCCOSDict = (Dictionary<string, string>)pcbaplcdata[2];
                 foreach (var item in retdata)
                 {
                     if (!item.IsCWDM4)
@@ -338,6 +382,10 @@ namespace SmartLinks.Models
                     if (PLCDict.ContainsKey(item.SN))
                     {
                         item.PLCPN = PLCDict[item.SN];
+                    }
+                    if (COCCOSDict.ContainsKey(item.SN))
+                    {
+                        item.COCCOS = COCCOSDict[item.SN];
                     }
                 }
 
@@ -376,7 +424,7 @@ namespace SmartLinks.Models
                 }
 
                 //load FW
-                var FWDict = LoadFWData(sncond,ctrl);
+                var FWDict = LoadFWData(cwdm4list, ctrl);
                 foreach (var item in retdata)
                 {
                     if (!item.IsCWDM4)
@@ -386,7 +434,14 @@ namespace SmartLinks.Models
                 }
 
                 //load tcbert
-                LoadTCBertInfo(retdata, ctrl);
+                var tcbertdict = LoadTCBertInfo(cwdm4list, ctrl);
+                foreach (var item in retdata)
+                {
+                    if (!item.IsCWDM4)
+                    { continue; }
+                    if (tcbertdict.ContainsKey(item.SN))
+                    { item.TCBert = tcbertdict[item.SN]; }
+                }
 
                 var PNDict = CfgUtility.GetSysConfig(ctrl);
                 foreach (var item in retdata)
@@ -400,13 +455,6 @@ namespace SmartLinks.Models
                     if (PNDict.ContainsKey("SPEC-" + item.PN))
                     { item.Spec = PNDict["SPEC-" + item.PN]; }
 
-                    if (PNDict.ContainsKey("COCCOS-" + item.PN))
-                    { item.COCCOS = PNDict["COCCOS-" + item.PN]; }
-
-                    if (string.IsNullOrEmpty(item.FW))
-                    {
-                        item.FW = LoadFWData2(item.SN, ctrl);
-                    }
                 }
 
             }//end if (hascwdm4module)

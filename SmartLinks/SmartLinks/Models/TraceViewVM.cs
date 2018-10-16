@@ -453,6 +453,108 @@ namespace SmartLinks.Models
             return ret;
         }
 
+        public static List<string> LoadAllTraceView2Local(string tester, List<string> snlist, string whichtest, Controller ctrl)
+        {
+            var ret = new List<string>();
+            try
+            {
+                var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+                var traceviewscrfolder = syscfgdict["TRACEVIEWFOLDER"] + "\\" + tester;
+                var traceviewscrfolder2 = syscfgdict["TRACEVIEWFOLDER"] + "\\" + tester + "\\" + tester;
+                var allsrcfiles = DirectoryEnumerateFiles(ctrl, traceviewscrfolder);
+                var allsrcfiles2 = DirectoryEnumerateFiles(ctrl, traceviewscrfolder2);
+                allsrcfiles.AddRange(allsrcfiles2);
+
+                string imgdir = ctrl.Server.MapPath("~/userfiles") + "\\docs\\TraceView\\";
+                if (!DirectoryExists(ctrl, imgdir))
+                {
+                    Directory.CreateDirectory(imgdir);
+                }
+                foreach (var sn in snlist)
+                {
+                    var tempret = new List<string>();
+
+                    foreach (var srcf in allsrcfiles)
+                    {
+                        var filename = Path.GetFileName(srcf).ToUpper();
+
+                        if (filename.Contains(sn.ToUpper())
+                            && filename.Contains(whichtest.ToUpper())
+                            && filename.Contains("_DUTORDERED_")
+                            && filename.Contains("_TRACEVIEW_"))
+                        {
+                            var traceviewtimestr = RetrieveTimeFromTraceViewName(filename);
+                            if (traceviewtimestr == null)
+                                continue;
+
+                            try
+                            {
+                                //var traceviewtime = DateTime.Parse(traceviewtimestr);
+                                //var dbtime = DateTime.Parse(dbtimestr);
+                                //if (traceviewtime > dbtime.AddSeconds(-5) && traceviewtime < dbtime.AddSeconds(5))
+                                //{
+                                logthdinfo("\r\nStart to copy file: " + srcf);
+                                var desfile = imgdir + filename;
+                                FileCopy(ctrl, srcf, desfile, true);
+                                if (FileExist(ctrl, desfile))
+                                {
+                                    logthdinfo("try to add data from file: " + desfile);
+                                    tempret.Add(desfile);
+                                }//copied file exist
+                                //}
+                            }
+                            catch (Exception ex)
+                            {
+                                logthdinfo("LoadTraceView2Local Exception: " + ex.Message);
+                            }
+                        }//end if
+                    }//end foreach
+
+                    if (tempret.Count == 0)
+                    {
+                        foreach (var srcf in allsrcfiles)
+                        {
+                            var filename = Path.GetFileName(srcf).ToUpper();
+
+                            if (filename.Contains(sn.ToUpper())
+                                && filename.Contains(whichtest.ToUpper())
+                                && filename.Contains("_DUT")
+                                && filename.Contains("_TRACEVIEW_"))
+                            {
+                                var traceviewtimestr = RetrieveTimeFromTraceViewName(filename);
+                                if (traceviewtimestr == null)
+                                    continue;
+
+                                try
+                                {
+                                    //var traceviewtime = DateTime.Parse(traceviewtimestr);
+                                    //var dbtime = DateTime.Parse(dbtimestr);
+                                    //if (traceviewtime > dbtime.AddSeconds(-5) && traceviewtime < dbtime.AddSeconds(5))
+                                    //{
+                                    logthdinfo("\r\n2Start to copy file: " + srcf);
+                                    var desfile = imgdir + filename;
+                                    FileCopy(ctrl, srcf, desfile, true);
+                                    if (FileExist(ctrl, desfile))
+                                    {
+                                        logthdinfo("2try to add data from file: " + desfile);
+                                        ret.Add(desfile);
+                                    }//copied file exist
+                                    //}
+                                }
+                                catch (Exception ex)
+                                {
+                                    logthdinfo("2LoadTraceView2Local Exception: " + ex.Message);
+                                }
+                            }//end if
+                        }//end foreach
+                    }//end if ret == 0
+
+                    ret.AddRange(tempret);
+                }//end snlist
+            }catch (Exception e) { }
+            return ret;
+        }
+
         #region FILEOPERATE
 
         private static bool FileExist(Controller ctrl, string filename)
