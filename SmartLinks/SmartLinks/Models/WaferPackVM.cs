@@ -35,6 +35,17 @@ namespace SmartLinks.Models
 
     public class WaferPackVM
     {
+        private static string Convert2Str(object obj)
+        {
+            try
+            {
+                if (obj.Equals(null))
+                { return string.Empty; }
+                return Convert.ToString(obj);
+            }
+            catch (Exception ex) { return string.Empty; }
+        }
+
         public static List<WaferTableItem> RetrieveSNByDateCode(List<string> datecodelist,Dictionary<string,string> appenddict)
         {
             var ret = new List<WaferTableItem>();
@@ -46,7 +57,10 @@ namespace SmartLinks.Models
             datecond = datecond.Substring(0, datecond.Length - 2);
             datecond = datecond + ") ";
 
-            var sql = "select ContainerName,DateCode,CustomerSerialNum,ContainerId FROM [InsiteDB].[insite].[Container] where DateCode in <datecond> or CustomerSerialNum in <datecond>";
+            //var sql = "select ContainerName,DateCode,CustomerSerialNum,ContainerId FROM [InsiteDB].[insite].[Container] where DateCode in <datecond> or CustomerSerialNum in <datecond>";
+            var sql = @"select ContainerName,DateCode,CustomerSerialNum,ContainerId  FROM [InsiteDB].[insite].[Container]  
+                          where ParentContainerId in (SELECT ContainerId FROM [InsiteDB].[insite].[Container] where ContainerName in <datecond>) 
+                          or CustomerSerialNum in <datecond>";
             sql = sql.Replace("<datecond>", datecond);
 
             var excludsndict = new Dictionary<string, bool>();
@@ -58,9 +72,9 @@ namespace SmartLinks.Models
 
                     var sn = Convert.ToString(line[0]);
                     if (sn.Length > 7 
-                        && !line[1].Equals(null) 
+                        //&& !line[1].Equals(null) 
                         && !pkgdict.ContainsKey(sn)) {
-                        pkgdict.Add(Convert.ToString(line[3]), Convert.ToString(line[1]));
+                        pkgdict.Add(Convert.ToString(line[3]), Convert2Str(line[1]));
                     }
                     else
                     {

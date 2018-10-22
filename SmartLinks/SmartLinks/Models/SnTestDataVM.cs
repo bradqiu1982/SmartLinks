@@ -65,6 +65,8 @@ namespace SmartLinks.Models
         {
             try
             {
+                if (obj.Equals(null))
+                { return string.Empty; }
                 return Convert.ToString(obj);
             }
             catch (Exception ex) { return string.Empty; }
