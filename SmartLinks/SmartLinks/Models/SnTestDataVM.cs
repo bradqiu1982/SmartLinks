@@ -60,89 +60,95 @@ namespace SmartLinks.Models
             }
         }
 
-        public static void RetrieveTestData(List<ScrapTableItem> scraptable)
+
+        private static string Convert2Str(object obj)
         {
-            var pnkeydict = new Dictionary<string, bool>();
-            foreach (var item in scraptable)
+            try
             {
-                if (!string.IsNullOrEmpty(item.PNKey) && !pnkeydict.ContainsKey(item.PNKey))
+                return Convert.ToString(obj);
+            }
+            catch (Exception ex) { return string.Empty; }
+        }
+
+        private static List<string> RetrieveDCTableFromSn(string sn)
+        {
+            var ret = new List<string>();
+            var dctabledict = new Dictionary<string, bool>();
+
+            var sql = @" select ddr.DataCollectionDefName from insitedb.insite.DataCollectionDefBase ddr  (nolock)
+	                    inner join insitedb.insite.TxnMap tm with(noloCK) ON tm.DataCollectionDefinitionBaseId = ddr.DataCollectionDefBaseId
+	                    inner join insitedb.insite.spec sp with(nolock) on sp.specid =  tm.specid
+	                    inner join InsiteDB.insite.WorkflowStep ws (nolock)on  ws.specbaseid = sp.specbaseid
+	                    inner join InsiteDB.insite.Workflow w (nolock)on w.WorkflowID = ws.WorkflowID
+                        inner join InsiteDB.insite.Product p(nolock) on w.WorkflowBaseId = p.WorkflowBaseId
+	                    inner join [InsiteDB].[insite].[Container] c(nolock) on c.ProductId = p.ProductId
+                        where c.ContainerName = '<ContainerName>' and ddr.DataCollectionDefName is not null";
+            sql = sql.Replace("<ContainerName>", sn);
+            var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var dc = Convert2Str(line[0]).ToUpper();
+                if (dc.Length > 4 && dc.Substring(0, 4).Contains("DCD_"))
                 {
-                    pnkeydict.Add(item.PNKey, true);
+                    var realdc = "";
+                    if (dc.Contains("DCD_Module_Initialization_0811".ToUpper()))
+                    { realdc = "initial"; }
+                    else
+                    { realdc = dc.Substring(4); }
+
+                    if (!dctabledict.ContainsKey(realdc))
+                    {
+                        dctabledict.Add(realdc, true);
+                    }
                 }//end if
             }//end foreach
+            ret.AddRange(dctabledict.Keys);
+            return ret;
+        }
 
-            var mestablist = PnMESVM.RetrievePnMESTabByPNDict(pnkeydict);
 
-            var sncond = " ('";
-            foreach (var item in scraptable)
+        public static void RetrieveTestData(List<ScrapTableItem> scraptable) {
+            foreach (var stab in scraptable)
             {
-                if (!string.IsNullOrEmpty(item.SN))
+                var mestablist = RetrieveDCTableFromSn(stab.SN);
+
+                var ret = new List<SnTestDataVM>();
+                foreach (var tabname in mestablist)
                 {
-                    sncond = sncond + item.SN + "','";
-                }
-            }
-            sncond = sncond.Substring(0, sncond.Length - 2);
-            sncond = sncond + ") ";
-
-            var ret = new List<SnTestDataVM>();
-            foreach (var tabname in mestablist)
-            {
-                var sql = "select dc_<DCTABLE>HistoryId,ModuleSerialNum, ErrAbbr, TestTimeStamp,assemblypartnum,WhichTest,TestStation from "
-                    + " insite.dc_<DCTABLE> (nolock)  where ModuleSerialNum in <SNCOND>";
-                sql = sql.Replace("<SNCOND>", sncond).Replace("<DCTABLE>",tabname);
-                var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
-                foreach (var line in dbret)
-                {
-                    var data = new SnTestDataVM();
-                    data.DataID = Convert.ToString(line[0]);
-                    data.ModuleSerialNum = Convert.ToString(line[1]);
-                    data.ErrAbbr = Convert.ToString(line[2]);
-                    data.TestTime = Convert.ToDateTime(line[3]);
-                    data.PN = Convert.ToString(line[4]);
-                    data.WhichTest = Convert.ToString(line[5]);
-                    data.TestStation = Convert.ToString(line[6]);
-                    data.MESTab = tabname;
-                    ret.Add(data);
-                }
-            }
-
-            ret.Sort(delegate (SnTestDataVM d1, SnTestDataVM d2)
-            {
-                return DateTime.Compare(d2.TestTime, d1.TestTime);
-            });
-
-            var sndict = new Dictionary<string, bool>();
-            var latestdata = new List<SnTestDataVM>();
-            foreach (var item in ret)
-            {
-                if (!sndict.ContainsKey(item.ModuleSerialNum))
-                {
-                    sndict.Add(item.ModuleSerialNum, true);
-                    latestdata.Add(item);
-                }
-            }
-
-            foreach (var desdata in scraptable)
-            {
-                foreach (var srcdata in latestdata)
-                {
-                    if (string.Compare(desdata.SN, srcdata.ModuleSerialNum, true) == 0)
+                    var sql = "select top 1 dc_<DCTABLE>HistoryId,ModuleSerialNum, ErrAbbr, TestTimeStamp,assemblypartnum,WhichTest,TestStation from "
+                        + " insite.dc_<DCTABLE> (nolock)  where ModuleSerialNum = '<modulesn>'";
+                    sql = sql.Replace("<modulesn>", stab.SN).Replace("<DCTABLE>", tabname);
+                    var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+                    foreach (var line in dbret)
                     {
-                        desdata.TestData = new SnTestDataVM(srcdata.DataID, srcdata.ModuleSerialNum
-                            , srcdata.PN, srcdata.WhichTest, srcdata.ErrAbbr, srcdata.MESTab, srcdata.TestTime,srcdata.TestStation);
-                        break;
+                        var data = new SnTestDataVM();
+                        data.DataID = Convert.ToString(line[0]);
+                        data.ModuleSerialNum = Convert.ToString(line[1]);
+                        data.ErrAbbr = Convert.ToString(line[2]);
+                        data.TestTime = Convert.ToDateTime(line[3]);
+                        data.PN = Convert.ToString(line[4]);
+                        data.WhichTest = Convert.ToString(line[5]);
+                        data.TestStation = Convert.ToString(line[6]);
+                        data.MESTab = tabname.ToUpper().Trim();
+                        ret.Add(data);
                     }
-                }//end foreach
-            }//end foreach
+                }
 
-            foreach (var desdata in scraptable)
-            {
-                if (desdata.TestData == null)
+                ret.Sort(delegate (SnTestDataVM d1, SnTestDataVM d2)
                 {
-                    desdata.TestData = new SnTestDataVM();
+                    return DateTime.Compare(d2.TestTime, d1.TestTime);
+                });
+
+                if (ret.Count > 0)
+                {
+                    stab.TestData = ret[0];
+                }
+                else
+                {
+                    stab.TestData = new SnTestDataVM();
                 }
             }
-       }
+        }
 
 
     }

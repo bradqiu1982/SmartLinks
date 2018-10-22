@@ -135,7 +135,7 @@ namespace SmartLinks.Models
             {
                 var key = Convert.ToString(line[0]);
                 var wt = Convert.ToString(line[1]);
-                var mes = Convert.ToString(line[2]);
+                var mes = Convert.ToString(line[2]).ToUpper().Trim();
                 if (!ret.ContainsKey(mes + key))
                 {
                     ret.Add(mes + key, wt);
