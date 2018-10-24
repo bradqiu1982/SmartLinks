@@ -85,7 +85,7 @@ namespace SmartLinks.Models
             var sql = @"select ToContainer,FromContainer,FromPNDescription,FromProductName  FROM [PDMS].[dbo].[ComponentIssueSummary]  
                            where ToContainer in <SNCOND> 
                            and (FromPNDescription like '%PCBA%' or FromPNDescription like '%PLC%'  
-                           or FromPNDescription like '%ON SUBMOUNT%' or  FromPNDescription like '%ON-SUBMOUNT%' or  FromPNDescription like '%ON-SILICON%') order by FromPNDescription";
+                           or FromPNDescription like '%ON SUBMOUNT%' or  FromPNDescription like '%ON-SUBMOUNT%' or  FromPNDescription like '%ON-SILICON%') order by  IssueDate desc,FromPNDescription";
 
             sql = sql.Replace("<SNCOND>", sncond);
             var dbret = DBUtility.ExeMESReportSqlWithRes(sql);
