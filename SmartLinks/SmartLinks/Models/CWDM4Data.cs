@@ -29,6 +29,16 @@ namespace SmartLinks.Models
             PNDesc = "";
             IsCWDM4 = false;
             ORL = "";
+
+            ERTCWL_CH0 = "";
+            ERTCWL_CH1 = "";
+            ERTCWL_CH2 = "";
+            ERTCWL_CH3 = "";
+
+            FINALWL_CH0 = "";
+            FINALWL_CH1 = "";
+            FINALWL_CH2 = "";
+            FINALWL_CH3 = "";
         }
 
         private static Dictionary<string, CWDM4Data> LoadCurrentStepAndPN(string sncond)
@@ -318,6 +328,84 @@ namespace SmartLinks.Models
             return ret;
         }
 
+        private static Dictionary<string, Dictionary<string,string>> RetrieveWL(string sncond,string dctable,string corner)
+        {
+            var ret = new Dictionary<string, Dictionary<string, string>>();
+            var sql = @"select dc.ModuleSerialNum,dce.CenterWLShift,dce.ChannelNumber from [InsiteDB].[insite].[dce_<tabname>_main] dce  
+                          left join [InsiteDB].[insite].[dc_<tabname>] dc on dc.dc_<tabname>HistoryId = dce.ParentHistoryID 
+                          where dc.ModuleSerialNum in <sncond> and dce.CornerID = '<corner>' and dce.CenterWLShift is not null order by dc.TestTimeStamp desc";
+            sql = sql.Replace("<tabname>", dctable).Replace("<sncond>", sncond).Replace("<corner>", corner);
+
+            var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var sn = Convert.ToString(line[0]);
+                var wl = Convert.ToString(line[1]);
+                var ch = Convert.ToString(line[2]);
+
+                if (!ret.ContainsKey(sn))
+                {
+                    var chdict = new Dictionary<string, string>();
+                    chdict.Add(ch, wl);
+                    ret.Add(sn, chdict);
+                }
+                else
+                {
+                    var chdict = ret[sn];
+                    if (!chdict.ContainsKey(ch))
+                    { chdict.Add(ch,wl); }
+                }
+            }
+            return ret;
+        }
+
+
+        public static List<CWDM4Data> QueryWL(List<string> snlist, Controller ctrl)
+        {
+            var retdata = new List<CWDM4Data>();
+            foreach (var sn in snlist)
+            {
+                var tempvm = new CWDM4Data();
+                tempvm.SN = sn.Trim().ToUpper();
+                retdata.Add(tempvm);
+            }
+            var sncond = "('" + string.Join("','", snlist) + "')";
+
+            var ertcdict = RetrieveWL(sncond, "ER_TEMPCOMP_TX", "25G2H");
+            var finaldict = RetrieveWL(sncond, "FINAL_TX", "25G1H");
+            foreach (var item in retdata)
+            {
+                if (ertcdict.ContainsKey(item.SN))
+                {
+                    var chdict = ertcdict[item.SN];
+                    if (chdict.ContainsKey("0"))
+                    { item.ERTCWL_CH0 = chdict["0"]; }
+                    if (chdict.ContainsKey("1"))
+                    { item.ERTCWL_CH1 = chdict["1"]; }
+                    if (chdict.ContainsKey("2"))
+                    { item.ERTCWL_CH2 = chdict["2"]; }
+                    if (chdict.ContainsKey("3"))
+                    { item.ERTCWL_CH3 = chdict["3"]; }
+                }
+                if (finaldict.ContainsKey(item.SN))
+                {
+                    var chdict = finaldict[item.SN];
+                    if (chdict.ContainsKey("0"))
+                    { item.FINALWL_CH0 = chdict["0"]; }
+                    if (chdict.ContainsKey("1"))
+                    { item.FINALWL_CH1 = chdict["1"]; }
+                    if (chdict.ContainsKey("2"))
+                    { item.FINALWL_CH2 = chdict["2"]; }
+                    if (chdict.ContainsKey("3"))
+                    { item.FINALWL_CH3 = chdict["3"]; }
+                }
+            }//end foreach
+
+            return retdata;
+        }
+
+
+
 
         public static List<CWDM4Data> LoadCWDM4Info(List<string> snlist, Controller ctrl)
         {
@@ -589,5 +677,15 @@ namespace SmartLinks.Models
 
         public string TXEye { set; get; }
         public string RXEye { set; get; }
+
+        public string ERTCWL_CH0 { set; get; }
+        public string ERTCWL_CH1 { set; get; }
+        public string ERTCWL_CH2 { set; get; }
+        public string ERTCWL_CH3 { set; get; }
+
+        public string FINALWL_CH0 { set; get; }
+        public string FINALWL_CH1 { set; get; }
+        public string FINALWL_CH2 { set; get; }
+        public string FINALWL_CH3 { set; get; }
     }
 }

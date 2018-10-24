@@ -120,9 +120,130 @@
         })
 
     }
+
+    var WLshow = function () {
+        var mywafertable = null;
+
+        $('#marks').focus();
+
+        $('body').on('keypress', '#marks', function (e) {
+            if (e.keyCode == 13) {
+                var all_marks = $.trim($(this).val()).split('\n');
+                var cur_marks = new Array();
+                var arr_count = new Array();
+                $.each(all_marks, function (i, val) {
+                    if (val != "") {
+                        if (arr_count[val]) {
+                            alert(val + " has already existed.");
+                            arr_count[val]++;
+                        }
+                        else {
+                            arr_count[val] = 1;
+                            cur_marks.push(val);
+                        }
+                    }
+                })
+                $('#total-marks').html(cur_marks.length);
+                $('#marks').val(cur_marks.join('\n'));
+            }
+        })
+
+        function RefreshWaferTable(warning) {
+            var all_marks = $.trim($('#marks').val()).split('\n');
+            var cur_marks = new Array();
+            var arr_count = new Array();
+            $.each(all_marks, function (i, val) {
+                if (val != "") {
+                    if (arr_count[val]) {
+                        alert(val + " has already existed.");
+                        arr_count[val]++;
+                    }
+                    else {
+                        arr_count[val] = 1;
+                        cur_marks.push(val);
+                    }
+                }
+            })
+            if (cur_marks.length === 0) {
+                if (warning) {
+                    alert("查询条件不可为空！");
+                }
+                return false;
+            }
+            $('#marks').val(cur_marks.join('\n'));
+            var options = {
+                loadingTips: "正在处理数据，请稍候...",
+                backgroundColor: "#aaa",
+                borderColor: "#fff",
+                opacity: 0.8,
+                borderColor: "#fff",
+                TipsColor: "#000",
+            }
+            $.bootstrapLoading.start(options);
+            $.post('/SmartLinks/GetCWDM4WLInfoData',
+           {
+               marks: JSON.stringify(cur_marks)
+           }, function (output) {
+
+               if (mywafertable) {
+                   mywafertable.destroy();
+               }
+               $("#WaferTableID").empty();
+
+               $.bootstrapLoading.end();
+
+               $.each(output.cwdm4list, function (i, val) {
+                   var appendstr = '<tr>';
+                   appendstr += '<td>' + val.SN + '</td>';
+                   appendstr += '<td>' + val.ERTCWL_CH0 + '</td>';
+                   appendstr += '<td>' + val.ERTCWL_CH1 + '</td>';
+                   appendstr += '<td>' + val.ERTCWL_CH2 + '</td>';
+                   appendstr += '<td>' + val.ERTCWL_CH3 + '</td>';
+                   appendstr += '<td>' + val.FINALWL_CH0 + '</td>';
+                   appendstr += '<td>' + val.FINALWL_CH1 + '</td>';
+                   appendstr += '<td>' + val.FINALWL_CH2 + '</td>';
+                   appendstr += '<td>' + val.FINALWL_CH3 + '</td>';
+                   appendstr += '</tr>';
+                   $("#WaferTableID").append(appendstr);
+               });
+
+
+               mywafertable = $('#mywafertable').DataTable({
+                   'iDisplayLength': 50,
+                   'aLengthMenu': [[20, 50, 100, -1],
+                   [20, 50, 100, "All"]],
+                   "aaSorting": [],
+                   "order": [],
+                   dom: 'lBfrtip',
+                   buttons: ['copyHtml5', 'csv', 'excelHtml5']
+               });
+
+           })
+        }
+
+
+        $('body').on('click', '#btn-marks-submit', function () {
+            RefreshWaferTable(true);
+        })
+
+        $('body').on('click', '#btn-marks-clean', function () {
+            $('#total-marks').html(0);
+            $('#marks').val('');
+            if (mywafertable) {
+                mywafertable.destroy();
+                mywafertable = null;
+            }
+            $("#WaferTableID").empty();
+        })
+
+    }
+
     return {
         init: function () {
             show();
+        },
+        WLinit: function () {
+            WLshow();
         }
     }
 }();

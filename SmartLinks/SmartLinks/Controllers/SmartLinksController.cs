@@ -402,6 +402,23 @@ namespace SmartLinks.Controllers
             return ret;
         }
 
+        public ActionResult CWDM4WLInfo()
+        {
+            return View();
+        }
+
+        public JsonResult GetCWDM4WLInfoData()
+        {
+            var marks = Request.Form["marks"];
+            List<string> snlist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
+            var cwdm4list = CWDM4Data.QueryWL(snlist, this);
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                cwdm4list = cwdm4list
+            };
+            return ret;
+        }
 
     }
 }
