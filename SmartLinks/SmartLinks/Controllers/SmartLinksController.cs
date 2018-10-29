@@ -420,5 +420,22 @@ namespace SmartLinks.Controllers
             return ret;
         }
 
+        public ActionResult TunableInfo()
+        {
+            return View();
+        }
+
+        public JsonResult GetTunableInfoData()
+        {
+            var marks = Request.Form["marks"];
+            List<string> snlist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
+            var tunablelist = TunableInfoData.GetData(snlist, this);
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                tunablelist = tunablelist
+            };
+            return ret;
+        }
     }
 }

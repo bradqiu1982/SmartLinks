@@ -1,0 +1,59 @@
+﻿
+@{
+    ViewBag.Title = "Tunable Info";
+    Layout = "~/Views/Shared/_Layout4ProdLine.cshtml";
+}
+
+<link type="text/css" rel="stylesheet" href="~/Content/wafer.css" />
+
+<style type="text/css">
+    th, td {
+        text-align: center;
+    }
+</style>
+
+<script type="text/javascript" src="~/Scripts/TunableInfo.js"></script>
+<script type="text/javascript" src="~/Scripts/jquery-bootstrap-loading.js"></script>
+<script type="text/javascript">
+    $(function(){
+        TunableInfo.init();
+    })
+</script>
+
+<div class="col-xs-3 mark-lists">
+    <div class="marks-title">
+        <span>请扫描 SN:</span>
+    </div>
+    <textarea class="form-control marks" id="marks"></textarea>
+    <div class="marks-submit">
+        <div class="total-marks label-danger col-xs-3" id="total-marks">0</div>
+        <div class="col-xs-4">
+            <input type="button" class="btn btn-warning btn-marks-clean" id="btn-marks-clean" value="清除">
+        </div>
+        <div class="marks-op col-xs-4 ">
+            <input type="button" class="btn btn-success btn-marks-submit" id="btn-marks-submit" value="提交">
+        </div>
+    </div>
+</div>
+<div class="col-xs-9 mark-detail">
+    <div class="mark-detail-op">
+    </div>
+    <table class="table  table-condensed" id="mywafertable">
+        <caption class="tb-caption">Tunable Info</caption>
+        <thead>
+            <tr>
+                <th>Module SN</th>
+                <th>Module PN</th>
+                <th>Compenent SN</th>
+                <th>Compenent Name</th>
+                <th>Compenent PN</th>
+                <th>MFR Name</th>
+            </tr>
+        </thead>
+        <tbody id="WaferTableID"></tbody>
+    </table>
+</div>
+
+
+
+
