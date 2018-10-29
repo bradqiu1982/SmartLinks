@@ -17,13 +17,15 @@ namespace SmartLinks.Models
             CurrentStep="";
             PCBASN="";
             PCBARev="";
-            PLCPN="";
+            PCBAVendor = "";
+            PLCPN ="";
             PLCVendor="";
             SHTOL = "NA";
             FW = "";
             TCBert = "NA";
             Spec = "";
             COCCOS = "";
+            LaserType = "";
             TXEye = "";
             RXEye = "";
             PNDesc = "";
@@ -81,6 +83,7 @@ namespace SmartLinks.Models
             var PCBADict = new Dictionary<string, string>();
             var PLCDict = new Dictionary<string, string>();
             var COCCOSDict = new Dictionary<string, string>();
+            var LASERDict = new Dictionary<string, string>();
 
             var sql = @"select ToContainer,FromContainer,FromPNDescription,FromProductName  FROM [PDMS].[dbo].[ComponentIssueSummary]  
                            where ToContainer in <SNCOND> 
@@ -114,22 +117,46 @@ namespace SmartLinks.Models
                 {
                     if (!COCCOSDict.ContainsKey(sn))
                     { COCCOSDict.Add(sn, "DUAL PAD COC"); }
+
+                    if (pndesc.Contains("BH2"))
+                    { if (!LASERDict.ContainsKey(sn))
+                        { LASERDict.Add(sn, "BH2"); } }
+                    else if (pndesc.Contains("BH3"))
+                    { if (!LASERDict.ContainsKey(sn))
+                        { LASERDict.Add(sn, "BH3"); }}
+
                 }
                 else if (pndesc.Contains("ON-SUBMOUNT"))
                 {
                     if (!COCCOSDict.ContainsKey(sn))
                     { COCCOSDict.Add(sn, "NORMAL COC"); }
+
+                    if (pndesc.Contains("BH2"))
+                    { if (!LASERDict.ContainsKey(sn))
+                        { LASERDict.Add(sn, "BH2"); } }
+                    else if (pndesc.Contains("BH3"))
+                    { if (!LASERDict.ContainsKey(sn))
+                        { LASERDict.Add(sn, "BH3"); }}
                 }
                 else if (pndesc.Contains("ON-SILICON"))
                 {
                     if (!COCCOSDict.ContainsKey(sn))
                     { COCCOSDict.Add(sn, "COS"); }
+
+                    if (pndesc.Contains("BH2"))
+                    { if (!LASERDict.ContainsKey(sn))
+                        { LASERDict.Add(sn, "BH2"); } }
+                    else if (pndesc.Contains("BH3"))
+                    { if (!LASERDict.ContainsKey(sn))
+                        { LASERDict.Add(sn, "BH3"); }}
                 }
             }//end foreach
 
             ret.Add(PCBADict);
             ret.Add(PLCDict);
             ret.Add(COCCOSDict);
+            ret.Add(LASERDict);
+
             return ret;
         }
 
@@ -458,6 +485,7 @@ namespace SmartLinks.Models
                 var PCBADict = (Dictionary<string, string>)pcbaplcdata[0];
                 var PLCDict = (Dictionary<string, string>)pcbaplcdata[1];
                 var COCCOSDict = (Dictionary<string, string>)pcbaplcdata[2];
+                var LASERDict = (Dictionary<string, string>)pcbaplcdata[3];
                 foreach (var item in retdata)
                 {
                     if (!item.IsCWDM4)
@@ -466,6 +494,14 @@ namespace SmartLinks.Models
                     if (PCBADict.ContainsKey(item.SN))
                     {
                         item.PCBASN = PCBADict[item.SN];
+
+                        var vendorflag = item.PCBASN.Substring(0, 1).ToUpper();
+                        if (vendorflag.Contains("H"))
+                        { item.PCBAVendor = "Hytera"; }
+                        else if (vendorflag.Contains("C"))
+                        { item.PCBAVendor = "Prime"; }
+                        else
+                        { item.PCBAVendor = "Fabrinet"; }
                     }
                     if (PLCDict.ContainsKey(item.SN))
                     {
@@ -474,6 +510,10 @@ namespace SmartLinks.Models
                     if (COCCOSDict.ContainsKey(item.SN))
                     {
                         item.COCCOS = COCCOSDict[item.SN];
+                    }
+                    if (LASERDict.ContainsKey(item.SN))
+                    {
+                        item.LaserType = LASERDict[item.SN];
                     }
                 }
 
@@ -634,6 +674,7 @@ namespace SmartLinks.Models
 
         public string PCBASN { set; get; }
         public string PCBARev { set; get; }
+        public string PCBAVendor { set; get; }
 
         public string PLCPN { set; get; }
         public string PLCVendor { set; get; }
@@ -674,6 +715,7 @@ namespace SmartLinks.Models
 
         public string Spec { set; get; }
         public string COCCOS { set; get; }
+        public string LaserType { set; get; }
 
         public string TXEye { set; get; }
         public string RXEye { set; get; }
