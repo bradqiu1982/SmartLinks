@@ -31,6 +31,7 @@ namespace SmartLinks.Models
             PNDesc = "";
             IsCWDM4 = false;
             ORL = "";
+            IsBurnIned = "NO";
 
             ERTCWL_CH0 = "";
             ERTCWL_CH1 = "";
@@ -157,6 +158,36 @@ namespace SmartLinks.Models
             ret.Add(COCCOSDict);
             ret.Add(LASERDict);
 
+            return ret;
+        }
+
+        private static Dictionary<string, bool> LoadBIInfo(string sncond)
+        {
+            var ret = new Dictionary<string, bool>();
+            var sql = "select distinct SerialNumber from [BurnInG3].[dbo].[BIDutSummary] where SerialNumber in <sncond>";
+            sql = sql.Replace("<sncond>",sncond);
+            var dbret = DBUtility.ExeOSABurnInSqlWithRes(@"WUX-D80009230\SQLEXPRESS", sql);
+            foreach (var line in dbret)
+            {
+                try
+                {
+                    var sn = Convert.ToString(line[0]);
+                    if (!ret.ContainsKey(sn))
+                    { ret.Add(sn, true); }
+                }
+                catch (Exception ex) { }
+            }
+            dbret = DBUtility.ExeOSABurnInSqlWithRes(@"SHG-D80010723\SQLEXPRESS", sql);
+            foreach (var line in dbret)
+            {
+                try
+                {
+                    var sn = Convert.ToString(line[0]);
+                    if (!ret.ContainsKey(sn))
+                    { ret.Add(sn, true); }
+                }
+                catch (Exception ex) { }
+            }
             return ret;
         }
 
@@ -517,6 +548,17 @@ namespace SmartLinks.Models
                     }
                 }
 
+                var bidict = LoadBIInfo(sncond);
+                foreach (var item in retdata)
+                {
+                    if (!item.IsCWDM4)
+                    { continue; }
+                    if (bidict.ContainsKey(item.SN))
+                    {
+                        item.IsBurnIned = "YES";
+                    }
+                }
+
                 //load pcba rev by pcba sn
                 var PCBARevDict = LoadPCBARev(retdata);
                 foreach (var item in retdata)
@@ -716,6 +758,7 @@ namespace SmartLinks.Models
         public string Spec { set; get; }
         public string COCCOS { set; get; }
         public string LaserType { set; get; }
+        public string IsBurnIned { set; get; }
 
         public string TXEye { set; get; }
         public string RXEye { set; get; }

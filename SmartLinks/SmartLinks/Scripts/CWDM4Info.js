@@ -86,6 +86,7 @@
                    appendstr += '<td>' + val.COCCOS + '</td>';
                    appendstr += '<td>' + val.ORLTX + '</td>';
                    appendstr += '<td>' + val.ORLRX + '</td>';
+                   appendstr += '<td>' + val.IsBurnIned + '</td>';
                    appendstr += '</tr>';
                    $("#WaferTableID").append(appendstr);
                });
