@@ -161,32 +161,27 @@ namespace SmartLinks.Models
             return ret;
         }
 
-        private static Dictionary<string, bool> LoadBIInfo(string sncond)
+        private static Dictionary<string, bool> LoadBIInfo(string sncond,Controller ctrl)
         {
+            var syscfg = CfgUtility.GetSysConfig(ctrl);
+            var dblist = syscfg["CWDM4BIDATABASE"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
             var ret = new Dictionary<string, bool>();
             var sql = "select distinct SerialNumber from [BurnInG3].[dbo].[BIDutSummary] where SerialNumber in <sncond>";
             sql = sql.Replace("<sncond>",sncond);
-            var dbret = DBUtility.ExeOSABurnInSqlWithRes(@"WUX-D80009230\SQLEXPRESS", sql);
-            foreach (var line in dbret)
+            foreach (var db in dblist)
             {
-                try
+                var dbret = DBUtility.ExeOSABurnInSqlWithRes(db, sql);
+                foreach (var line in dbret)
                 {
-                    var sn = Convert.ToString(line[0]);
-                    if (!ret.ContainsKey(sn))
-                    { ret.Add(sn, true); }
+                    try
+                    {
+                        var sn = Convert.ToString(line[0]);
+                        if (!ret.ContainsKey(sn))
+                        { ret.Add(sn, true); }
+                    }
+                    catch (Exception ex) { }
                 }
-                catch (Exception ex) { }
-            }
-            dbret = DBUtility.ExeOSABurnInSqlWithRes(@"SHG-D80010723\SQLEXPRESS", sql);
-            foreach (var line in dbret)
-            {
-                try
-                {
-                    var sn = Convert.ToString(line[0]);
-                    if (!ret.ContainsKey(sn))
-                    { ret.Add(sn, true); }
-                }
-                catch (Exception ex) { }
             }
             return ret;
         }
@@ -548,7 +543,7 @@ namespace SmartLinks.Models
                     }
                 }
 
-                var bidict = LoadBIInfo(sncond);
+                var bidict = LoadBIInfo(sncond,ctrl);
                 foreach (var item in retdata)
                 {
                     if (!item.IsCWDM4)
