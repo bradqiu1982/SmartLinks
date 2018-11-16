@@ -328,20 +328,21 @@ namespace SmartLinks.Models
                         }
                     }
                 }//end if
-                else
+
                 {
                     var testdatalist = RetrieveLatestSNStep(item.SN);
                     if (testdatalist.Count > 0)
                     {
-                        item.TestData.DataID = testdatalist[0].DataID;
-                        item.WhichTest = testdatalist[0].WhichTest;
-                        item.TestData.ErrAbbr = testdatalist[0].ErrAbbr;
-                        item.TestData.TestTime = testdatalist[0].TestTime;
+
                         var matchprocess = false;
                         foreach (var p in processlist)
                         {
-                            if (item.WhichTest.ToUpper().Contains(p.ToUpper()))
+                            if (testdatalist[0].WhichTest.ToUpper().Contains(p.ToUpper()))
                             {
+                                item.TestData.DataID = testdatalist[0].DataID;
+                                item.WhichTest = testdatalist[0].WhichTest;
+                                item.TestData.ErrAbbr = testdatalist[0].ErrAbbr;
+                                item.TestData.TestTime = testdatalist[0].TestTime;
                                 item.TestData.ErrAbbr = "PROCESS";
                                 matchprocess = true;
                                 break;
@@ -353,23 +354,23 @@ namespace SmartLinks.Models
                             item.Result = SCRAPRESULT.DSCRAP;
                             item.MatchedRule = "PROCESS SCRAP";
                         }
-                        else
-                        {
-                            if (pndefresdict.ContainsKey(item.PN))
-                            {
-                                item.Result = pndefresdict[item.PN];
-                                item.MatchedRule = "DEFAULT";
-                            }
-                        }
+                        //else
+                        //{
+                        //    if (pndefresdict.ContainsKey(item.PN))
+                        //    {
+                        //        item.Result = pndefresdict[item.PN];
+                        //        item.MatchedRule = "DEFAULT";
+                        //    }
+                        //}
                     }
-                    else
-                    {
-                        if (pndefresdict.ContainsKey(item.PN))
-                        {
-                            item.Result = pndefresdict[item.PN];
-                            item.MatchedRule = "DEFAULT";
-                        }
-                    }
+                    //else
+                    //{
+                    //    if (pndefresdict.ContainsKey(item.PN))
+                    //    {
+                    //        item.Result = pndefresdict[item.PN];
+                    //        item.MatchedRule = "DEFAULT";
+                    //    }
+                    //}
                 }
 
             }//foreach
@@ -459,7 +460,7 @@ namespace SmartLinks.Models
             var testdatalist = new List<SnTestDataVM>();
 
             var sql = @"select top 1 ProductId,MoveOutTime,WorkflowStepName,Comments,TxnTypeName
-                        from PDMSMaster.dbo.HistStepMoveSummary (nolock) where ContainerName = '<ContainerName>'  and MFGOrderId is not null order by MoveOutTime desc";
+                        from PDMSMaster.dbo.HistStepMoveSummaryOld (nolock) where ContainerName = '<ContainerName>'  and MFGOrderId is not null order by MoveOutTime desc";
             sql = sql.Replace("<ContainerName>", sn.Replace("'", ""));
             var dbret = DBUtility.ExeMESReportSqlWithRes(sql, null);
             if (dbret.Count > 0)
