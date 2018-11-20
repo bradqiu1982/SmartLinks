@@ -460,7 +460,7 @@ namespace SmartLinks.Models
             var testdatalist = new List<SnTestDataVM>();
 
             var sql = @"select top 1 ProductId,MoveOutTime,WorkflowStepName,Comments,TxnTypeName
-                        from PDMSMaster.dbo.HistStepMoveSummaryOld (nolock) where ContainerName = '<ContainerName>'  and MFGOrderId is not null order by MoveOutTime desc";
+                        from PDMSMaster.dbo.HistStepMoveSummary (nolock) where ContainerName = '<ContainerName>'  and MFGOrderId is not null order by MoveOutTime desc";
             sql = sql.Replace("<ContainerName>", sn.Replace("'", ""));
             var dbret = DBUtility.ExeMESReportSqlWithRes(sql, null);
             if (dbret.Count > 0)
