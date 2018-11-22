@@ -37,28 +37,64 @@ namespace SmartLinks.Models
             return ret;
         }
 
-        public static Dictionary<string, string> LoadORLData(Controller ctrl)
+        public static Dictionary<string, bool> LoadParallelBIData(Controller ctrl)
         {
-            var ret = new Dictionary<string, string>();
+            var ret = new Dictionary<string, bool>();
+            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+            var htolfile = syscfgdict["CWDM4SHTOL"];
+            var desfile = DownloadShareFile(htolfile, ctrl);
+            if (desfile != null && FileExist(ctrl, desfile))
+            {
+                var rawdata = RetrieveDataFromExcelWithAuth(ctrl, desfile, "BI SN", 3);
+                foreach (var line in rawdata)
+                {
+                    var sn = line[0].ToUpper().Trim();
+                    if (!ret.ContainsKey(sn))
+                    {
+                        ret.Add(sn, true);
+                    }
+                }
+            }
+            return ret;
+        }
+
+        public static void LoadORLData(List<CWDM4Data> retdata,Controller ctrl)
+        {
+            var ret = new Dictionary<string, CWDM4Data>();
             var syscfgdict = CfgUtility.GetSysConfig(ctrl);
             var htolfile = syscfgdict["CWDM4ORL"];
             var desfile = DownloadShareFile(htolfile, ctrl);
             if (desfile != null && FileExist(ctrl, desfile))
             {
-                var rawdata = RetrieveDataFromExcelWithAuth(ctrl, desfile,null, 5);
+                var rawdata = RetrieveDataFromExcelWithAuth(ctrl, desfile,null, 6);
+                rawdata.Reverse();
                 foreach (var line in rawdata)
                 {
                     var sn = line[0].ToUpper().Trim();
-                    var txval = line[1];
-                    var rxval = line[2];
-
                     if (!ret.ContainsKey(sn))
                     {
-                        ret.Add(sn, "TX:"+txval+"/RX:"+rxval);
+                        var vm = new CWDM4Data();
+                        vm.ORLTX = line[1];
+                        vm.ORLRX = line[2];
+                        vm.ORLTX70C = line[3];
+                        ret.Add(sn, vm);
                     }
                 }
             }
-            return ret;
+
+            foreach (var item in retdata)
+            {
+                if (!item.IsCWDM4)
+                { continue; }
+
+                if (ret.ContainsKey(item.SN))
+                {
+                    item.ORLTX = ret[item.SN].ORLTX;
+                    item.ORLRX = ret[item.SN].ORLRX;
+                    item.ORLTX70C = ret[item.SN].ORLTX70C;
+                }
+            }
+
         }
 
         public static string DownloadShareFile(string srcfile, Controller ctrl)

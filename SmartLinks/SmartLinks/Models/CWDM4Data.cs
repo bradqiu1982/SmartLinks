@@ -30,8 +30,13 @@ namespace SmartLinks.Models
             RXEye = "";
             PNDesc = "";
             IsCWDM4 = false;
-            ORL = "";
+            ORLTX = "";
+            ORLRX = "";
+            ORLTX70C = "";
             IsBurnIned = "NO";
+
+            SHTOLRes = "FAIL";
+            RSSIRes = "FAIL";
 
             ERTCWL_CH0 = "";
             ERTCWL_CH1 = "";
@@ -182,6 +187,13 @@ namespace SmartLinks.Models
                     }
                     catch (Exception ex) { }
                 }
+            }
+
+            var pbidict = ExternalDataCollector.LoadParallelBIData(ctrl);
+            foreach (var kv in pbidict)
+            {
+                if (!ret.ContainsKey(kv.Key))
+                { ret.Add(kv.Key, true); }
             }
             return ret;
         }
@@ -381,13 +393,13 @@ namespace SmartLinks.Models
             return ret;
         }
 
-        private static Dictionary<string, Dictionary<string,string>> RetrieveWL(string sncond,string dctable,string corner)
+        private static Dictionary<string, Dictionary<string,string>> RetrieveTestData(string sncond,string param,string dctable,string corner)
         {
             var ret = new Dictionary<string, Dictionary<string, string>>();
-            var sql = @"select dc.ModuleSerialNum,dce.CenterWLShift,dce.ChannelNumber from [InsiteDB].[insite].[dce_<tabname>_main] dce  
+            var sql = @"select dc.ModuleSerialNum,dce.<param>,dce.ChannelNumber from [InsiteDB].[insite].[dce_<tabname>_main] dce  
                           left join [InsiteDB].[insite].[dc_<tabname>] dc on dc.dc_<tabname>HistoryId = dce.ParentHistoryID 
-                          where dc.ModuleSerialNum in <sncond> and dce.CornerID = '<corner>' and dce.CenterWLShift is not null order by dc.TestTimeStamp desc";
-            sql = sql.Replace("<tabname>", dctable).Replace("<sncond>", sncond).Replace("<corner>", corner);
+                          where dc.ModuleSerialNum in <sncond> and dce.CornerID = '<corner>' and dce.<param> is not null order by dc.TestTimeStamp desc";
+            sql = sql.Replace("<tabname>", dctable).Replace("<sncond>", sncond).Replace("<corner>", corner).Replace("<param>",param);
 
             var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
             foreach (var line in dbret)
@@ -424,8 +436,8 @@ namespace SmartLinks.Models
             }
             var sncond = "('" + string.Join("','", snlist) + "')";
 
-            var ertcdict = RetrieveWL(sncond, "ER_TEMPCOMP_TX", "25G2H");
-            var finaldict = RetrieveWL(sncond, "FINAL_TX", "25G1H");
+            var ertcdict = RetrieveTestData(sncond, "CenterWLShift", "ER_TEMPCOMP_TX", "25G2H");
+            var finaldict = RetrieveTestData(sncond, "CenterWLShift", "FINAL_TX", "25G1H");
             foreach (var item in retdata)
             {
                 if (ertcdict.ContainsKey(item.SN))
@@ -457,22 +469,143 @@ namespace SmartLinks.Models
             return retdata;
         }
 
+        private static void LoadSHOTRes(List<CWDM4Data> retdata, string sncond,Controller ctrl)
+        {
+            var syscfg = CfgUtility.GetSysConfig(ctrl);
+            var ldilimit = Convert.ToDouble(syscfg["CWDM4_LDI_DELTA"]);
+            var pwrlimit = Convert.ToDouble(syscfg["CWDM4_TXPOWER_DELTA"]);
+            var chlist = new string[] { "0","1","2","3" }.ToList();
 
+            var epwrdict = RetrieveTestData(sncond, "TxPower_dBm", "ER_TempComp_Tx", "25G2R");
+            var fpwrdict = RetrieveTestData(sncond, "TxPower_dBm", "Final_Tx", "25G2R");
+
+            var eldidict = RetrieveTestData(sncond, "LDI_mA", "ER_TempComp_Tx", "25G2R");
+            var fldidict = RetrieveTestData(sncond, "LDI_mA", "Final_Tx", "25G2R");
+
+            foreach (var item in retdata)
+            {
+                if (!item.IsCWDM4)
+                { item.SHTOLRes = "";  continue; }
+
+                if (!epwrdict.ContainsKey(item.SN))
+                { item.SHTOLRes = "NO E_PWR"; continue; }
+                if (!fpwrdict.ContainsKey(item.SN))
+                { item.SHTOLRes = "NO F_PWR"; continue; }
+                if (!eldidict.ContainsKey(item.SN))
+                { item.SHTOLRes = "NO E_LDI"; continue; }
+                if (!fldidict.ContainsKey(item.SN))
+                { item.SHTOLRes = "NO F_LDI"; continue; }
+
+                var f = false;
+                foreach (var ch in chlist)
+                {
+                    if (!epwrdict[item.SN].ContainsKey(ch))
+                    { item.SHTOLRes = "NO E_PWR_" + ch; f = true; break; }
+                    if (!fpwrdict[item.SN].ContainsKey(ch))
+                    { item.SHTOLRes = "NO F_PWR_" + ch; f = true; break; }
+                    if (!eldidict[item.SN].ContainsKey(ch))
+                    { item.SHTOLRes = "NO E_LDI_" + ch; f = true; break; }
+                    if (!fldidict[item.SN].ContainsKey(ch))
+                    { item.SHTOLRes = "NO F_LDI_" + ch; f = true; break; }
+                }
+                if (f) { continue; }
+
+                f = false;
+                foreach (var ch in chlist)
+                {
+                    var epwr = Convert.ToDouble(epwrdict[item.SN][ch]);
+                    var fpwr = Convert.ToDouble(fpwrdict[item.SN][ch]);
+                    var eldi = Convert.ToDouble(eldidict[item.SN][ch]);
+                    var fldi = Convert.ToDouble(fldidict[item.SN][ch]);
+                    var pwrdelta = Math.Abs(epwr - fpwr);
+                    var ldidelta = Math.Abs(eldi - fldi);
+                    if (pwrdelta > pwrlimit)
+                    { item.SHTOLRes = "PWR Delta Fail"; f = true; break; }
+                    if (ldidelta > ldilimit)
+                    { item.SHTOLRes = "LDI Delta Fail"; f = true; break; }
+                }
+                if (!f)
+                { item.SHTOLRes = "PASS"; }
+            }//end foreach
+        }
+
+        private static void LoadRSSIRes(List<CWDM4Data> retdata, string sncond, Controller ctrl)
+        {
+            var syscfg = CfgUtility.GetSysConfig(ctrl);
+            var rpwrlimit = Convert.ToDouble(syscfg["CWDM4_RXPOWER_DELTA"]);
+            var rpwr2limit = Convert.ToDouble(syscfg["CWDM4_RXPOWER2_DELTA"]);
+            var chlist = new string[] { "0", "1", "2", "3" }.ToList();
+
+            var epwrdict = RetrieveTestData(sncond, "ModuleRxCalPower_dBm", "ER_TempComp_Rx", "25G2R");
+            var fpwrdict = RetrieveTestData(sncond, "ModuleRxCalPower_dBm", "Final_Rx", "25G2R");
+
+            var epwr2dict = RetrieveTestData(sncond, "ModuleRxCalPower2_dBm", "ER_TempComp_Rx", "25G2R");
+            var fpwr2dict = RetrieveTestData(sncond, "ModuleRxCalPower2_dBm", "Final_Rx", "25G2R");
+
+            foreach (var item in retdata)
+            {
+                if (!item.IsCWDM4)
+                { item.RSSIRes = ""; continue; }
+
+                if (!epwrdict.ContainsKey(item.SN))
+                { item.RSSIRes = "NO E_PWR"; continue; }
+                if (!fpwrdict.ContainsKey(item.SN))
+                { item.RSSIRes = "NO F_PWR"; continue; }
+                if (!epwr2dict.ContainsKey(item.SN))
+                { item.RSSIRes = "NO E_PWR2"; continue; }
+                if (!fpwr2dict.ContainsKey(item.SN))
+                { item.RSSIRes = "NO F_PWR2"; continue; }
+
+                var f = false;
+                foreach (var ch in chlist)
+                {
+                    if (!epwrdict[item.SN].ContainsKey(ch))
+                    { item.RSSIRes = "NO E_PWR_" + ch; f = true; break;}
+                    if (!fpwrdict[item.SN].ContainsKey(ch))
+                    { item.RSSIRes = "NO F_PWR_" + ch; f = true; break; }
+                    if (!epwr2dict[item.SN].ContainsKey(ch))
+                    { item.RSSIRes = "NO E_PWR2_" + ch; f = true; break; }
+                    if (!fpwr2dict[item.SN].ContainsKey(ch))
+                    { item.RSSIRes = "NO F_PWR2_" + ch; f = true; break; }
+                }
+                if (f) { continue; }
+
+                f = false;
+                foreach (var ch in chlist)
+                {
+                    var epwr = Convert.ToDouble(epwrdict[item.SN][ch]);
+                    var fpwr = Convert.ToDouble(fpwrdict[item.SN][ch]);
+                    var epwr2 = Convert.ToDouble(epwr2dict[item.SN][ch]);
+                    var fpwr2 = Convert.ToDouble(fpwr2dict[item.SN][ch]);
+                    var pwrdelta = Math.Abs(epwr - fpwr);
+                    var pwr2delta = Math.Abs(epwr2 - fpwr2);
+                    if (pwrdelta > rpwrlimit)
+                    { item.RSSIRes = "PWR Delta Fail"; f = true; break; }
+                    if (pwr2delta > rpwr2limit)
+                    { item.RSSIRes = "PWR2 Delta Fail"; f = true; break; }
+                }
+
+                if (!f)
+                { item.RSSIRes = "PASS"; }
+            }//end foreach
+        }
 
 
         public static List<CWDM4Data> LoadCWDM4Info(List<string> snlist, Controller ctrl)
         {
             var retdata = new List<CWDM4Data>();
+            var trimsnlist = new List<string>();
             foreach (var sn in snlist)
             {
                 var tempvm = new CWDM4Data();
                 tempvm.SN = sn.Trim().ToUpper();
                 retdata.Add(tempvm);
+                trimsnlist.Add(tempvm.SN);
             }
 
             var hascwdm4module = false;
             //load base info
-            var sncond = "('" + string.Join("','", snlist) + "')";
+            var sncond = "('" + string.Join("','", trimsnlist) + "')";
             var basinfodict = LoadCurrentStepAndPN(sncond);
             foreach (var item in retdata)
             {
@@ -579,14 +712,7 @@ namespace SmartLinks.Models
                 }
 
                 //load ORL SN dict
-                var ORLDict = ExternalDataCollector.LoadORLData(ctrl);
-                foreach (var item in retdata)
-                {
-                    if (!item.IsCWDM4)
-                    { continue; }
-                    if (ORLDict.ContainsKey(item.SN))
-                    { item.ORL = ORLDict[item.SN]; }
-                }
+                ExternalDataCollector.LoadORLData(retdata,ctrl);
 
                 //load FW
                 var FWDict = LoadFWData(cwdm4list, ctrl);
@@ -607,6 +733,9 @@ namespace SmartLinks.Models
                     if (tcbertdict.ContainsKey(item.SN))
                     { item.TCBert = tcbertdict[item.SN]; }
                 }
+
+                LoadSHOTRes(retdata, sncond,ctrl);
+                LoadRSSIRes(retdata, sncond,ctrl);
 
                 var PNDict = CfgUtility.GetSysConfig(ctrl);
                 foreach (var item in retdata)
@@ -717,35 +846,10 @@ namespace SmartLinks.Models
         public string PLCVendor { set; get; }
 
         public string SHTOL { set; get; }
-        public string ORL { set; get; }
 
-        public string ORLTX {
-            get {
-                if (ORL.Contains("/"))
-                {
-                    return ORL.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries)[0].Replace("TX:", "").Replace("RX:", "");
-                }
-                else
-                {
-                    return "";
-                }
-            }
-        }
-
-        public string ORLRX
-        {
-            get
-            {
-                if (ORL.Contains("/"))
-                {
-                    return ORL.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries)[1].Replace("TX:", "").Replace("RX:", "");
-                }
-                else
-                {
-                    return "";
-                }
-            }
-        }
+        public string ORLTX70C { set; get; }
+        public string ORLTX { set; get; }
+        public string ORLRX { set; get; }
 
         public string FW { set; get; }
         public string TCBert { set; get; }
@@ -757,6 +861,9 @@ namespace SmartLinks.Models
 
         public string TXEye { set; get; }
         public string RXEye { set; get; }
+
+        public string SHTOLRes { set; get; }
+        public string RSSIRes { set; get; }
 
         public string ERTCWL_CH0 { set; get; }
         public string ERTCWL_CH1 { set; get; }

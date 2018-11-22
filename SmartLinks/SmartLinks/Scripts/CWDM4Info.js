@@ -79,6 +79,7 @@
                    appendstr += '<td>' + val.FW + '</td>';
                    appendstr += '<td>' + val.CurrentStep + '</td>';
                    appendstr += '<td>' + val.SHTOL + '</td>';
+                   appendstr += '<td>' + val.SHTOLRes + '</td>';
                    appendstr += '<td>' + val.TCBert + '</td>';
                    appendstr += '<td>' + val.Spec + '</td>';
                    appendstr += '<td>' + val.PLCVendor + '</td>';
@@ -86,7 +87,9 @@
                    appendstr += '<td>' + val.COCCOS + '</td>';
                    appendstr += '<td>' + val.ORLTX + '</td>';
                    appendstr += '<td>' + val.ORLRX + '</td>';
+                   appendstr += '<td>' + val.ORLTX70C + '</td>';
                    appendstr += '<td>' + val.IsBurnIned + '</td>';
+                   appendstr += '<td>' + val.RSSIRes + '</td>';
                    appendstr += '</tr>';
                    $("#WaferTableID").append(appendstr);
                });
