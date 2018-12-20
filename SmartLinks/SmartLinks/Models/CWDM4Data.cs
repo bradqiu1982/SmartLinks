@@ -38,6 +38,10 @@ namespace SmartLinks.Models
             SHTOLRes = "FAIL";
             RSSIRes = "FAIL";
 
+            MainStore = "PASS";
+
+            SFAPN = "";
+
             ERTCWL_CH0 = "";
             ERTCWL_CH1 = "";
             ERTCWL_CH2 = "";
@@ -590,6 +594,50 @@ namespace SmartLinks.Models
             }//end foreach
         }
 
+        private static Dictionary<string, string> LoadSFAPn(string sncond)
+        {
+            var snpiddict = new Dictionary<string, string>();
+            var sql = "SELECT  ContainerName,ProductId FROM [NPITrace].[dbo].[ProjectMoveHistory] where ContainerName in  <sncond> order by MoveOutTime asc";
+            sql = sql.Replace("<sncond>", sncond);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            foreach (var line in dbret)
+            {
+                var sn = Convert.ToString(line[0]);
+                var pid = Convert.ToString(line[1]);
+                if (!snpiddict.ContainsKey(sn))
+                { snpiddict.Add(sn, pid); }
+            }
+
+            if (snpiddict.Count > 0)
+            {
+                var pidpndict = new Dictionary<string, string>();
+                var pidcond = "('" + string.Join("','", snpiddict.Values.ToList()) + "')";
+                sql = @"SELECT p.productid,pb.[ProductName] FROM [InsiteDB].[insite].[ProductBase] pb (nolock) 
+                        left join[InsiteDB].[insite].[Product] p on  pb.productbaseid =  p.productbaseid where p.productid in <pidcond> ";
+                sql = sql.Replace("<pidcond>", pidcond);
+                dbret = DBUtility.ExeRealMESSqlWithRes(sql, null);
+                foreach (var line in dbret)
+                {
+                    var pid = Convert.ToString(line[0]);
+                    var pn = Convert.ToString(line[1]);
+                    if (!pidpndict.ContainsKey(pid))
+                    {
+                        pidpndict.Add(pid, pn);
+                    }
+                }
+
+                var snsfapn = new Dictionary<string, string>();
+                foreach (var snkv in snpiddict)
+                {
+                    if (pidpndict.ContainsKey(snkv.Value))
+                    {
+                        snsfapn.Add(snkv.Key, pidpndict[snkv.Value]);
+                    }
+                }
+                return snsfapn;
+            }
+            return new Dictionary<string, string>();
+        }
 
         public static List<CWDM4Data> LoadCWDM4Info(List<string> snlist, Controller ctrl)
         {
@@ -737,6 +785,15 @@ namespace SmartLinks.Models
                 LoadSHOTRes(retdata, sncond,ctrl);
                 LoadRSSIRes(retdata, sncond,ctrl);
 
+                var sfapndict = LoadSFAPn(sncond);
+                foreach (var item in retdata)
+                {
+                    if (!item.IsCWDM4)
+                    { continue; }
+                    if (sfapndict.ContainsKey(item.SN))
+                    { item.SFAPN = sfapndict[item.SN]; }
+                }
+
                 var PNDict = CfgUtility.GetSysConfig(ctrl);
                 foreach (var item in retdata)
                 {
@@ -749,6 +806,21 @@ namespace SmartLinks.Models
                     if (PNDict.ContainsKey("SPEC-" + item.PN))
                     { item.Spec = PNDict["SPEC-" + item.PN]; }
 
+                }
+
+                var mainstorepn = PNDict["MAINSTOREPN"];
+                foreach (var item in retdata)
+                {
+                    if (!item.IsCWDM4)
+                    { continue; }
+
+                    if (mainstorepn.Contains(item.PN))
+                    {
+                        if (!item.LaserType.ToUpper().Contains("BH3"))
+                        {
+                            item.MainStore = "FAIL:" + item.LaserType;
+                        }
+                    }
                 }
 
             }//end if (hascwdm4module)
@@ -859,11 +931,15 @@ namespace SmartLinks.Models
         public string LaserType { set; get; }
         public string IsBurnIned { set; get; }
 
+        public string MainStore { set; get; }
+
         public string TXEye { set; get; }
         public string RXEye { set; get; }
 
         public string SHTOLRes { set; get; }
         public string RSSIRes { set; get; }
+        public string SFAPN { set; get; }
+
 
         public string ERTCWL_CH0 { set; get; }
         public string ERTCWL_CH1 { set; get; }

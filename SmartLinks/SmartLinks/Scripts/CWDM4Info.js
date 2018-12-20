@@ -90,6 +90,8 @@
                    appendstr += '<td>' + val.ORLTX70C + '</td>';
                    appendstr += '<td>' + val.IsBurnIned + '</td>';
                    appendstr += '<td>' + val.RSSIRes + '</td>';
+                   appendstr += '<td>' + val.MainStore + '</td>';
+                   appendstr += '<td>' + val.SFAPN + '</td>';
                    appendstr += '</tr>';
                    $("#WaferTableID").append(appendstr);
                });
