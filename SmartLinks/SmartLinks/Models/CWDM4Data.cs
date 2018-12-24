@@ -597,7 +597,7 @@ namespace SmartLinks.Models
         private static Dictionary<string, string> LoadSFAPn(string sncond)
         {
             var snpiddict = new Dictionary<string, string>();
-            var sql = "SELECT  ContainerName,ProductId FROM [NPITrace].[dbo].[ProjectMoveHistory] where WorkflowStepName like '%Main%' and WorkflowStepName like '%Store%' and ContainerName in  <sncond> order by MoveOutTime desc";
+            var sql = "SELECT  ContainerName,ProductId FROM [NPITrace].[dbo].[ProjectMoveHistory] where WorkflowStepName like '%MD_VMI_1'  and ContainerName in  <sncond> order by MoveOutTime desc";
             sql = sql.Replace("<sncond>", sncond);
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
             foreach (var line in dbret)
