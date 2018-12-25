@@ -98,7 +98,7 @@ namespace SmartLinks.Models
             var sql = @"select ToContainer,FromContainer,FromPNDescription,FromProductName  FROM [PDMS].[dbo].[ComponentIssueSummary]  
                            where ToContainer in <SNCOND> 
                            and (FromPNDescription like '%PCBA%' or FromPNDescription like '%PLC%'  
-                           or FromPNDescription like '%ON SUBMOUNT%' or  FromPNDescription like '%ON-SUBMOUNT%' or  FromPNDescription like '%ON-SILICON%') order by  IssueDate desc";
+                           or FromPNDescription like '%ON SUBMOUNT%' or  FromPNDescription like '%ON-SUBMOUNT%' or  FromPNDescription like '%ON-SILICON%'  or  FromPNDescription like '%LASER,SILICON%') order by  IssueDate desc";
 
             sql = sql.Replace("<SNCOND>", sncond);
             var dbret = DBUtility.ExeMESReportSqlWithRes(sql);
@@ -144,6 +144,11 @@ namespace SmartLinks.Models
                     if (pndesc.Contains("BH2"))
                     { if (!LASERDict.ContainsKey(sn))
                         { LASERDict.Add(sn, "BH2"); } }
+                    else if (pndesc.Contains("BH3A"))
+                    {
+                        if (!LASERDict.ContainsKey(sn))
+                        { LASERDict.Add(sn, "BH3A"); }
+                    }
                     else if (pndesc.Contains("BH3"))
                     { if (!LASERDict.ContainsKey(sn))
                         { LASERDict.Add(sn, "BH3"); }}
@@ -156,9 +161,35 @@ namespace SmartLinks.Models
                     if (pndesc.Contains("BH2"))
                     { if (!LASERDict.ContainsKey(sn))
                         { LASERDict.Add(sn, "BH2"); } }
+                    else if (pndesc.Contains("BH3A"))
+                    {
+                        if (!LASERDict.ContainsKey(sn))
+                        { LASERDict.Add(sn, "BH3A"); }
+                    }
                     else if (pndesc.Contains("BH3"))
                     { if (!LASERDict.ContainsKey(sn))
                         { LASERDict.Add(sn, "BH3"); }}
+                }
+                else if (pndesc.Contains("LASER,SILICON"))
+                {
+                    if (!COCCOSDict.ContainsKey(sn))
+                    { COCCOSDict.Add(sn, "COS"); }
+
+                    if (pndesc.Contains("BH2"))
+                    {
+                        if (!LASERDict.ContainsKey(sn))
+                        { LASERDict.Add(sn, "BH2"); }
+                    }
+                    else if (pndesc.Contains("BH3A"))
+                    {
+                        if (!LASERDict.ContainsKey(sn))
+                        { LASERDict.Add(sn, "BH3A"); }
+                    }
+                    else if (pndesc.Contains("BH3"))
+                    {
+                        if (!LASERDict.ContainsKey(sn))
+                        { LASERDict.Add(sn, "BH3"); }
+                    }
                 }
             }//end foreach
 
