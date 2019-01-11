@@ -199,6 +199,7 @@
     <Compile Include="Models\ExternalDataCollector.cs" />
     <Compile Include="Models\LinkVM.cs" />
     <Compile Include="Models\MachineUserMap.cs" />
+    <Compile Include="Models\ModuleAssemblyVM.cs" />
     <Compile Include="Models\PnMainVM.cs" />
     <Compile Include="Models\PnMESVM.cs" />
     <Compile Include="Models\PnRulesVM.cs" />
@@ -284,6 +285,7 @@
     <Content Include="Content\images\ie8\etc.png" />
     <Content Include="Content\images\ie8\FA.png" />
     <Content Include="Content\images\ie8\HPUTREND.png" />
+    <Content Include="Content\images\ie8\JOBORDER.png" />
     <Content Include="Content\images\ie8\lego.png" />
     <Content Include="Content\images\ie8\link.png" />
     <Content Include="Content\images\ie8\OA.png" />
@@ -297,6 +299,7 @@
     <Content Include="Content\images\ie8\video.png" />
     <Content Include="Content\images\ILearnIcons.png" />
     <Content Include="Content\images\imgupload.png" />
+    <Content Include="Content\images\JOBORDER.png" />
     <Content Include="Content\images\lego.png" />
     <Content Include="Content\images\link.png" />
     <Content Include="Content\images\loading.gif" />
@@ -353,6 +356,7 @@
     <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker3.min.css.map" />
     <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker3.standalone.css.map" />
     <Content Include="Content\bootstrap-datepicker\bootstrap-datepicker3.standalone.min.css.map" />
+    <Content Include="Content\images\ie8\resume_e.doc" />
     <None Include="Properties\PublishProfiles\smartpublish.pubxml" />
     <Content Include="Scripts\asset_test.xlsx" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
@@ -381,6 +385,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\modulesubassembly.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\scrap.js" />
@@ -431,6 +436,7 @@
     <Content Include="Views\SmartLinks\CWDM4Info.cshtml" />
     <Content Include="Views\SmartLinks\CWDM4WLInfo.cshtml" />
     <Content Include="Views\SmartLinks\TunableInfo.cshtml" />
+    <Content Include="Views\SmartLinks\ModuleSubAssembly.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

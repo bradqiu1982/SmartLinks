@@ -437,5 +437,24 @@ namespace SmartLinks.Controllers
             };
             return ret;
         }
+
+        public ActionResult ModuleSubAssembly()
+        {
+            return View();
+        }
+
+        public JsonResult ModuleSubAssemblyData()
+        {
+            var marks = Request.Form["marks"];
+            List<string> snlist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
+            var assemblylist = ModuleAssemblyVM.RetrieveData(snlist);
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                assemblylist = assemblylist
+            };
+            return ret;
+        }
+
     }
 }
