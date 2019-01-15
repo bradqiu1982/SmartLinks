@@ -95,13 +95,24 @@ namespace SmartLinks.Models
             var COCCOSDict = new Dictionary<string, string>();
             var LASERDict = new Dictionary<string, string>();
 
-            var sql = @"select ToContainer,FromContainer,FromPNDescription,FromProductName  FROM [PDMS].[dbo].[ComponentIssueSummary]  
-                           where ToContainer in <SNCOND> 
-                           and (FromPNDescription like '%PCBA%' or FromPNDescription like '%PLC%'  
-                           or FromPNDescription like '%ON SUBMOUNT%' or  FromPNDescription like '%ON-SUBMOUNT%' or  FromPNDescription like '%ON-SILICON%'  or  FromPNDescription like '%LASER,SILICON%') order by  IssueDate desc";
+            //var sql = @"select ToContainer,FromContainer,FromPNDescription,FromProductName  FROM [PDMS].[dbo].[ComponentIssueSummary]  
+            //               where ToContainer in <SNCOND> 
+            //               and (FromPNDescription like '%PCBA%' or FromPNDescription like '%PLC%'  
+            //               or FromPNDescription like '%ON SUBMOUNT%' or  FromPNDescription like '%ON-SUBMOUNT%' or  FromPNDescription like '%ON-SILICON%'  or  FromPNDescription like '%LASER,SILICON%') order by  IssueDate desc";
+
+            var sql = @"select  co.ContainerName,fc.ContainerName FromContainer, p.Description FromPNDescription,pb.ProductName from insitedb.insite.ComponentIssueHistory cih with(nolock)
+                    inner join insitedb.insite.Historymainline hml  with(nolock) on hml.HistoryMainlineId = cih.historymainlineid  
+                    inner join insitedb.insite.IssueHistoryDetail  ihd with(nolock) on ihd.ComponentIssueHistoryId= cih.ComponentIssueHistoryId
+                    inner join insitedb.insite.IssueActualsHistory iah with(nolock) on iah.IssueHistoryDetailId=ihd.IssueHistoryDetailId
+                    inner join insitedb.insite.Product p with(nolock) on p.ProductId  = ihd.ProductId
+                    inner join insitedb.insite.ProductBase pb with(nolock) on pb.ProductBaseId  = p.ProductBaseId
+                    inner join  InsiteDB.insite.container co (nolock) on co.containerid=hml.HistoryId
+                    inner join  InsiteDB.insite.container fc (nolock) on fc.ContainerId=iah.FromContainerId
+                    where co.ContainerName in <SNCOND> and (p.Description like '%PCBA%' or p.Description like '%PLC%'  
+                     or p.Description like '%ON SUBMOUNT%' or  p.Description like '%ON-SUBMOUNT%' or  p.Description like '%ON-SILICON%'  or  p.Description like '%LASER,SILICON%') order by co.ContainerName,hml.MfgDate desc";
 
             sql = sql.Replace("<SNCOND>", sncond);
-            var dbret = DBUtility.ExeMESReportSqlWithRes(sql);
+            var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
             foreach (var line in dbret)
             {
                 var sn = Convert.ToString(line[0]).ToUpper().Trim();
