@@ -14,13 +14,15 @@ var lightBox = function () {
         default_imgs = ['./Content/images/peace.png', './Content/images/data.png', './Content/images/daisy.png'
             , './Content/images/clover.png', './Content/images/scrap.png', './Content/images/component.png'
             , './Content/images/video.png', './Content/images/lego.png', './Content/images/Assets.png', './Content/images/distribution.png'
-            , './Content/images/scraprate.png', './Content/images/HPUTREND.png', './Content/images/snteststatus.png', './Content/images/VCSEL.png', './Content/images/CPK.png', './Content/images/JOBORDER.png'];
+            , './Content/images/scraprate.png', './Content/images/HPUTREND.png', './Content/images/snteststatus.png', './Content/images/VCSEL.png'
+            , './Content/images/CPK.png', './Content/images/JOBORDER.png', './Content/images/SUBASSEMBLY.png'];
         default_imgs_ie8 = ['./Content/images/ie8/peace.png', './Content/images/ie8/data.png', './Content/images/ie8/daisy.png'
             , './Content/images/ie8/clover.png', './Content/images/ie8/scrap.png', './Content/images/ie8/component.png'
             , './Content/images/ie8/video.png', './Content/images/ie8/lego.png', './Content/images/ie8/Assets.png', './Content/images/ie8/distribution.png'
-            , './Content/images/ie8/scraprate.png', './Content/images/ie8/HPUTREND.png', './Content/images/ie8/snteststatus.png', './Content/images/ie8/VCSEL.png', './Content/images/ie8/CPK.png', './Content/images/ie8/JOBORDER.png'];
+            , './Content/images/ie8/scraprate.png', './Content/images/ie8/HPUTREND.png', './Content/images/ie8/snteststatus.png', './Content/images/ie8/VCSEL.png'
+            , './Content/images/ie8/CPK.png', './Content/images/ie8/JOBORDER.png', './Content/images/ie8/SUBASSEMBLY.png'];
         default_links_ie8 = ['AGILE', 'BR', 'DOMINO', 'ERP', 'FA', 'TRACEVIEW', 'DAISY', 'OA', 'CLOVER', 'SCRAP'
-            , 'COMPONENT', 'VIDEO', 'LEGO', 'ASSETS', 'DISTRIBUTION', 'SCRAPRATE', 'HPUTREND', 'SNTESTSTATUS', 'VCSEL', 'CPK', 'JOBORDER'];
+            , 'COMPONENT', 'VIDEO', 'LEGO', 'ASSETS', 'DISTRIBUTION', 'SCRAPRATE', 'HPUTREND', 'SNTESTSTATUS', 'VCSEL', 'CPK', 'JOBORDER', 'SUBASSEMBLY'];
 
         $.post('/SmartLinks/AllData',
         {
