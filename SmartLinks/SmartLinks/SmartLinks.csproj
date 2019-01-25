@@ -57,14 +57,33 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
       <HintPath>..\packages\Microsoft.Office.Interop.Excel.15.0.4795.1000\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\packages\Microsoft.Office.Interop.Outlook.15.0.4797.1003\lib\net20\Microsoft.Office.Interop.Outlook.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.PowerPoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\packages\Microsoft.Office.Interop.PowerPoint.15.0.4420.1017\lib\net20\Microsoft.Office.Interop.PowerPoint.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Word, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\packages\Microsoft.Office.Interop.Word.15.0.4797.1003\lib\net20\Microsoft.Office.Interop.Word.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="NReco.VideoConverter, Version=1.1.2.0, Culture=neutral, PublicKeyToken=395ccb334978a0cd, processorArchitecture=MSIL">
       <HintPath>..\packages\NReco.VideoConverter.1.1.2\lib\net20\NReco.VideoConverter.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="office, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Oracle.DataAccess, Version=4.112.4.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\oracle\odp.net\bin\4\Oracle.DataAccess.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -182,6 +201,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AssetController.cs" />
+    <Compile Include="Controllers\FileShareController.cs" />
     <Compile Include="Controllers\ScrapHelperController.cs" />
     <Compile Include="Controllers\SmartLinksController.cs" />
     <Compile Include="Controllers\TVideoSiteController.cs" />
@@ -200,12 +220,14 @@
     <Compile Include="Models\LinkVM.cs" />
     <Compile Include="Models\MachineUserMap.cs" />
     <Compile Include="Models\ModuleAssemblyVM.cs" />
+    <Compile Include="Models\OfficeConverter.cs" />
     <Compile Include="Models\PnMainVM.cs" />
     <Compile Include="Models\PnMESVM.cs" />
     <Compile Include="Models\PnRulesVM.cs" />
     <Compile Include="Models\ProjectVM.cs" />
     <Compile Include="Models\ScrapHistoryVM.cs" />
     <Compile Include="Models\ScrapVM.cs" />
+    <Compile Include="Models\SnapFileVM.cs" />
     <Compile Include="Models\SnTestDataVM.cs" />
     <Compile Include="Models\TechVideoVM.cs" />
     <Compile Include="Models\TraceViewVM.cs" />
@@ -364,10 +386,16 @@
     <Content Include="Content\images\ie8\resume_e.doc" />
     <None Include="Properties\PublishProfiles\smartpublish.pubxml" />
     <Content Include="Scripts\asset_test.xlsx" />
+    <Content Include="Scripts\bootstrap-tagsinput\bootstrap-tagsinput.min.js.map" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\asset.js" />
     <Content Include="Scripts\bootstrap-datepicker\bootstrap-datepicker.js" />
     <Content Include="Scripts\bootstrap-datepicker\bootstrap-datepicker.min.js" />
+    <Content Include="Scripts\bootstrap-tagsinput\bootstrap-tagsinput.css" />
+    <Content Include="Scripts\bootstrap-tagsinput\bootstrap-tagsinput.js" />
+    <Content Include="Scripts\bootstrap-tagsinput\bootstrap-tagsinput.min.js" />
+    <Content Include="Scripts\bootstrap-tagsinput\bootstrap3-typeahead.js" />
+    <Content Include="Scripts\bootstrap-tagsinput\bootstrap3-typeahead.min.js" />
     <Content Include="Scripts\CWDM4Info.js" />
     <Content Include="Scripts\datatables\buttons.dataTables.min.css" />
     <Content Include="Scripts\datatables\buttons.html5.min.js" />
@@ -396,6 +424,7 @@
     <Content Include="Scripts\scrap.js" />
     <Content Include="Scripts\SmartLinks-db-script.txt" />
     <Content Include="Scripts\SmartLinksCfg.txt" />
+    <Content Include="Scripts\snapfile.js" />
     <Content Include="Scripts\technicalvideo.js" />
     <Content Include="Scripts\TunableInfo.js" />
     <Content Include="Scripts\wafer.js" />
@@ -444,6 +473,10 @@
     <Content Include="Views\SmartLinks\TunableInfo.cshtml" />
     <Content Include="Views\SmartLinks\ModuleSubAssembly.cshtml" />
     <Content Include="Views\SmartLinks\WaferStatus.cshtml" />
+    <Content Include="Views\FileShare\Welcome.cshtml" />
+    <Content Include="Views\FileShare\ReviewDocument.cshtml" />
+    <Content Include="Views\FileShare\ReviewError.cshtml" />
+    <Content Include="Views\FileShare\SnapFile.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

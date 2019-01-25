@@ -260,3 +260,17 @@ CREATE TABLE [dbo].[SmartLinkLog] (
 	[Link]   NVARCHAR (MAX)   DEFAULT ('')  NOT NULL,
     [UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL
 );
+
+
+CREATE TABLE [dbo].[SnapFileVM] (
+	[DocID]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[Owner]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[ShareTo]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[FileAddr]   NVARCHAR (MAX)   DEFAULT ('')  NOT NULL,
+	[ReviewTimes]   INT DEFAULT (0) NOT NULL,
+    [UpdateTime]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[APVal1] NVARCHAR(200) DEFAULT ('') NOT NULL,
+	[APVal2] NVARCHAR(200) DEFAULT ('') NOT NULL,
+	[APVal3] NVARCHAR(200) DEFAULT ('') NOT NULL
+);
+

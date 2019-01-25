@@ -1,0 +1,112 @@
+﻿
+@{
+    ViewBag.Title = "SnapFile";
+    Layout = "~/Views/Shared/_Layout4Video.cshtml";
+}
+
+<link type="text/css" rel="stylesheet" href="~/Content/technicalvideo.css" />
+<link type="text/css" rel="stylesheet" href="~/Scripts/jquery-autocomplete/jquery.auto-complete.css" />
+<link type="text/css" rel="stylesheet" href="~/Scripts/bootstrap-tagsinput/bootstrap-tagsinput.css" />
+<style type="text/css">
+    .bootstrap-tagsinput {
+        width: 100% !important;
+    }
+
+    th, td {
+        text-align: center;
+    }
+    
+    .DocLink {
+        cursor:pointer;
+    }
+</style>
+
+
+<script type="text/javascript" src="~/Scripts/bootstrap-tagsinput/bootstrap-tagsinput.js"></script>
+<script type="text/javascript" src="~/Scripts/bootstrap-tagsinput/bootstrap3-typeahead.js"></script>
+<script type="text/javascript" src="~/Scripts/jquery-autocomplete/jquery.auto-complete.min.js"></script>
+
+<script src="~/Scripts/snapfile.js" type="text/javascript"></script>
+<script type="text/javascript">
+        $(function(){
+            SNAPFILE.INIT();
+        })
+</script>
+
+
+<div class="row form-group">
+    <div class="col-xs-2"></div>
+    <div class="col-xs-8" style="border-left-width:8px;border-left-style:solid;border-left-color:#FF7400">
+        <strong style="font-family:'Arial Narrow';font-size:18px">Share File</strong>
+    </div>
+    <div class="col-xs-2"></div>
+</div>
+
+<form action="/FileShare/SnapFile" enctype="multipart/form-data" method="post" id="uploadform" name="uploadform">
+    <div class="row form-group">
+        <div class="col-xs-2"></div>
+        <div class="col-xs-8">
+            <div class="row form-group">
+                <div class="col-xs-2">
+                    <span class="btn btn-success btn-file" style="font-family:'Arial Narrow', arial" id="choosefile" data-intro="Click to Upload MESConfig.ini file." data-step="9">
+                        <strong><font color="red">Upload Share File</font></strong>
+                        <input type="file" name="files" id="file1" runat="server" onchange="ShowFileNames(this)" />
+                    </span>
+                </div>
+                <div class="col-xs-10" style="padding-left:10px;"><label class="form-control label-default" style="background-color:#f5f5f5;margin-left:10px;"  id="filename" name="filename"></label></div>
+                <script type="text/javascript">
+                    function ShowFileNames(oFile) {
+                        $('#filename').text(oFile.value);
+                    }
+                </script>
+            </div>
+            <div class="row form-group">
+                <div class="col-xs-2"><label class="form-control label-default" style="background-color:#f5f5f5">Share To</label></div>
+                <div class="col-xs-8"><input class="form-control" type="text" id="shareto" name="shareto" placeholder="Share Document To" style="padding-left:15px!important;" /></div>
+                <div class="col-xs-2"><button class="btn btn-primary" type="button" id="searchbtn" name="searchbtn">Share</button></div>
+            </div>
+        </div>
+        <div class="col-xs-2"></div>
+    </div>
+</form>
+
+<hr/>
+
+    <div class="row form-group" style="margin-top:15px;">
+        <div class="col-xs-2"></div>
+        <div class="col-xs-8" style="border-left-width:8px;border-left-style:solid;border-left-color:#FF7400">
+            <strong style="font-family:'Arial Narrow';font-size:18px">I Review</strong>
+        </div>
+        <div class="col-xs-2"></div>
+    </div>
+    <div class="row form-group">
+        <div class="col-xs-2"></div>
+        <div class="col-xs-8">
+            <table class="table  table-condensed" id="reviewtable">
+                <thead id="reviewtabhead"></thead>
+                <tbody id="reviewtabcontent"></tbody>
+            </table>
+        </div>
+        <div class="col-xs-2"></div>
+    </div>
+
+<hr/>
+
+    <div class="row form-group" style="margin-top:15px;">
+        <div class="col-xs-2"></div>
+        <div class="col-xs-8" style="border-left-width:8px;border-left-style:solid;border-left-color:#FF7400">
+            <strong style="font-family:'Arial Narrow';font-size:18px">I Share</strong>
+        </div>
+        <div class="col-xs-2"></div>
+    </div>
+    <div class="row form-group">
+        <div class="col-xs-2"></div>
+        <div class="col-xs-8">
+            <table class="table  table-condensed" id="sharetable">
+                <thead id="sharetabhead"></thead>
+                <tbody id="sharetabcontent"></tbody>
+            </table>
+        </div>
+        <div class="col-xs-2"></div>
+    </div>
+

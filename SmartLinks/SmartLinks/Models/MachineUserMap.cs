@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Web;
 
 namespace SmartLinks.Models
@@ -70,6 +71,33 @@ namespace SmartLinks.Models
                 }
             }
             return ret;
+        }
+
+        private static string DetermineCompName(string IP)
+        {
+            try
+            {
+                IPAddress myIP = IPAddress.Parse(IP);
+                IPHostEntry GetIPHost = Dns.GetHostEntry(myIP);
+                List<string> compName = GetIPHost.HostName.ToString().Split('.').ToList();
+                return compName.First().ToUpper();
+            }
+            catch (Exception ex)
+            { return string.Empty; }
+        }
+
+        public static string GetUseNameByIP(string IP)
+        {
+            var machinename = DetermineCompName(IP);
+            var macuserdict = RetrieveUserMap();
+            if (macuserdict.ContainsKey(machinename))
+            {
+                return macuserdict[machinename];
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
 
         public static bool IsSeniorEmployee(string machine, string username)

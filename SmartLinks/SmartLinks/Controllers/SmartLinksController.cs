@@ -474,7 +474,6 @@ namespace SmartLinks.Controllers
             return ret;
         }
 
-
         private double GetAF(double tu,double ts,double ls,double lu)
         {
             var eak = 1.21 / 0.00008617;
