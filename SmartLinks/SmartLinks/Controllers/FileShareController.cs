@@ -7,6 +7,7 @@ using SmartLinks.Models;
 using System.IO;
 using System.Net;
 using System.Web.Routing;
+using System.Text.RegularExpressions;
 
 namespace SmartLinks.Controllers
 {
@@ -40,14 +41,34 @@ namespace SmartLinks.Controllers
             return ret;
         }
 
+        public bool CheckIE()
+        {
+            var browse = Request.Browser;
+            if (string.Compare(browse.Browser, "IE", true) == 0 
+                || string.Compare(browse.Browser, "InternetExplorer", true) == 0)
+            {
+                return true;
+            }
+            if (Regex.IsMatch(HttpContext.Request.UserAgent, @"Edge\/\d+"))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public ActionResult SnapFile()
         {
             var username = MachineUserMap.GetUseNameByIP(Request.UserHostName);
             if (string.IsNullOrEmpty(username))
             { return RedirectToAction("Welcome", "FileShare"); }
 
+            if (CheckIE())
+            { return View("ReviewIEError"); }
+
             return View();
         }
+
 
         private string GetShareFileUrl()
         {
@@ -201,6 +222,9 @@ namespace SmartLinks.Controllers
             var filelist = SnapFileVM.RetrieveFileByID(docid, username);
             if (filelist.Count == 0)
             { return View("ReviewError"); }
+
+            if (CheckIE())
+            { return View("ReviewIEError"); }
 
             var url = filelist[0].FileAddr;
             ViewBag.DocTitle = Path.GetFileNameWithoutExtension(Server.MapPath("~"+url));

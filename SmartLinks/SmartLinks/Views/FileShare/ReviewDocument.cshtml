@@ -29,12 +29,30 @@
         @if (ViewBag.url.ToUpper().Contains(".PDF"))
         {
             <div style="display: block; position: absolute; top: 0px; left: 0; margin: 0; padding: 0;margin-left:15px!important; width: 97%; height: 35px; background: #3d3d3d; z-index: 999;"></div>
-            <iframe src="@ViewBag.Url" height="680" width="100%"></iframe>
+            <iframe id="myframe" src="@ViewBag.Url" height="680" width="100%" oncontextmenu="return false;"></iframe>
         }
         else
         {
-            <iframe src="@ViewBag.Url" height="680" width="100%"></iframe>
+            <iframe id="myframe" src="@ViewBag.Url" height="680" width="100%" oncontextmenu="return false;"></iframe>
         }
     </div>
     <div class="col-xs-1"></div>
+    <script type="text/javascript">
+        document.oncontextmenu = function () { // Use document as opposed to window for IE8 compatibility
+            return false;
+        };
+
+        window.addEventListener('contextmenu', function (e) { // Not compatible with IE < 9
+            e.preventDefault();
+        }, false);
+
+        document.ondblclick = function (e) {
+            if (e.button == 2 || e.button == 3) {
+                e.preventDefault();
+                e.stopPropagation();
+                return (false);
+            }
+        };
+        
+    </script>
 </div>
