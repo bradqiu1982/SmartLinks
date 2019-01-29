@@ -96,6 +96,14 @@ namespace SmartLinks.Models
             DBUtility.ExeLocalSqlNoRes(sql, dict);
         }
 
+        public static void RemoveFileByID(string id)
+        {
+            var sql = "delete from SnapFileVM where DocID=@DocID";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@DocID", id);
+            DBUtility.ExeLocalSqlNoRes(sql, dict);
+        }
+
         public SnapFileVM()
         {
             DocID = "";

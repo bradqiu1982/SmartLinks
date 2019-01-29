@@ -208,7 +208,6 @@ namespace SmartLinks.Controllers
             return View();
         }
 
-
         public JsonResult ShareToList()
         {
             var dict = MachineUserMap.RetrieveUserMap();
@@ -243,6 +242,18 @@ namespace SmartLinks.Controllers
             }
             var ret = new JsonResult();
             ret.Data = new { doclist = doclist };
+            return ret;
+        }
+
+        public JsonResult RemoveDocument()
+        {
+            var docid = Request.Form["docid"];
+            SnapFileVM.RemoveFileByID(docid);
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                success = true
+            };
             return ret;
         }
     }

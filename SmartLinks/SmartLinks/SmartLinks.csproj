@@ -315,6 +315,7 @@
     <Content Include="Content\images\ie8\peace.png" />
     <Content Include="Content\images\ie8\scrap.png" />
     <Content Include="Content\images\ie8\scraprate.png" />
+    <Content Include="Content\images\ie8\ShareFile.png" />
     <Content Include="Content\images\ie8\SmartLinks.png" />
     <Content Include="Content\images\ie8\snteststatus.png" />
     <Content Include="Content\images\ie8\SUBASSEMBLY.png" />
@@ -336,6 +337,7 @@
     <Content Include="Content\images\scrap.png" />
     <Content Include="Content\images\scraprate.png" />
     <Content Include="Content\images\search.png" />
+    <Content Include="Content\images\ShareFile.png" />
     <Content Include="Content\images\SmartLinks.png" />
     <Content Include="Content\images\SmartLinks_1.png" />
     <Content Include="Content\images\snteststatus.png" />

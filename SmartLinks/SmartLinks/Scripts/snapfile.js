@@ -72,6 +72,20 @@
             window.open('/FileShare/ReviewDocument?docid=' + docid, "_blank");
         });
 
+        $('body').on('click', '.DelLink', function () {
+            var docid = $(this).attr('mydataid');
+            if (confirm("Do you really want to remove this file?"))
+            {
+                $.post('/FileShare/RemoveDocument',
+                    {
+                        docid:docid
+                    },
+                    function (output) {
+                        window.location.reload(true);
+                    });
+            }
+        });
+
         var reviewtable = null;
         var loadreviewdocuments = function ()
         {
@@ -118,12 +132,14 @@
 
                 var appendstr = '<tr>' +
                                 '<th>Shared File</th>' +
+                                //'<th><span class="glyphicon glyphicon-trash"></span></th>'+
                             '</tr>';
                 $('#sharetabhead').append(appendstr);
 
                 $.each(output.doclist, function (i, val) {
                     appendstr = '<tr>' +
                         '<td><span class="DocLink" mydataid="' + val.DocID + '">' + val.FileAddr + '<span></td>' +
+                        //'<td><span class="glyphicon glyphicon-trash DelLink" mydataid="' + val.DocID + '"><span></td>' +
                         '</tr>';
                     $('#sharetabcontent').append(appendstr);
                 });
