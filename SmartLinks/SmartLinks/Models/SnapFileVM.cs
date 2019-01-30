@@ -21,7 +21,7 @@ namespace SmartLinks.Models
 
         public static List<SnapFileVM> RetrieveFileListByOwner(string owner)
         {
-            var sql = "select distinct DocID,FileAddr,UpdateTime from SnapFileVM where Owner=@Owner order by UpdateTime desc";
+            var sql = "select distinct DocID,FileAddr,UpdateTime,APVal1 from SnapFileVM where Owner=@Owner and APVal1 <> 'DELETE' order by UpdateTime desc";
             var ret = new List<SnapFileVM>();
             var dict = new Dictionary<string, string>();
             dict.Add("@Owner",owner);
@@ -98,8 +98,13 @@ namespace SmartLinks.Models
 
         public static void RemoveFileByID(string id)
         {
-            var sql = "delete from SnapFileVM where DocID=@DocID";
+            var sql = "delete from SnapFileVM where DocID=@DocID and ReviewTimes = 0";
             var dict = new Dictionary<string, string>();
+            dict.Add("@DocID", id);
+            DBUtility.ExeLocalSqlNoRes(sql, dict);
+
+            sql = "update SnapFileVM set APVal1 = 'DELETE'  where DocID=@DocID ";
+            dict = new Dictionary<string, string>();
             dict.Add("@DocID", id);
             DBUtility.ExeLocalSqlNoRes(sql, dict);
         }

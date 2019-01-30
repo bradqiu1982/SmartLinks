@@ -53,6 +53,11 @@
                 return false;
             }
 
+            if (uploadfilename.indexOf(".XLSM") != -1) {
+                alert("Your file contains dangerous script,maybe you can save it as .XLS file!");
+                return false;
+            }
+
             var shareto = $.trim($('#shareto').tagsinput('items'));
             if (shareto == '') {
                 shareto = $.trim($('#shareto').parent().find('input').eq(0).val());
@@ -62,9 +67,9 @@
                 alert("You need to choose at least one person to share your file!");
                 return false;
             }
-            
+            $('#searchbtn').attr('ReadOnly', true);
             $('#uploadform').submit();
-
+            ('#searchbtn').attr('ReadOnly', false);
         });
 
         $('body').on('click', '.DocLink', function () {
