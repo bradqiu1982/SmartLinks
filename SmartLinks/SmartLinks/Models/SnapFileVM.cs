@@ -7,21 +7,22 @@ namespace SmartLinks.Models
 {
     public class SnapFileVM
     {
-        public static void StoreData(string id,string owner,string shareto,string url,string now)
+        public static void StoreData(string id,string owner,string shareto,string url,string tag,string now)
         {
-            var sql = "insert into SnapFileVM(DocID,Owner,ShareTo,FileAddr,UpdateTime) values(@DocID,@Owner,@ShareTo,@FileAddr,@UpdateTime)";
+            var sql = "insert into SnapFileVM(DocID,Owner,ShareTo,FileAddr,UpdateTime,APVal2) values(@DocID,@Owner,@ShareTo,@FileAddr,@UpdateTime,@Tag)";
             var dict = new Dictionary<string, string>();
             dict.Add("@DocID",id);
             dict.Add("@Owner",owner);
             dict.Add("@ShareTo",shareto);
             dict.Add("@FileAddr",url);
             dict.Add("@UpdateTime", now);
+            dict.Add("@Tag", tag);
             DBUtility.ExeLocalSqlNoRes(sql, dict);
         }
 
         public static List<SnapFileVM> RetrieveFileListByOwner(string owner)
         {
-            var sql = "select distinct DocID,FileAddr,UpdateTime,APVal1 from SnapFileVM where Owner=@Owner and APVal1 <> 'DELETE' order by UpdateTime desc";
+            var sql = "select distinct DocID,FileAddr,UpdateTime,APVal2 from SnapFileVM where Owner=@Owner and APVal1 <> 'DELETE' order by UpdateTime desc";
             var ret = new List<SnapFileVM>();
             var dict = new Dictionary<string, string>();
             dict.Add("@Owner",owner);
@@ -31,6 +32,8 @@ namespace SmartLinks.Models
                 var tempvm = new SnapFileVM();
                 tempvm.DocID = Convert.ToString(line[0]);
                 tempvm.FileAddr = Convert.ToString(line[1]);
+                tempvm.UpdateTime = Convert.ToDateTime(line[2]).ToString("yyyy-MM-dd");
+                tempvm.Tag = Convert.ToString(line[3]);
                 ret.Add(tempvm);
             }
             return ret;
@@ -38,7 +41,7 @@ namespace SmartLinks.Models
 
         public static List<SnapFileVM> RetrieveFileListByShareTo(string shareto)
         {
-            var sql = "select DocID,FileAddr,Owner,ShareTo,UpdateTime,ReviewTimes from SnapFileVM where ShareTo=@ShareTo order by ReviewTimes desc, UpdateTime desc";
+            var sql = "select DocID,FileAddr,Owner,ShareTo,UpdateTime,ReviewTimes,APVal2 from SnapFileVM where ShareTo=@ShareTo order by ReviewTimes desc, UpdateTime desc";
             var ret = new List<SnapFileVM>();
             var dict = new Dictionary<string, string>();
             dict.Add("@ShareTo", shareto);
@@ -49,6 +52,8 @@ namespace SmartLinks.Models
                 tempvm.DocID = Convert.ToString(line[0]);
                 tempvm.FileAddr = Convert.ToString(line[1]);
                 tempvm.Owner = Convert.ToString(line[2]);
+                tempvm.UpdateTime = Convert.ToDateTime(line[4]).ToString("yyyy-MM-dd");
+                tempvm.Tag = Convert.ToString(line[6]);
                 ret.Add(tempvm);
             }
             return ret;
@@ -116,6 +121,7 @@ namespace SmartLinks.Models
             ShareTo = "";
             FileAddr = "";
             ReviewTimes = 0;
+            Tag = "";
         }
 
         public string DocID { set; get; }
@@ -123,5 +129,7 @@ namespace SmartLinks.Models
         public string ShareTo { set; get; }
         public string FileAddr { set; get; }
         public int ReviewTimes { set; get; }
+        public string Tag { set; get; }
+        public string UpdateTime{ set; get; }
     }
 }

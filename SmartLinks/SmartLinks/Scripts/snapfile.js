@@ -104,12 +104,18 @@
 
                 var appendstr = '<tr>' +
                                 '<th>Review File</th>' +
+                                '<th>Owner</th>' +
+                                '<th>Category</th>' +
+                                '<th>Date</th>' +
                             '</tr>';
                 $('#reviewtabhead').append(appendstr);
 
                 $.each(output.doclist, function (i, val) {
                     appendstr = '<tr>' +
                         '<td><span class="DocLink" mydataid="' + val.DocID + '">' + val.FileAddr + '<span></td>' +
+                        '<td>' + val.Owner + '</td>' +
+                        '<td>' + val.Tag + '</td>' +
+                        '<td>' + val.UpdateTime + '</td>' +
                         '</tr>';
                     $('#reviewtabcontent').append(appendstr);
                 });
@@ -137,6 +143,8 @@
 
                 var appendstr = '<tr>' +
                                 '<th>Shared File</th>' +
+                                '<th>Category</th>' +
+                                '<th>Date</th>' +
                                 '<th><span class="glyphicon glyphicon-trash"></span></th>'+
                             '</tr>';
                 $('#sharetabhead').append(appendstr);
@@ -144,6 +152,8 @@
                 $.each(output.doclist, function (i, val) {
                     appendstr = '<tr>' +
                         '<td><span class="DocLink" mydataid="' + val.DocID + '">' + val.FileAddr + '<span></td>' +
+                        '<td>' + val.Tag + '</td>' +
+                        '<td>' + val.UpdateTime + '</td>' +
                         '<td><span class="glyphicon glyphicon-trash DelLink" mydataid="' + val.DocID + '"><span></td>' +
                         '</tr>';
                     $('#sharetabcontent').append(appendstr);

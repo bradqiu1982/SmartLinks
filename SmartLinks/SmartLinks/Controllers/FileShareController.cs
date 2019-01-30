@@ -26,6 +26,32 @@ namespace SmartLinks.Controllers
             { return string.Empty; }
         }
 
+        private List<SelectListItem> CreateSelectList(List<string> valist, string defVal)
+        {
+            bool selected = false;
+            var pslist = new List<SelectListItem>();
+            foreach (var p in valist)
+            {
+                var pitem = new SelectListItem();
+                pitem.Text = p;
+                pitem.Value = p;
+                if (!string.IsNullOrEmpty(defVal) && string.Compare(defVal, p, true) == 0)
+                {
+                    pitem.Selected = true;
+                    selected = true;
+                }
+                pslist.Add(pitem);
+            }
+
+            if (!selected && pslist.Count > 0)
+            {
+                pslist[0].Selected = true;
+            }
+
+            return pslist;
+        }
+
+
         public ActionResult Welcome()
         {
             return View();
@@ -66,19 +92,26 @@ namespace SmartLinks.Controllers
             if (CheckIE())
             { return View("ReviewIEError"); }
 
+            var syscfg = CfgUtility.GetSysConfig(this);
+            var tags = syscfg["SNAPFILETAGS"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            ViewBag.taglist = CreateSelectList(tags, "");
+
             return View();
         }
 
 
-        private string GetShareFileUrl()
+        private List<string> GetShareFileUrls()
         {
-            try
+            var ret = new List<string>();
+           
+            for(var idx = 0; idx < Request.Files.Count;idx++)
             {
-                foreach (string fl in Request.Files)
+                try
                 {
-                    if (fl != null && Request.Files[fl].ContentLength > 0)
+                    HttpPostedFileBase fl = Request.Files.Get(idx);
+                    if (fl != null && fl.ContentLength > 0)
                     {
-                        var ext = Path.GetExtension(Path.GetFileName(Request.Files[fl].FileName)).ToUpper();
+                        var ext = Path.GetExtension(Path.GetFileName(fl.FileName)).ToUpper();
                         if (ext.Contains(".PPT")
                             || ext.Contains(".DOC")
                             || ext.Contains(".XLS")
@@ -87,7 +120,7 @@ namespace SmartLinks.Controllers
                             || ext.Contains(".PDF")
                             || ext.Contains(".HTML"))
                         {
-                            string fn = System.IO.Path.GetFileName(Request.Files[fl].FileName)
+                            string fn = System.IO.Path.GetFileName(fl.FileName)
                             .Replace(" ", "_").Replace("#", "").Replace("'", "")
                             .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
 
@@ -98,7 +131,7 @@ namespace SmartLinks.Controllers
                                 Directory.CreateDirectory(imgdir);
                             }
                             fn = Path.GetFileNameWithoutExtension(fn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(fn);
-                            Request.Files[fl].SaveAs(imgdir + fn);
+                            fl.SaveAs(imgdir + fn);
 
                             var wholefn = imgdir + fn;
 
@@ -106,14 +139,14 @@ namespace SmartLinks.Controllers
                             {
                                 if (System.IO.File.Exists(imgdir + Path.GetFileNameWithoutExtension(fn) + ".pdf"))
                                 {
-                                    return "/userfiles/docs/" + datestring + "/" + Path.GetFileNameWithoutExtension(fn) + ".pdf";
+                                    ret.Add("/userfiles/docs/" + datestring + "/" + Path.GetFileNameWithoutExtension(fn) + ".pdf");
                                 }
                             }
                             else if (ext.Contains(".HTML"))
                             {
                                 if (System.IO.File.Exists(imgdir + Path.GetFileNameWithoutExtension(fn) + ".html"))
                                 {
-                                    return "/userfiles/docs/" + datestring + "/" + Path.GetFileNameWithoutExtension(fn) + ".html";
+                                    ret.Add("/userfiles/docs/" + datestring + "/" + Path.GetFileNameWithoutExtension(fn) + ".html");
                                 }
                             }
                             else if (ext.Contains(".XLS"))
@@ -122,7 +155,7 @@ namespace SmartLinks.Controllers
                                 {
                                     if (System.IO.File.Exists(imgdir + Path.GetFileNameWithoutExtension(fn) + ".html"))
                                     {
-                                        return "/userfiles/docs/" + datestring + "/" + Path.GetFileNameWithoutExtension(fn) + ".html";
+                                        ret.Add("/userfiles/docs/" + datestring + "/" + Path.GetFileNameWithoutExtension(fn) + ".html");
                                     }
                                 }
                             }
@@ -132,7 +165,7 @@ namespace SmartLinks.Controllers
                                 {
                                     if (System.IO.File.Exists(imgdir + Path.GetFileNameWithoutExtension(fn) + ".html"))
                                     {
-                                        return "/userfiles/docs/" + datestring + "/" + Path.GetFileNameWithoutExtension(fn) + ".html";
+                                        ret.Add("/userfiles/docs/" + datestring + "/" + Path.GetFileNameWithoutExtension(fn) + ".html");
                                     }
                                 }
                             }
@@ -142,7 +175,7 @@ namespace SmartLinks.Controllers
                                 {
                                     if (System.IO.File.Exists(imgdir + Path.GetFileNameWithoutExtension(fn) + ".html"))
                                     {
-                                        return "/userfiles/docs/" + datestring + "/" + Path.GetFileNameWithoutExtension(fn) + ".html";
+                                        ret.Add("/userfiles/docs/" + datestring + "/" + Path.GetFileNameWithoutExtension(fn) + ".html");
                                     }
                                 }
                             }
@@ -152,20 +185,18 @@ namespace SmartLinks.Controllers
                                 {
                                     if (System.IO.File.Exists(imgdir + Path.GetFileNameWithoutExtension(fn) + ".pdf"))
                                     {
-                                        return "/userfiles/docs/" + datestring + "/" + Path.GetFileNameWithoutExtension(fn) + ".pdf";
+                                        ret.Add("/userfiles/docs/" + datestring + "/" + Path.GetFileNameWithoutExtension(fn) + ".pdf");
                                     }
                                 }
                             }
                         }//end if
                     }//end if
-                }//end foreach
-            }//end try
-            catch (Exception ex)
-            {
-                return string.Empty;
-            }
+                }//end try
+                catch (Exception ex)
+                {}
+            }//end foreach
 
-            return string.Empty;
+            return ret;
         }
 
         private void SendShareDocEmail(List<string> towho,string owner, string filename,string docid)
@@ -188,16 +219,18 @@ namespace SmartLinks.Controllers
         [HttpPost, ActionName("SnapFile")]
         public ActionResult SnapFilePost()
         {
-            var url = GetShareFileUrl();
-            if (!string.IsNullOrEmpty(url))
+            var urls = GetShareFileUrls();
+            foreach(var url in urls)
             {
                 var owener = MachineUserMap.GetUseNameByIP(Request.UserHostName);
                 var sharetolist = Request.Form["shareto"].Split(new string[] { ",", ";", " " }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                var tag = Request.Form["taglist"];
+
                 var docid = Guid.NewGuid().ToString("N");
                 var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 foreach (var s in sharetolist)
                 {
-                    SnapFileVM.StoreData(docid, owener,s.Trim().ToUpper(), url,now);
+                    SnapFileVM.StoreData(docid, owener,s.Trim().ToUpper(), url,tag,now);
                 }
 
                 var sharefilename = Path.GetFileNameWithoutExtension(Server.MapPath("~" + url));
