@@ -41,6 +41,7 @@ namespace SmartLinks.Models
             MainStore = "PASS";
 
             SFAPN = "";
+            PLCDCFilter = "PASS";
 
             ERTCWL_CH0 = "";
             ERTCWL_CH1 = "";
@@ -95,12 +96,14 @@ namespace SmartLinks.Models
             var COCCOSDict = new Dictionary<string, string>();
             var LASERDict = new Dictionary<string, string>();
 
+            var PLCDatecodeDict = new Dictionary<string, string>();
+
             //var sql = @"select ToContainer,FromContainer,FromPNDescription,FromProductName  FROM [PDMS].[dbo].[ComponentIssueSummary]  
             //               where ToContainer in <SNCOND> 
             //               and (FromPNDescription like '%PCBA%' or FromPNDescription like '%PLC%'  
             //               or FromPNDescription like '%ON SUBMOUNT%' or  FromPNDescription like '%ON-SUBMOUNT%' or  FromPNDescription like '%ON-SILICON%'  or  FromPNDescription like '%LASER,SILICON%') order by  IssueDate desc";
 
-            var sql = @"select  co.ContainerName,fc.ContainerName FromContainer, p.Description FromPNDescription,pb.ProductName from insitedb.insite.ComponentIssueHistory cih with(nolock)
+            var sql = @"select  co.ContainerName,fc.ContainerName FromContainer, p.Description FromPNDescription,pb.ProductName,fc.datecode from insitedb.insite.ComponentIssueHistory cih with(nolock)
                     inner join insitedb.insite.Historymainline hml  with(nolock) on hml.HistoryMainlineId = cih.historymainlineid  
                     inner join insitedb.insite.IssueHistoryDetail  ihd with(nolock) on ihd.ComponentIssueHistoryId= cih.ComponentIssueHistoryId
                     inner join insitedb.insite.IssueActualsHistory iah with(nolock) on iah.IssueHistoryDetailId=ihd.IssueHistoryDetailId
@@ -132,6 +135,9 @@ namespace SmartLinks.Models
                     if (!PLCDict.ContainsKey(sn))
                     {
                         PLCDict.Add(sn, frompn);
+
+                        var dc = Convert.ToString(line[4]).ToUpper().Trim();
+                        PLCDatecodeDict.Add(sn, dc);
                     }
                 }
                 else if (pndesc.Contains("ON SUBMOUNT"))
@@ -208,6 +214,7 @@ namespace SmartLinks.Models
             ret.Add(PLCDict);
             ret.Add(COCCOSDict);
             ret.Add(LASERDict);
+            ret.Add(PLCDatecodeDict);
 
             return ret;
         }
@@ -685,6 +692,8 @@ namespace SmartLinks.Models
 
         public static List<CWDM4Data> LoadCWDM4Info(List<string> snlist, Controller ctrl)
         {
+            var syscfg = CfgUtility.GetSysConfig(ctrl);
+
             var retdata = new List<CWDM4Data>();
             var trimsnlist = new List<string>();
             foreach (var sn in snlist)
@@ -737,6 +746,9 @@ namespace SmartLinks.Models
                 var PLCDict = (Dictionary<string, string>)pcbaplcdata[1];
                 var COCCOSDict = (Dictionary<string, string>)pcbaplcdata[2];
                 var LASERDict = (Dictionary<string, string>)pcbaplcdata[3];
+
+                var PLCDatecodeDict = (Dictionary<string, string>)pcbaplcdata[4];
+
                 foreach (var item in retdata)
                 {
                     if (!item.IsCWDM4)
@@ -766,6 +778,15 @@ namespace SmartLinks.Models
                     {
                         item.LaserType = LASERDict[item.SN];
                     }
+
+                    if (PLCDatecodeDict.ContainsKey(item.SN))
+                    {
+                        if (!string.IsNullOrEmpty(PLCDatecodeDict[item.SN]) && syscfg["CWDM4PLCDATACODEFILTER"].Contains(PLCDatecodeDict[item.SN]))
+                        {
+                            item.PLCDCFilter = "FAIL";
+                        }
+                    }
+
                 }
 
                 var bidict = LoadBIInfo(sncond,ctrl);
@@ -984,6 +1005,7 @@ namespace SmartLinks.Models
         public string RSSIRes { set; get; }
         public string SFAPN { set; get; }
 
+        public string PLCDCFilter { set; get; }
 
         public string ERTCWL_CH0 { set; get; }
         public string ERTCWL_CH1 { set; get; }

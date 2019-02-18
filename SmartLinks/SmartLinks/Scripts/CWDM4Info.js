@@ -83,6 +83,7 @@
                    appendstr += '<td>' + val.TCBert + '</td>';
                    appendstr += '<td>' + val.Spec + '</td>';
                    appendstr += '<td>' + val.PLCVendor + '</td>';
+                   appendstr += '<td>' + val.PLCDCFilter + '</td>';
                    appendstr += '<td>' + val.LaserType + '</td>';
                    appendstr += '<td>' + val.COCCOS + '</td>';
                    appendstr += '<td>' + val.ORLTX + '</td>';
