@@ -228,6 +228,7 @@
     <Compile Include="Models\ScrapHistoryVM.cs" />
     <Compile Include="Models\ScrapVM.cs" />
     <Compile Include="Models\SnapFileVM.cs" />
+    <Compile Include="Models\SNProVM.cs" />
     <Compile Include="Models\SnTestDataVM.cs" />
     <Compile Include="Models\TechVideoVM.cs" />
     <Compile Include="Models\TraceViewVM.cs" />
@@ -427,6 +428,7 @@
     <Content Include="Scripts\SmartLinks-db-script.txt" />
     <Content Include="Scripts\SmartLinksCfg.txt" />
     <Content Include="Scripts\snapfile.js" />
+    <Content Include="Scripts\SNProgress.js" />
     <Content Include="Scripts\technicalvideo.js" />
     <Content Include="Scripts\TunableInfo.js" />
     <Content Include="Scripts\wafer.js" />
@@ -480,6 +482,7 @@
     <Content Include="Views\FileShare\ReviewError.cshtml" />
     <Content Include="Views\FileShare\SnapFile.cshtml" />
     <Content Include="Views\FileShare\ReviewIEError.cshtml" />
+    <Content Include="Views\SmartLinks\SNProgress.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

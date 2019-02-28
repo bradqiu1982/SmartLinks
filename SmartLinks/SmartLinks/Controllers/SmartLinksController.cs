@@ -474,54 +474,23 @@ namespace SmartLinks.Controllers
             return ret;
         }
 
-        private double GetAF(double tu,double ts,double ls,double lu)
+
+        public ActionResult SNProgress()
         {
-            var eak = 1.21 / 0.00008617;
-            var tuts = 1 / (tu+273.15) - 1 / (ts+273.15);
-            var lslupower = Math.Pow(ls / lu, 2.29);
-            return Math.Exp(eak * tuts) * lslupower;
+            return View();
         }
 
-        private void GetBaseValue(double tu, double lu, double year)
+        public JsonResult SNProgressData()
         {
-            var sb = new StringBuilder();
-
-            var ts = 60.0;
-            while (ts < 150.0)
+            var marks = Request.Form["marks"];
+            List<string> wlist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
+            var sndatalist = SNProVM.RetrieveData(wlist);
+            var ret = new JsonResult();
+            ret.Data = new
             {
-                var ls = 10.0;
-                while (ls < 21.0)
-                {
-                    var af = GetAF(tu,ts,ls,lu);
-                    var baseval = Math.Round(year*365.0*24.0*60*60 / af,6);
-
-                    sb.Append(ts.ToString() + "," + ls.ToString() + "," + baseval.ToString() + "\r\n");
-
-                    ls += 0.05;
-                }
-                ts += 0.1;
-            }
-
-            var logfile = "d:\\log\\year-" + year.ToString().Replace(".", "") + ".csv";
-            System.IO.File.WriteAllText(logfile, sb.ToString());
-        }
-
-        public ActionResult ComputeHTOLBase()
-        {
-
-            var tu = 75.0;
-            var lu = 7.5;
-            GetBaseValue(tu,lu, 6.01);
-
-            tu = 70.0;
-            lu = 7.5;
-            GetBaseValue(tu, lu, 10.37);
-
-            tu = 65.0;
-            lu = 7.5;
-            GetBaseValue(tu, lu, 13.77);
-
-            return View("All");
+                sndatalist = sndatalist
+            };
+            return ret;
         }
 
     }
