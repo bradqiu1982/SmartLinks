@@ -480,11 +480,24 @@ namespace SmartLinks.Controllers
             return View();
         }
 
-        public JsonResult SNProgressData()
+        public JsonResult SNWorkFlowData()
         {
             var marks = Request.Form["marks"];
             List<string> wlist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
-            var sndatalist = SNProVM.RetrieveData(wlist);
+            var sndatalist = SNProVM.RetrieveWorkFlowData(wlist);
+            var ret = new JsonResult();
+            ret.Data = new
+            {
+                sndatalist = sndatalist
+            };
+            return ret;
+        }
+
+        public JsonResult SNTestFlowData()
+        {
+            var marks = Request.Form["marks"];
+            List<string> wlist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
+            var sndatalist = SNProVM.RetrieveTestFlowData(wlist);
             var ret = new JsonResult();
             ret.Data = new
             {

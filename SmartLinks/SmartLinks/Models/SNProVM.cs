@@ -25,7 +25,7 @@ namespace SmartLinks.Models
         }
 
 
-        public static List<SNProVM> RetrieveData(List<string> SNList)
+        public static List<SNProVM> RetrieveWorkFlowData(List<string> SNList)
         {
             var ret = new List<SNProVM>();
 
@@ -41,6 +41,30 @@ namespace SmartLinks.Models
             sql = sql.Replace("<sncond>", sncond);
 
             var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                try
+                {
+                    ret.Add(new SNProVM(Convert.ToString(line[0]), Convert.ToString(line[1])
+                        , Convert.ToString(line[2]), Convert.ToDateTime(line[3]).ToString("yyyy-MM-dd HH:mm:ss")));
+                }
+                catch (Exception ex) { }
+            }
+
+            return ret;
+        }
+
+        public static List<SNProVM> RetrieveTestFlowData(List<string> SNList)
+        {
+            var ret = new List<SNProVM>();
+
+            var sncond = "('" + string.Join("','", SNList) + "')";
+            var sql = @"SELECT distinct [ModuleSN],[PN],[WhichTest],[TestTimeStamp]  FROM [BSSupport].[dbo].[ModuleTestData] 
+                        WHERE ModuleSN in <sncond> order by ModuleSN,TestTimeStamp asc";
+
+            sql = sql.Replace("<sncond>", sncond);
+
+            var dbret = DBUtility.ExeBSSqlWithRes(sql);
             foreach (var line in dbret)
             {
                 try

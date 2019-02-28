@@ -26,7 +26,7 @@
             }
         })
 
-        function RefreshWaferTable(warning) {
+        function RefreshTable(qtype,warning) {
             var all_marks = $.trim($('#marks').val()).split('\n');
             var cur_marks = new Array();
             var arr_count = new Array();
@@ -58,10 +58,17 @@
                 TipsColor: "#000",
             }
             $.bootstrapLoading.start(options);
-            $.post('/SmartLinks/SNProgressData',
-           {
-               marks: JSON.stringify(cur_marks)
-           }, function (output) {
+
+            var url = '/SmartLinks/SNWorkFlowData';
+            if (qtype.indexOf('workflow') == -1)
+            {
+                url = '/SmartLinks/SNTestFlowData';
+            }
+
+            $.post(url,
+               {
+                   marks: JSON.stringify(cur_marks)
+               }, function (output) {
                $.bootstrapLoading.end();
                if (mywafertable) {
                    mywafertable.destroy();
@@ -93,8 +100,12 @@
         }
 
 
-        $('body').on('click', '#btn-marks-submit', function () {
-            RefreshWaferTable(true);
+        $('body').on('click', '#btn-marks-workflow', function () {
+            RefreshTable('workflow', true);
+        })
+
+        $('body').on('click', '#btn-marks-testflow', function () {
+            RefreshTable('testflow', true);
         })
 
         $('body').on('click', '#btn-marks-clean', function () {
