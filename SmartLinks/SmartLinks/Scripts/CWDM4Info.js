@@ -93,6 +93,7 @@
                    appendstr += '<td>' + val.RSSIRes + '</td>';
                    appendstr += '<td>' + val.MainStore + '</td>';
                    appendstr += '<td>' + val.SFAPN + '</td>';
+                   //appendstr += '<td>' + val.QTTxPower + '</td>';
                    appendstr += '</tr>';
                    $("#WaferTableID").append(appendstr);
                });

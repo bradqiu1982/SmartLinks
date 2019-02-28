@@ -43,6 +43,8 @@ namespace SmartLinks.Models
             SFAPN = "";
             PLCDCFilter = "PASS";
 
+            QTTxPower = "";
+
             ERTCWL_CH0 = "";
             ERTCWL_CH1 = "";
             ERTCWL_CH2 = "";
@@ -285,9 +287,10 @@ namespace SmartLinks.Models
         }
 
 
-        private static Dictionary<string, string> LoadFWData(List<string> snlist,Controller ctrl)
+        private static List<Dictionary<string, string>> LoadQtTraceViewData(List<string> snlist,Controller ctrl)
         {
-            var ret = new Dictionary<string, string>();
+            var fwdict = new Dictionary<string, string>();
+            var pwrdict = new Dictionary<string, string>();
             var stationlist = CfgUtility.GetSysConfig(ctrl)["CWDM4QUICKTESTSTATION"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
             foreach (var station in stationlist)
             {
@@ -316,7 +319,7 @@ namespace SmartLinks.Models
                         if (string.IsNullOrEmpty(currentsn))
                         { continue; }
 
-                        if (ret.ContainsKey(currentsn))
+                        if (fwdict.ContainsKey(currentsn))
                         { continue; }
 
                         var allline = System.IO.File.ReadAllLines(f);
@@ -326,17 +329,33 @@ namespace SmartLinks.Models
                             {
 
                                 var fws = l.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                                if (!ret.ContainsKey(currentsn))
+                                if (!fwdict.ContainsKey(currentsn))
                                 {
-                                    ret.Add(currentsn, fws[fws.Length - 1].Replace("<", "").Replace(">", "").Replace("(", "").Replace(")", ""));
+                                    fwdict.Add(currentsn, fws[fws.Length - 1].Replace("<", "").Replace(">", "").Replace("(", "").Replace(")", ""));
                                 }
                                 break;
                             }
                         }
+
+                        //var temppwr = "";
+                        //foreach (var l in allline)
+                        //{
+                        //    if (l.ToUpper().Contains("ModuleTxPower".ToUpper()) && l.Contains("] --- "))
+                        //    {
+                        //        var fws = l.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                        //        temppwr += fws[fws.Length - 1].Replace("<", "").Replace(">", "").Replace("(", "").Replace(")", "")+",";
+                        //    }
+                        //}
+                        //if (!string.IsNullOrEmpty(temppwr) && !pwrdict.ContainsKey(currentsn)) {
+                        //    pwrdict.Add(currentsn, temppwr);
+                        //}
                     }
                 }//end if
             }
 
+            var ret = new List<Dictionary<string, string>>();
+            ret.Add(fwdict);
+            ret.Add(pwrdict);
             return ret;
         }
 
@@ -828,13 +847,23 @@ namespace SmartLinks.Models
                 ExternalDataCollector.LoadORLData(retdata,ctrl);
 
                 //load FW
-                var FWDict = LoadFWData(cwdm4list, ctrl);
+                var traceviewdata = LoadQtTraceViewData(cwdm4list, ctrl);
+                var FWDict = traceviewdata[0];
                 foreach (var item in retdata)
                 {
                     if (!item.IsCWDM4)
                     { continue; }
                     if (FWDict.ContainsKey(item.SN))
                     { item.FW = FWDict[item.SN]; }
+                }
+
+                var PwrDict = traceviewdata[1];
+                foreach (var item in retdata)
+                {
+                    if (!item.IsCWDM4)
+                    { continue; }
+                    if (PwrDict.ContainsKey(item.SN))
+                    { item.QTTxPower = PwrDict[item.SN]; }
                 }
 
                 //load tcbert
@@ -1006,6 +1035,8 @@ namespace SmartLinks.Models
         public string SFAPN { set; get; }
 
         public string PLCDCFilter { set; get; }
+
+        public string QTTxPower { set; get; }
 
         public string ERTCWL_CH0 { set; get; }
         public string ERTCWL_CH1 { set; get; }
