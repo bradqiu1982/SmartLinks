@@ -69,22 +69,70 @@
                {
                    marks: JSON.stringify(cur_marks)
                }, function (output) {
-               $.bootstrapLoading.end();
+                   $.bootstrapLoading.end();
+
                if (mywafertable) {
                    mywafertable.destroy();
+                   mywafertable = null;
                }
+
+               $("#waferheadid").empty();
                $("#WaferTableID").empty();
-
-               $.each(output.sndatalist, function (i, val) {
-                   var appendstr = '<tr>';
-                   appendstr += '<td>' + val.SN + '</td>';
-                   appendstr += '<td>' + val.PN + '</td>';
-                   appendstr += '<td>' + val.WKFlow + '</td>';
-                   appendstr += '<td>' + val.Time + '</td>';
+               var appendstr = '';
+               
+               if (qtype.indexOf('workflow') != -1) {
+                   appendstr = '';
+                   appendstr += '<tr>';
+                   appendstr += '<th>SN</th>';
+                   appendstr += '<th>PN</th>';
+                   appendstr += '<th>WorkFlow</th>';
+                   appendstr += '<th>TimeStamp</th>';
                    appendstr += '</tr>';
-                   $("#WaferTableID").append(appendstr);
-               });
+                   $("#waferheadid").append(appendstr);
 
+                   
+                   $.each(output.sndatalist, function (i, val) {
+                       appendstr = '';
+                       appendstr += '<tr>';
+                       appendstr += '<td>' + val.SN + '</td>';
+                       appendstr += '<td>' + val.PN + '</td>';
+                       appendstr += '<td>' + val.WKFlow + '</td>';
+                       appendstr += '<td>' + val.Time + '</td>';
+                       appendstr += '</tr>';
+                       $("#WaferTableID").append(appendstr);
+                   });
+                   
+               } else {
+                   appendstr = '';
+                   appendstr += '<tr>';
+                   appendstr += '<th>SN</th>';
+                   appendstr += '<th>PN</th>';
+                   appendstr += '<th>WhichTest</th>';
+                   appendstr += '<th>Failure</th>';
+                   appendstr += '<th>Tester</th>';
+                   appendstr += '<th>TimeStamp</th>';
+                   appendstr += '</tr>';
+                   $("#waferheadid").append(appendstr);
+
+                   
+                   $.each(output.sndatalist, function (i, val) {
+                       appendstr = '';
+                       if (val.Failure.indexOf("PASS") != -1) {
+                           appendstr += '<tr>';
+                       }
+                       else {
+                           appendstr += '<tr class="tr-danger">';
+                       }
+                       appendstr += '<td>' + val.SN + '</td>';
+                       appendstr += '<td>' + val.PN + '</td>';
+                       appendstr += '<td>' + val.WKFlow + '</td>';
+                       appendstr += '<td>' + val.Failure + '</td>';
+                       appendstr += '<td>' + val.Tester + '</td>';
+                       appendstr += '<td>' + val.Time + '</td>';
+                       appendstr += '</tr>';
+                       $("#WaferTableID").append(appendstr);
+                   });
+               }
 
                mywafertable = $('#mywafertable').DataTable({
                    'iDisplayLength': 50,

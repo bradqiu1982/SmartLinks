@@ -14,6 +14,11 @@ body {
     border-bottom: 1px solid #00539F;
 }
 
+.tr-danger {
+    background-color: #f6baba!important;
+    border-color: #eed3d7;
+}
+
 .logo-img {
     height: 100%;
     width: 30%;
