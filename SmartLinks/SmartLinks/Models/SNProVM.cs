@@ -39,7 +39,7 @@ namespace SmartLinks.Models
                         left join InsiteDB.insite.historyMainline hml with (nolock) on c.containerId = hml.containerId
                         left join InsiteDB.insite.MoveHistory mv with (nolock) on mv.HistoryMainlineId= hml.HistoryMainlineId
                         left join InsiteDB.insite.workflowstep ws(nolock) on  ws.WorkflowStepId  = hml.WorkflowStepId
-                        left join InsiteDB.insite.product p with (nolock) on  c.productId = p.productId 
+                        left join InsiteDB.insite.product p with (nolock) on  hml.productId = p.productId 
                         left join InsiteDB.insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId 
                         where c.ContainerName in <sncond> and mv.MoveInTime is not null   order by SerialName,hml.MfgDate asc";
 
