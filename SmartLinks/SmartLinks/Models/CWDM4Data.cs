@@ -665,48 +665,68 @@ namespace SmartLinks.Models
         private static Dictionary<string, string> LoadSFAPn(string sncond)
         {
             var snpiddict = new Dictionary<string, string>();
-            var sql = "SELECT  ContainerName,ProductId FROM [NPITrace].[dbo].[ProjectMoveHistory] where WorkflowStepName like '%MD_VMI_1'  and ContainerName in  <sncond> order by MoveOutTime desc";
+            var sql = @"SELECT c.ContainerName as SerialName,pb.productname 
+                        FROM InsiteDB.insite.container c with (nolock) 
+                        left join InsiteDB.insite.historyMainline hml with (nolock) on c.containerId = hml.containerId 
+                        left join InsiteDB.insite.workflowstep ws(nolock) on  ws.WorkflowStepId  = hml.WorkflowStepId 
+                        left join InsiteDB.insite.product p with (nolock) on  hml.productId = p.productId  
+                        left join InsiteDB.insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId 
+                        where c.ContainerName in <sncond>  and ws.WorkflowStepName like '%MD_VMI_1'  order by SerialName,hml.MfgDate desc";
             sql = sql.Replace("<sncond>", sncond);
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            var dbret = DBUtility.ExeRealMESSqlWithRes(sql, null);
             foreach (var line in dbret)
             {
                 var sn = Convert.ToString(line[0]);
-                var pid = Convert.ToString(line[1]);
-                if (!snpiddict.ContainsKey(sn))
-                {
-                    snpiddict.Add(sn, pid);
+                var pn = Convert.ToString(line[1]);
+                if (!snpiddict.ContainsKey(sn)) {
+                    snpiddict.Add(sn, pn);
                 }
             }
 
-            if (snpiddict.Count > 0)
-            {
-                var pidpndict = new Dictionary<string, string>();
-                var pidcond = "('" + string.Join("','", snpiddict.Values.ToList()) + "')";
-                sql = @"SELECT p.productid,pb.[ProductName] FROM [InsiteDB].[insite].[ProductBase] pb (nolock) 
-                        left join[InsiteDB].[insite].[Product] p on  pb.productbaseid =  p.productbaseid where p.productid in <pidcond> ";
-                sql = sql.Replace("<pidcond>", pidcond);
-                dbret = DBUtility.ExeRealMESSqlWithRes(sql, null);
-                foreach (var line in dbret)
-                {
-                    var pid = Convert.ToString(line[0]);
-                    var pn = Convert.ToString(line[1]);
-                    if (!pidpndict.ContainsKey(pid))
-                    {
-                        pidpndict.Add(pid, pn);
-                    }
-                }
+            return snpiddict;
 
-                var snsfapn = new Dictionary<string, string>();
-                foreach (var snkv in snpiddict)
-                {
-                    if (pidpndict.ContainsKey(snkv.Value))
-                    {
-                        snsfapn.Add(snkv.Key, pidpndict[snkv.Value]);
-                    }
-                }
-                return snsfapn;
-            }
-            return new Dictionary<string, string>();
+            //var sql = "SELECT  ContainerName,ProductId FROM [NPITrace].[dbo].[ProjectMoveHistory] where WorkflowStepName like '%MD_VMI_1'  and ContainerName in  <sncond> order by MoveOutTime desc";
+            //sql = sql.Replace("<sncond>", sncond);
+            //var dbret = DBUtility.ExeLocalSqlWithRes(sql, null);
+            //foreach (var line in dbret)
+            //{
+            //    var sn = Convert.ToString(line[0]);
+            //    var pid = Convert.ToString(line[1]);
+            //    if (!snpiddict.ContainsKey(sn))
+            //    {
+            //        snpiddict.Add(sn, pid);
+            //    }
+            //}
+
+            //if (snpiddict.Count > 0)
+            //{
+            //    var pidpndict = new Dictionary<string, string>();
+            //    var pidcond = "('" + string.Join("','", snpiddict.Values.ToList()) + "')";
+            //    sql = @"SELECT p.productid,pb.[ProductName] FROM [InsiteDB].[insite].[ProductBase] pb (nolock) 
+            //            left join[InsiteDB].[insite].[Product] p on  pb.productbaseid =  p.productbaseid where p.productid in <pidcond> ";
+            //    sql = sql.Replace("<pidcond>", pidcond);
+            //    dbret = DBUtility.ExeRealMESSqlWithRes(sql, null);
+            //    foreach (var line in dbret)
+            //    {
+            //        var pid = Convert.ToString(line[0]);
+            //        var pn = Convert.ToString(line[1]);
+            //        if (!pidpndict.ContainsKey(pid))
+            //        {
+            //            pidpndict.Add(pid, pn);
+            //        }
+            //    }
+
+            //    var snsfapn = new Dictionary<string, string>();
+            //    foreach (var snkv in snpiddict)
+            //    {
+            //        if (pidpndict.ContainsKey(snkv.Value))
+            //        {
+            //            snsfapn.Add(snkv.Key, pidpndict[snkv.Value]);
+            //        }
+            //    }
+            //    return snsfapn;
+            //}
+            //return new Dictionary<string, string>();
         }
 
         public static List<CWDM4Data> LoadCWDM4Info(List<string> snlist, Controller ctrl)
