@@ -25,6 +25,9 @@ EMAILSERVER:::wmail.finisar.com
 
 SCRAP4PROCESSNAME:::Post_Burn_in;Pre_Burn_in;Die attach;UnderFill;Lens_Alignment;Post_Re_flow Inspection;PCBA initial;PCBA_Baking;SilverEpoxyCure;Wire Bond;VCSEL_Burn_in;PostDieAttachIns;Flip-chip;Dieattach;upload flex;structure_epoxy;WireBonding;_VMI;Reflow;IPQC;LES check;Power check;Wafer VMI;VCSEL ID Check;Packing_D/C;Wafercheck;Repacking_Label;Module Assembly;Packing_Check;SCRAP_;
 
+DIESORTFOLDER:::\\wux-engsys01.china.ads.finisar.com\DieSorting
+DIESORTSHARE:::\\wux-engsys01.china.ads.finisar.com\DieSortingNew
+
 CWDM4SHTOL:::\\wux-fs\PUBLIC\Wuxi Parallel NPI\CWDM4\S-HTOL\Data\S-HTOL Record.xlsx
 CWDM4ORL:::\\cn-file01\Public\Project\QSFP28 CWDM4 Gen3\ORL TEST DAT.xlsx
 CWDM4FINAL1STATION:::SNY-DPDH1139;SNY-DPDH1453;IPH_TEST464;IPH_TEST465;IPH_TEST468;IPH_TEST469

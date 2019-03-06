@@ -217,6 +217,7 @@
     <Compile Include="Models\EmailUtility.cs" />
     <Compile Include="Models\ExcelReader.cs" />
     <Compile Include="Models\ExternalDataCollector.cs" />
+    <Compile Include="Models\FileLoadedData.cs" />
     <Compile Include="Models\LinkVM.cs" />
     <Compile Include="Models\MachineUserMap.cs" />
     <Compile Include="Models\ModuleAssemblyVM.cs" />
