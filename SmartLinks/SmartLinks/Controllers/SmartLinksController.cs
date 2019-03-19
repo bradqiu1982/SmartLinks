@@ -506,11 +506,11 @@ namespace SmartLinks.Controllers
             return ret;
         }
 
-        public ActionResult LoadDieSortFile()
-        {
-            ExternalDataCollector.LoadDieSortFile(this);
-            return View("All");
-        }
+        //public ActionResult LoadDieSortFile()
+        //{
+        //    ExternalDataCollector.LoadDieSortFile(this);
+        //    return View("All");
+        //}
 
     }
 }
