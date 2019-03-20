@@ -33,7 +33,7 @@ namespace SmartLinks.Models
             ORLTX = "";
             ORLRX = "";
             ORLTX70C = "";
-            IsBurnIned = "NO";
+            IsBurnIned = "";
 
             SHTOLRes = "FAIL";
             RSSIRes = "FAIL";
@@ -221,13 +221,13 @@ namespace SmartLinks.Models
             return ret;
         }
 
-        private static Dictionary<string, bool> LoadBIInfo(string sncond,Controller ctrl)
+        private static Dictionary<string, string> LoadBIInfo(string sncond,Controller ctrl)
         {
             var syscfg = CfgUtility.GetSysConfig(ctrl);
             var dblist = syscfg["CWDM4BIDATABASE"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
-            var ret = new Dictionary<string, bool>();
-            var sql = "select distinct SerialNumber from [BurnInG3].[dbo].[BIDutSummary] where SerialNumber in <sncond>";
+            var ret = new Dictionary<string, string>();
+            var sql = "select distinct SerialNumber,TestCost_Time from [BurnInG3].[dbo].[BIDutSummary] where SerialNumber in <sncond> and TestCost_Time <> 0";
             sql = sql.Replace("<sncond>",sncond);
             foreach (var db in dblist)
             {
@@ -237,19 +237,23 @@ namespace SmartLinks.Models
                     try
                     {
                         var sn = Convert.ToString(line[0]);
+                        var testcost = "";
+                        if (line[1] != null)
+                        { testcost = Math.Round((double)Convert.ToInt32(line[1]) / 3600.0, 1).ToString(); }
+
                         if (!ret.ContainsKey(sn))
-                        { ret.Add(sn, true); }
+                        { ret.Add(sn, testcost); }
                     }
                     catch (Exception ex) { }
                 }
             }
 
-            var pbidict = ExternalDataCollector.LoadParallelBIData(ctrl);
-            foreach (var kv in pbidict)
-            {
-                if (!ret.ContainsKey(kv.Key))
-                { ret.Add(kv.Key, true); }
-            }
+            //var pbidict = ExternalDataCollector.LoadParallelBIData(ctrl);
+            //foreach (var kv in pbidict)
+            //{
+            //    if (!ret.ContainsKey(kv.Key))
+            //    { ret.Add(kv.Key, true); }
+            //}
             return ret;
         }
 
@@ -835,7 +839,7 @@ namespace SmartLinks.Models
                     { continue; }
                     if (bidict.ContainsKey(item.SN))
                     {
-                        item.IsBurnIned = "YES";
+                        item.IsBurnIned = bidict[item.SN];
                     }
                 }
 
