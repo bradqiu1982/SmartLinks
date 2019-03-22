@@ -396,6 +396,7 @@ namespace SmartLinks.Controllers
             List<string> snlist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
             var cwdm4list = CWDM4Data.LoadCWDM4Info(snlist,this);
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new {
                 cwdm4list = cwdm4list
             };
@@ -413,6 +414,7 @@ namespace SmartLinks.Controllers
             List<string> snlist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
             var cwdm4list = CWDM4Data.QueryWL(snlist, this);
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new
             {
                 cwdm4list = cwdm4list
@@ -467,6 +469,7 @@ namespace SmartLinks.Controllers
             List<string> wlist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
             var waferdatalist = WaferStatusVM.RetrieveData(wlist);
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new
             {
                 waferdatalist = waferdatalist
@@ -486,6 +489,7 @@ namespace SmartLinks.Controllers
             List<string> wlist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
             var sndatalist = SNProVM.RetrieveWorkFlowData(wlist);
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new
             {
                 sndatalist = sndatalist
@@ -499,6 +503,7 @@ namespace SmartLinks.Controllers
             List<string> wlist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
             var sndatalist = SNProVM.RetrieveTestFlowData(wlist);
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new
             {
                 sndatalist = sndatalist

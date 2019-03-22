@@ -153,6 +153,7 @@ namespace SmartLinks.Controllers
             }
 
             var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new { sucess = true,
                              data = wafertable,
                              waferdup = waferdup
