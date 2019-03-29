@@ -511,6 +511,26 @@ namespace SmartLinks.Controllers
             return ret;
         }
 
+        public ActionResult JOWorkFlow()
+        {
+            return View();
+        }
+
+        public JsonResult JOWorkFlowData()
+        {
+            var marks = Request.Form["marks"];
+            List<string> jolist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
+            var jdatalist = JODetailVM.LoadData(jolist);
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new
+            {
+                jdatalist = jdatalist
+            };
+            return ret;
+        }
+
+
         //public ActionResult LoadDieSortFile()
         //{
         //    ExternalDataCollector.LoadDieSortFile(this);
