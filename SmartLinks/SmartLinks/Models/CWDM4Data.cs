@@ -291,110 +291,139 @@ namespace SmartLinks.Models
         }
 
 
-        private static List<Dictionary<string, string>> LoadQtTraceViewData(List<string> snlist,Controller ctrl)
+        //private static List<Dictionary<string, string>> LoadQtTraceViewData(List<string> snlist,Controller ctrl)
+        //{
+        //    var fwdict = new Dictionary<string, string>();
+        //    var pwrdict = new Dictionary<string, string>();
+        //    var stationlist = CfgUtility.GetSysConfig(ctrl)["CWDM4QUICKTESTSTATION"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+        //    foreach (var station in stationlist)
+        //    {
+        //        var filelist = TraceViewVM.LoadAllTraceView2Local(station, snlist, "QUICKTEST", ctrl);
+        //        if (filelist.Count > 0)
+        //        {
+        //            filelist.Sort(delegate (string obj1, string obj2)
+        //            {
+        //                var time1 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj1));
+        //                var time2 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj2));
+        //                return time2.CompareTo(time1);
+        //            });
+
+        //            foreach (var f in filelist)
+        //            {
+        //                var currentsn = "";
+        //                foreach (var tempsn in snlist)
+        //                {
+        //                    if (f.ToUpper().Contains(tempsn))
+        //                    {
+        //                        currentsn = tempsn;
+        //                        break;
+        //                    }
+        //                }
+
+        //                if (string.IsNullOrEmpty(currentsn))
+        //                { continue; }
+
+        //                if (fwdict.ContainsKey(currentsn))
+        //                { continue; }
+
+        //                var allline = System.IO.File.ReadAllLines(f);
+        //                foreach (var l in allline)
+        //                {
+        //                    if (l.ToUpper().Contains("Firmware Version:".ToUpper()) || l.ToUpper().Contains("QSFP28_eCWDM FW Rev".ToUpper()))
+        //                    {
+
+        //                        var fws = l.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+        //                        if (!fwdict.ContainsKey(currentsn))
+        //                        {
+        //                            fwdict.Add(currentsn, fws[fws.Length - 1].Replace("<", "").Replace(">", "").Replace("(", "").Replace(")", ""));
+        //                        }
+        //                        break;
+        //                    }
+        //                }
+
+        //                //var temppwr = "";
+        //                //foreach (var l in allline)
+        //                //{
+        //                //    if (l.ToUpper().Contains("ModuleTxPower".ToUpper()) && l.Contains("] --- "))
+        //                //    {
+        //                //        var fws = l.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+        //                //        temppwr += fws[fws.Length - 1].Replace("<", "").Replace(">", "").Replace("(", "").Replace(")", "")+",";
+        //                //    }
+        //                //}
+        //                //if (!string.IsNullOrEmpty(temppwr) && !pwrdict.ContainsKey(currentsn)) {
+        //                //    pwrdict.Add(currentsn, temppwr);
+        //                //}
+        //            }
+        //        }//end if
+        //    }
+
+        //    var ret = new List<Dictionary<string, string>>();
+        //    ret.Add(fwdict);
+        //    ret.Add(pwrdict);
+        //    return ret;
+        //}
+
+
+
+        //private static string LoadFWData2(string sn, Controller ctrl)
+        //{
+        //    var ret = "";
+        //    var stationlist = CfgUtility.GetSysConfig(ctrl)["CWDM4QUICKTESTSTATION"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+        //    foreach (var station in stationlist)
+        //    {
+        //            var filelist = TraceViewVM.LoadAllTraceView2Local(station, sn, "QUICKTEST", ctrl);
+        //            if (filelist.Count > 0)
+        //            {
+        //                filelist.Sort(delegate (string obj1, string obj2) {
+        //                    var time1 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj1));
+        //                    var time2 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj2));
+        //                    return time2.CompareTo(time1);
+        //                });
+
+        //                foreach (var f in filelist)
+        //                {
+        //                    var allline = System.IO.File.ReadAllLines(f);
+        //                    foreach (var l in allline)
+        //                    {
+        //                        if (l.ToUpper().Contains("Firmware Version:".ToUpper()) || l.ToUpper().Contains("QSFP28_eCWDM FW Rev".ToUpper()))
+        //                        {
+        //                            var fws = l.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+        //                            ret = fws[fws.Length - 1].Replace("<", "").Replace(">", "").Replace("(", "").Replace(")", "");
+        //                            return ret;
+        //                        }
+        //                    }
+        //                }
+        //            }//end if
+
+        //    }//end foreach
+
+        //    return ret;
+        //}
+
+        private static List<Dictionary<string, string>> LoadFWData(List<string> snlist, Controller ctrl)
         {
             var fwdict = new Dictionary<string, string>();
             var pwrdict = new Dictionary<string, string>();
-            var stationlist = CfgUtility.GetSysConfig(ctrl)["CWDM4QUICKTESTSTATION"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            foreach (var station in stationlist)
+
+            var sncond = "('" + string.Join("','", snlist) + "')";
+
+            var sql = @"select dc.ModuleSerialNum,dce.ModuleFwVersion from InSiteDB.insite.dc_QuickTest (nolock) dc 
+                    left join InSiteDB.insite.dce_QuickTest_main (nolock) dce on dc.dc_QuickTestHistoryId = dce.ParentHistoryId
+                    where dc.ModuleSerialNum in <sncond> and dce.ModuleFwVersion is not null order by dc.TestTimeStamp desc";
+            sql = sql.Replace("<sncond>", sncond);
+
+            var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+            foreach (var line in dbret)
             {
-                var filelist = TraceViewVM.LoadAllTraceView2Local(station, snlist, "QUICKTEST", ctrl);
-                if (filelist.Count > 0)
-                {
-                    filelist.Sort(delegate (string obj1, string obj2)
-                    {
-                        var time1 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj1));
-                        var time2 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj2));
-                        return time2.CompareTo(time1);
-                    });
-
-                    foreach (var f in filelist)
-                    {
-                        var currentsn = "";
-                        foreach (var tempsn in snlist)
-                        {
-                            if (f.ToUpper().Contains(tempsn))
-                            {
-                                currentsn = tempsn;
-                                break;
-                            }
-                        }
-
-                        if (string.IsNullOrEmpty(currentsn))
-                        { continue; }
-
-                        if (fwdict.ContainsKey(currentsn))
-                        { continue; }
-
-                        var allline = System.IO.File.ReadAllLines(f);
-                        foreach (var l in allline)
-                        {
-                            if (l.ToUpper().Contains("Firmware Version:".ToUpper()) || l.ToUpper().Contains("QSFP28_eCWDM FW Rev".ToUpper()))
-                            {
-
-                                var fws = l.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                                if (!fwdict.ContainsKey(currentsn))
-                                {
-                                    fwdict.Add(currentsn, fws[fws.Length - 1].Replace("<", "").Replace(">", "").Replace("(", "").Replace(")", ""));
-                                }
-                                break;
-                            }
-                        }
-
-                        //var temppwr = "";
-                        //foreach (var l in allline)
-                        //{
-                        //    if (l.ToUpper().Contains("ModuleTxPower".ToUpper()) && l.Contains("] --- "))
-                        //    {
-                        //        var fws = l.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                        //        temppwr += fws[fws.Length - 1].Replace("<", "").Replace(">", "").Replace("(", "").Replace(")", "")+",";
-                        //    }
-                        //}
-                        //if (!string.IsNullOrEmpty(temppwr) && !pwrdict.ContainsKey(currentsn)) {
-                        //    pwrdict.Add(currentsn, temppwr);
-                        //}
-                    }
-                }//end if
+                var sn = Convert.ToString(line[0]);
+                var fw = Convert.ToString(line[1]);
+                if (!fwdict.ContainsKey(sn))
+                { fwdict.Add(sn, fw); }
             }
 
             var ret = new List<Dictionary<string, string>>();
             ret.Add(fwdict);
             ret.Add(pwrdict);
-            return ret;
-        }
-
-        private static string LoadFWData2(string sn, Controller ctrl)
-        {
-            var ret = "";
-            var stationlist = CfgUtility.GetSysConfig(ctrl)["CWDM4QUICKTESTSTATION"].Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-            foreach (var station in stationlist)
-            {
-                    var filelist = TraceViewVM.LoadAllTraceView2Local(station, sn, "QUICKTEST", ctrl);
-                    if (filelist.Count > 0)
-                    {
-                        filelist.Sort(delegate (string obj1, string obj2) {
-                            var time1 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj1));
-                            var time2 = DateTime.Parse(TraceViewVM.RetrieveTimeFromTraceViewName(obj2));
-                            return time2.CompareTo(time1);
-                        });
-
-                        foreach (var f in filelist)
-                        {
-                            var allline = System.IO.File.ReadAllLines(f);
-                            foreach (var l in allline)
-                            {
-                                if (l.ToUpper().Contains("Firmware Version:".ToUpper()) || l.ToUpper().Contains("QSFP28_eCWDM FW Rev".ToUpper()))
-                                {
-                                    var fws = l.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                                    ret = fws[fws.Length - 1].Replace("<", "").Replace(">", "").Replace("(", "").Replace(")", "");
-                                    return ret;
-                                }
-                            }
-                        }
-                    }//end if
-
-            }//end foreach
-
             return ret;
         }
 
@@ -871,7 +900,7 @@ namespace SmartLinks.Models
                 ExternalDataCollector.LoadORLData(retdata,ctrl);
 
                 //load FW
-                var traceviewdata = LoadQtTraceViewData(cwdm4list, ctrl);
+                var traceviewdata = LoadFWData(cwdm4list, ctrl);
                 var FWDict = traceviewdata[0];
                 foreach (var item in retdata)
                 {
