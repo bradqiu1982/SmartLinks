@@ -530,6 +530,24 @@ namespace SmartLinks.Controllers
             return ret;
         }
 
+        public ActionResult SNLatestStatus()
+        {
+            return View();
+        }
+
+        public JsonResult SNStatusData()
+        {
+            var marks = Request.Form["marks"];
+            List<string> snlist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
+            var sndatalist = JODetailVM.LoadSNData(snlist);
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new
+            {
+                sndatalist = sndatalist
+            };
+            return ret;
+        }
 
         //public ActionResult LoadDieSortFile()
         //{

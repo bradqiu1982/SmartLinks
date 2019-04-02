@@ -26,60 +26,60 @@ namespace SmartLinks.Models
             }
         }
 
-        private static void SolveDieSortFile(string diefile, string desfolder)
-        {
-            try
-            {
-                var doc = new XmlDocument();
-                doc.Load(diefile);
-                var namesp = doc.DocumentElement.GetAttribute("xmlns");
-                doc = StripNamespace(doc);
+        //private static void SolveDieSortFile(string diefile, string desfolder)
+        //{
+        //    try
+        //    {
+        //        var doc = new XmlDocument();
+        //        doc.Load(diefile);
+        //        var namesp = doc.DocumentElement.GetAttribute("xmlns");
+        //        doc = StripNamespace(doc);
 
-                XmlElement root = doc.DocumentElement;
-                var nodes = root.SelectNodes("//BinDefinition[@BinQuality='Pass']");
-                foreach (XmlElement nd in nodes)
-                {
-                    nd.SetAttribute("BinCount", "666");
-                }
+        //        XmlElement root = doc.DocumentElement;
+        //        var nodes = root.SelectNodes("//BinDefinition[@BinQuality='Pass']");
+        //        foreach (XmlElement nd in nodes)
+        //        {
+        //            nd.SetAttribute("BinCount", "666");
+        //        }
 
-                foreach (XmlElement nd in root.SelectNodes("//BinCode[@X='240' and @Y='74']"))
-                {
-                    nd.ParentNode.RemoveChild(nd);
-                    //System.Windows.MessageBox.Show(nd.InnerText);
-                }
+        //        foreach (XmlElement nd in root.SelectNodes("//BinCode[@X='240' and @Y='74']"))
+        //        {
+        //            nd.ParentNode.RemoveChild(nd);
+        //            //System.Windows.MessageBox.Show(nd.InnerText);
+        //        }
 
-                doc.DocumentElement.SetAttribute("xmlns", namesp);
-                doc.Save(Path.Combine(desfolder, Path.GetFileName(diefile) + ".NEW"));
+        //        doc.DocumentElement.SetAttribute("xmlns", namesp);
+        //        doc.Save(Path.Combine(desfolder, Path.GetFileName(diefile) + ".NEW"));
 
-                doc = new XmlDocument();
-                doc.Load(diefile);
-                doc.Save(Path.Combine(desfolder, Path.GetFileName(diefile)));
-            }
-            catch (Exception ex) { }
-        }
+        //        doc = new XmlDocument();
+        //        doc.Load(diefile);
+        //        doc.Save(Path.Combine(desfolder, Path.GetFileName(diefile)));
+        //    }
+        //    catch (Exception ex) { }
+        //}
 
-        public static void LoadDieSortFile(Controller ctrl)
-        {
-            var filetype = "DIESORT";
-            var syscfgdict = CfgUtility.GetSysConfig(ctrl);
-            var srcfolder = syscfgdict["DIESORTFOLDER"];
-            var desfolder = syscfgdict["DIESORTSHARE"];
-            var srcfiles = DirectoryEnumerateFiles(ctrl, srcfolder);
+        //public static void LoadDieSortFile(Controller ctrl)
+        //{
+        //    var filetype = "DIESORT";
+        //    var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+        //    var srcfolder = syscfgdict["DIESORTFOLDER"];
+        //    var desfolder = syscfgdict["DIESORTSHARE"];
+        //    var srcfiles = DirectoryEnumerateFiles(ctrl, srcfolder);
 
-            var loadedfiledict = FileLoadedData.LoadedFiles(filetype);
-            foreach (var srcf in srcfiles)
-            {
-                var srcfilename = Path.GetFileName(srcf);
-                if (loadedfiledict.ContainsKey(srcfilename))
-                { continue; }
-                var desfile = DownloadShareFile(srcf, ctrl);
-                if (desfile != null && FileExist(ctrl, desfile))
-                {
-                    //FileLoadedData.UpdateLoadedFile(srcfilename, filetype);
-                    SolveDieSortFile(desfile, desfolder);
-                }
-            }
-        }
+        //    var loadedfiledict = FileLoadedData.LoadedFiles(filetype);
+        //    foreach (var srcf in srcfiles)
+        //    {
+        //        var srcfilename = Path.GetFileName(srcf);
+        //        if (loadedfiledict.ContainsKey(srcfilename))
+        //        { continue; }
+        //        var desfile = DownloadShareFile(srcf, ctrl);
+        //        if (desfile != null && FileExist(ctrl, desfile))
+        //        {
+        //            //FileLoadedData.UpdateLoadedFile(srcfilename, filetype);
+        //            SolveDieSortFile(desfile, desfolder);
+        //        }
+        //    }
+        //}
 
         public static Dictionary<string, string> LoadSHTOLData(Controller ctrl)
         {
