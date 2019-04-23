@@ -356,6 +356,88 @@ namespace SmartLinks.Models
             }
         }
 
+
+        private static SqlConnection GetDMRConnector()
+        {
+            var conn = new SqlConnection();
+            try
+            {
+                conn.ConnectionString = @"Server=wux-prod03\prod01;uid=OA_FAI_Reader;pwd=123_FAI_#;Database=eDMR;Connection Timeout=90;";
+                conn.Open();
+                return conn;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("fail to connect to the DMR pdms database:" + ex.Message);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("fail to connect to the DMR pdms database" + ex.Message);
+                return null;
+            }
+        }
+
+        public static List<List<object>> ExeDMRSqlWithRes(string sql, Dictionary<string, string> parameters = null)
+        {
+            var ret = new List<List<object>>();
+            var conn = GetDMRConnector();
+            try
+            {
+                if (conn == null)
+                    return ret;
+
+                var command = conn.CreateCommand();
+                command.CommandTimeout = 180;
+                command.CommandText = sql;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        SqlParameter parameter = new SqlParameter();
+                        parameter.ParameterName = param.Key;
+                        parameter.SqlDbType = SqlDbType.NVarChar;
+                        parameter.Value = param.Value;
+                        command.Parameters.Add(parameter);
+                    }
+                }
+                var sqlreader = command.ExecuteReader();
+                if (sqlreader.HasRows)
+                {
+
+                    while (sqlreader.Read())
+                    {
+                        var newline = new List<object>();
+                        for (var i = 0; i < sqlreader.FieldCount; i++)
+                        {
+                            newline.Add(sqlreader.GetValue(i));
+                        }
+                        ret.Add(newline);
+                    }
+                }
+
+                sqlreader.Close();
+                CloseConnector(conn);
+                return ret;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+        }
+
+
+
         private static SqlConnection GetRealMESConnector()
         {
             var conn = new SqlConnection();

@@ -214,6 +214,7 @@
     <Compile Include="Models\CookieUtility.cs" />
     <Compile Include="Models\CWDM4Data.cs" />
     <Compile Include="Models\DBUtility.cs" />
+    <Compile Include="Models\DMRSNVM.cs" />
     <Compile Include="Models\EmailUtility.cs" />
     <Compile Include="Models\ExcelReader.cs" />
     <Compile Include="Models\ExternalDataCollector.cs" />
@@ -411,6 +412,7 @@
     <Content Include="Scripts\datatables\buttons.html5.min.js" />
     <Content Include="Scripts\datatables\dataTables.buttons.min.js" />
     <Content Include="Scripts\datatables\jszip.min.js" />
+    <Content Include="Scripts\dmr.js" />
     <Content Include="Scripts\exam.js" />
     <Content Include="Scripts\highcharts-more.js" />
     <Content Include="Scripts\highcharts.js" />
@@ -492,6 +494,7 @@
     <Content Include="Views\SmartLinks\SNProgress.cshtml" />
     <Content Include="Views\SmartLinks\JOWorkFlow.cshtml" />
     <Content Include="Views\SmartLinks\SNLatestStatus.cshtml" />
+    <Content Include="Views\SmartLinks\DMRTrace.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

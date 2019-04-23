@@ -549,11 +549,63 @@ namespace SmartLinks.Controllers
             return ret;
         }
 
-        //public ActionResult LoadDieSortFile()
-        //{
-        //    ExternalDataCollector.LoadDieSortFile(this);
-        //    return View("All");
-        //}
+        public ActionResult DMRTrace()
+        {
+            return View();
+        }
+
+        public JsonResult LoadDRMProLine()
+        {
+            var prodlist = CfgUtility.GetSysConfig(this)["DMRTRACEPRODUCTLINES"].Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new {
+                prodlist = prodlist
+            };
+            return ret;
+        }
+
+        public JsonResult DMRWIPData()
+        {
+            var prodline = Request.Form["prodline"];
+            DMRSNVM.UpdateDMRSNStatus(prodline,this);
+
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new
+            {
+            };
+            return ret;
+        }
+
+        public JsonResult DMRTRACEData()
+        {
+            var prodline = Request.Form["prodline"];
+
+            var startdate = DateTime.Now;
+            var enddate = DateTime.Now;
+            var sdate = DateTime.Parse(Request.Form["sdate"]);
+            var edate = DateTime.Parse(Request.Form["edate"]);
+            if (sdate < edate)
+            {
+                startdate = DateTime.Parse(sdate.ToString("yyyy-MM-dd") + " 00:00:00");
+                enddate = DateTime.Parse(edate.ToString("yyyy-MM-dd") + " 00:00:00").AddDays(1).AddSeconds(-1);
+            }
+            else
+            {
+                startdate = DateTime.Parse(edate.ToString("yyyy-MM-dd") + " 00:00:00");
+                enddate = DateTime.Parse(sdate.ToString("yyyy-MM-dd") + " 00:00:00").AddDays(1).AddSeconds(-1);
+            }
+
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new
+            {
+            };
+            return ret;
+        }
+
+
 
     }
 }

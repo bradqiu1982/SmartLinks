@@ -1,0 +1,72 @@
+﻿
+@{
+    ViewBag.Title = "DMRTrace";
+    Layout = "~/Views/Shared/_Layout4ProdLine.cshtml";
+}
+
+<script type="text/javascript" src="~/Scripts/dmr.js"></script>
+<script type="text/javascript">
+    $(function(){
+        DMR.init();
+    })
+</script>
+
+<div class="row" style="margin-top:10px;">
+    <div class="col-xs-12">
+        <div class="v-container">
+            <div class="v-filter">
+                <div class="row row-margin">
+                    <div class="col-xs-3"><input class="form-control" type="text" id="proline" name="proline" placeholder="Product Line" readonly="readonly"></div>
+                    <div class="col-xs-3">
+                        <div class="input-group date" data-date=""
+                             data-date-format="yyyy-mm-dd">
+                            <input type="text" class="form-control"
+                                   id="sdate" name="sdate" value="" placeholder="Start Date" readonly>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-th"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-xs-1 text-center">~</div>
+                    <div class="col-xs-3">
+                        <div class="input-group date" data-date=""
+                             data-date-format="yyyy-mm-dd">
+                            <input type="text" class="form-control"
+                                   id="edate" name="edate" value="" placeholder="End Date" readonly>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-th"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-xs-1 box-search">
+                        <input type="button" class="btn btn-success" name="btn-wip" id="btn-wip" value="WIP">
+                    </div>
+                    <div class="col-xs-1 box-search">
+                        <input type="button" class="btn btn-success" name="btn-trace" id="btn-trace" value="Trace">
+                    </div>
+                </div>
+            </div>
+            <div class="v-content">
+                <table class="table table-hover  table-condensed table-striped" id="dmrdisttable" style="margin-top:1%">
+                    <caption class="tb-caption">DMR Distribution</caption>
+                    <thead id="dmrdisthead"></thead>
+                    <tbody id="dmrdistcontent"></tbody>
+                </table>
+            </div>
+            <div class="v-content">
+                <table class="table table-hover  table-condensed table-striped" id="dmrsumtable" style="margin-top:1%">
+                    <caption class="tb-caption">DMR Summary</caption>
+                    <thead id="dmrsumhead"></thead>
+                    <tbody id="dmrsumcontent"></tbody>
+                </table>
+            </div>
+            <div class="v-content">
+                <table class="table table-hover  table-condensed table-striped" id="dmrsntable" style="margin-top:1%">
+                    <caption class="tb-caption">DMR SN Trace</caption>
+                    <thead id="dmrsnhead"></thead>
+                    <tbody id="dmrsncontent"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

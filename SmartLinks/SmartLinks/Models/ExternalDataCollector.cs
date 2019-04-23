@@ -190,7 +190,7 @@ namespace SmartLinks.Models
             }
         }
 
-        private static bool FileExist(Controller ctrl, string filename)
+        public static bool FileExist(Controller ctrl, string filename)
         {
             try
             {
@@ -300,7 +300,7 @@ namespace SmartLinks.Models
             }
         }
 
-        private static List<List<string>> RetrieveDataFromExcelWithAuth(Controller ctrl, string filename, string sheetname = null, int columns = 101)
+        public static List<List<string>> RetrieveDataFromExcelWithAuth(Controller ctrl, string filename, string sheetname = null, int columns = 101)
         {
             try
             {
