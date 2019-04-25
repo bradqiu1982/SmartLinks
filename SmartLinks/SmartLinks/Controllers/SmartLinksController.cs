@@ -565,15 +565,46 @@ namespace SmartLinks.Controllers
             return ret;
         }
 
+        private List<DMRSNVM> ModuleDistribution(List<DMRSNVM> srcdata)
+        {
+            var stepdict = new Dictionary<string, int>();
+            foreach (var item in srcdata)
+            {
+                if (stepdict.ContainsKey(item.WorkFlowStep))
+                { stepdict[item.WorkFlowStep] += 1;}
+                else
+                { stepdict.Add(item.WorkFlowStep, 1); }
+            }
+
+            var ret = new List<DMRSNVM>();
+            foreach (var kv in stepdict)
+            {
+                var tempvm = new DMRSNVM();
+                tempvm.WorkFlowStep = kv.Key;
+                tempvm.ModuleCount = kv.Value;
+                ret.Add(tempvm);
+            }
+
+            ret.Sort(delegate (DMRSNVM obj1, DMRSNVM obj2)
+            {
+                return obj2.ModuleCount.CompareTo(obj1.ModuleCount);
+            });
+
+            return ret;
+        } 
+        
         public JsonResult DMRWIPData()
         {
             var prodline = Request.Form["prodline"];
-            DMRSNVM.UpdateDMRSNStatus(prodline,this);
+            var dmrdata = DMRSNVM.RetrieveDMRSNData(prodline,null,null,this);
+            var moduledist = ModuleDistribution(dmrdata);
 
             var ret = new JsonResult();
             ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new
             {
+                moduledist = moduledist,
+                dmrdata = dmrdata
             };
             return ret;
         }
@@ -596,15 +627,32 @@ namespace SmartLinks.Controllers
                 startdate = DateTime.Parse(edate.ToString("yyyy-MM-dd") + " 00:00:00");
                 enddate = DateTime.Parse(sdate.ToString("yyyy-MM-dd") + " 00:00:00").AddDays(1).AddSeconds(-1);
             }
+            var dmrdata = DMRSNVM.RetrieveDMRSNData(prodline,startdate.ToString("yyyy-MM-dd HH:mm:ss")
+                ,enddate.ToString("yyyy-MM-dd HH:mm:ss"), this);
+            var moduledist = ModuleDistribution(dmrdata);
 
             var ret = new JsonResult();
             ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new
             {
+                moduledist = moduledist,
+                dmrdata = dmrdata
             };
             return ret;
         }
 
+        public JsonResult SNWholeWorkFlow()
+        {
+            var sn = Request.Form["sn"];
+            var snworkflowlist = DMRSNVM.RetrieveSNWorkFlow(sn);
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new
+            {
+                snworkflowlist = snworkflowlist
+            };
+            return ret;
+        }
 
 
     }
