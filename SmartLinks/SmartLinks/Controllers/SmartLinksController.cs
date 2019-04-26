@@ -567,13 +567,21 @@ namespace SmartLinks.Controllers
 
         private List<DMRSNVM> ModuleDistribution(List<DMRSNVM> srcdata)
         {
-            var stepdict = new Dictionary<string, int>();
+            var stepdict = new Dictionary<string, DMRSNVM>();
             foreach (var item in srcdata)
             {
                 if (stepdict.ContainsKey(item.WorkFlowStep))
-                { stepdict[item.WorkFlowStep] += 1;}
+                {
+                    stepdict[item.WorkFlowStep].ModuleCount += 1;
+                    stepdict[item.WorkFlowStep].WorkFlow = item.WorkFlow;
+                }
                 else
-                { stepdict.Add(item.WorkFlowStep, 1); }
+                {
+                    var tempvm = new DMRSNVM();
+                    tempvm.WorkFlow = item.WorkFlow;
+                    tempvm.ModuleCount = 1;
+                    stepdict.Add(item.WorkFlowStep, tempvm);
+                }
             }
 
             var ret = new List<DMRSNVM>();
@@ -581,7 +589,8 @@ namespace SmartLinks.Controllers
             {
                 var tempvm = new DMRSNVM();
                 tempvm.WorkFlowStep = kv.Key;
-                tempvm.ModuleCount = kv.Value;
+                tempvm.WorkFlow = kv.Value.WorkFlow;
+                tempvm.ModuleCount = kv.Value.ModuleCount;
                 ret.Add(tempvm);
             }
 

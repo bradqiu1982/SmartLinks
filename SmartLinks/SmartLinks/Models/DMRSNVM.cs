@@ -185,6 +185,8 @@ namespace SmartLinks.Models
                         and hml.MfgDate is not null order by SerialName,hml.MfgDate asc";
                 sql = sql.Replace("<sncond>", sncond);
                 dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+
+                var previousstep = new DMRSNVM();
                 foreach (var l in dbret)
                 {
                     try
@@ -194,11 +196,13 @@ namespace SmartLinks.Models
                         var ustep = step.ToUpper();
                         var dt = Convert.ToDateTime(l[2]).ToString("yyyy-MM-dd HH:mm:ss");
 
-                        if (string.IsNullOrEmpty(snstepdict[sn].DMRStoreStep)
-                            && !(ustep.Contains("EQ") && ustep.Contains("INVENTORY")))
+
+                        if (!string.IsNullOrEmpty(snstepdict[sn].DMRRepairStep)
+                            && snstepdict[sn].DMRRepairStep.ToUpper().Contains("COMPONENTS")
+                           && snstepdict[sn].DMRRepairStep.ToUpper().Contains("REMOVE"))
                         {
-                            snstepdict[sn].DMRStartStep = step;
-                            snstepdict[sn].DMRStartTime = dt;
+                            snstepdict[sn].DMRRepairStep = step;
+                            //snstepdict[sn].DMRRepairTime = dt;
                         }
 
                         if (!string.IsNullOrEmpty(snstepdict[sn].DMRStoreStep) 
@@ -209,8 +213,8 @@ namespace SmartLinks.Models
                         }
 
                         if (!string.IsNullOrEmpty(snstepdict[sn].DMRStoreStep)
-                            && string.IsNullOrEmpty(snstepdict[sn].DMRReturnStep)
-                            && ustep.Contains("MAIN") && ustep.Contains("STORE"))
+                            && ustep.Contains("MAIN") && ustep.Contains("STORE")
+                            && string.IsNullOrEmpty(snstepdict[sn].DMRReturnStep))
                         {
                             snstepdict[sn].DMRReturnStep = step;
                             snstepdict[sn].DMRReturnTime = dt;
@@ -220,8 +224,22 @@ namespace SmartLinks.Models
                         {
                             snstepdict[sn].DMRStoreStep = step;
                             snstepdict[sn].DMRStoreTime = dt;
+
+                            snstepdict[sn].DMRRepairStep = "";
+                            snstepdict[sn].DMRRepairTime = "";
+                            snstepdict[sn].DMRReturnStep = "";
+                            snstepdict[sn].DMRReturnTime = "";
+
+                            if (string.Compare(previousstep.SN, sn) == 0 && !string.IsNullOrEmpty(previousstep.DMRStartStep))
+                            {
+                                snstepdict[sn].DMRStartStep = previousstep.DMRStartStep;
+                                snstepdict[sn].DMRStartTime = previousstep.DMRStartTime;
+                            }
                         }
 
+                        previousstep.SN = sn;
+                        previousstep.DMRStartStep = step;
+                        previousstep.DMRStartTime = dt;
                     }
                     catch (Exception ex) { }
                 }//end foreach

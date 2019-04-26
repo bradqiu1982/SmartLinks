@@ -42,6 +42,7 @@
             $("#dmrdistcontent").empty();
 
             $("#dmrdisthead").append('<tr>' +
+                    '<th>WORK FLOW</th>' +
                     '<th>WORK FLOW STEP</th>' +
                     '<th>MODULE COUNT</th>' +
                     '</tr>');
@@ -49,6 +50,7 @@
 
             $.each(output.moduledist, function (i, val) {
                 var appendstr = '<tr>';
+                appendstr += '<td>' + val.WorkFlow + '</td>';
                 appendstr += '<td>' + val.WorkFlowStep + '</td>';
                 appendstr += '<td>' + val.ModuleCount + '</td>';
                 appendstr += '</tr>';
