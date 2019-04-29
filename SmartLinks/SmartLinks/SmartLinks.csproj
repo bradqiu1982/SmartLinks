@@ -289,6 +289,7 @@
     <Content Include="Content\images\data.png" />
     <Content Include="Content\images\DIESORT.png" />
     <Content Include="Content\images\distribution.png" />
+    <Content Include="Content\images\DMRICON.png" />
     <Content Include="Content\images\Domino.png" />
     <Content Include="Content\images\ERP.png" />
     <Content Include="Content\images\etc.png" />
@@ -309,6 +310,7 @@
     <Content Include="Content\images\ie8\data.png" />
     <Content Include="Content\images\ie8\DIESORT.png" />
     <Content Include="Content\images\ie8\distribution.png" />
+    <Content Include="Content\images\ie8\DMRICON.png" />
     <Content Include="Content\images\ie8\Domino.png" />
     <Content Include="Content\images\ie8\ERP.png" />
     <Content Include="Content\images\ie8\etc.png" />
