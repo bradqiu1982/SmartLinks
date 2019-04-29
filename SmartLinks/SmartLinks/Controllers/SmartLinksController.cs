@@ -600,19 +600,58 @@ namespace SmartLinks.Controllers
             });
 
             return ret;
-        } 
-        
+        }
+
+        private List<DMRSNVM> DMRStatusSum(List<DMRSNVM> srcdata)
+        {
+            var ret = new List<DMRSNVM>();
+
+            var dmrdict = new Dictionary<string, DMRSNVM>();
+            foreach (var item in srcdata)
+            {
+                if (dmrdict.ContainsKey(item.DMRID))
+                {
+                    dmrdict[item.DMRID].ModuleCount += 1;
+                }
+                else
+                {
+                    var tempvm = new DMRSNVM();
+                    tempvm.DMRID = item.DMRID;
+                    tempvm.DMRDate = item.DMRDate;
+                    tempvm.DMROAStep = item.DMROAStep;
+                    tempvm.DMROAStatus = item.DMROAStatus;
+                    tempvm.ModuleCount = 1;
+
+                    dmrdict.Add(item.DMRID, tempvm);
+                }
+            }
+
+            if (dmrdict.Count > 0)
+            {
+                ret = dmrdict.Values.ToList();
+                ret.Sort(delegate (DMRSNVM obj1, DMRSNVM obj2)
+                {
+                    return obj1.DMRID.CompareTo(obj2.DMRID);
+                });
+            }
+
+            return ret;
+        }
+
+
         public JsonResult DMRWIPData()
         {
             var prodline = Request.Form["prodline"];
             var dmrdata = DMRSNVM.RetrieveDMRSNData(prodline,null,null,this);
             var moduledist = ModuleDistribution(dmrdata);
+            var dmrstatuslist = DMRStatusSum(dmrdata);
 
             var ret = new JsonResult();
             ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new
             {
                 moduledist = moduledist,
+                dmrstatuslist = dmrstatuslist,
                 dmrdata = dmrdata
             };
             return ret;
@@ -639,12 +678,14 @@ namespace SmartLinks.Controllers
             var dmrdata = DMRSNVM.RetrieveDMRSNData(prodline,startdate.ToString("yyyy-MM-dd HH:mm:ss")
                 ,enddate.ToString("yyyy-MM-dd HH:mm:ss"), this);
             var moduledist = ModuleDistribution(dmrdata);
+            var dmrstatuslist = DMRStatusSum(dmrdata);
 
             var ret = new JsonResult();
             ret.MaxJsonLength = Int32.MaxValue;
             ret.Data = new
             {
                 moduledist = moduledist,
+                dmrstatuslist = dmrstatuslist,
                 dmrdata = dmrdata
             };
             return ret;

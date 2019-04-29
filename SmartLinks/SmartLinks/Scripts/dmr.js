@@ -5,7 +5,7 @@
         $('.date').datepicker({ autoclose: true, pickerPosition: "bottom-left", changeMonth: true,changeYear: true });
 
         var dmrdisttable = null;
-        //var dmrsumtable = null;
+        var dmroatable = null;
         var dmrsntable = null;
         var snworkflowtable = null;
 
@@ -58,9 +58,9 @@
             });
 
             dmrdisttable = $('#dmrdisttable').DataTable({
-                'iDisplayLength': 50,
-                'aLengthMenu': [[20, 50, 100, -1],
-                [20, 50, 100, "All"]],
+                'iDisplayLength': 10,
+                'aLengthMenu': [[10,20, 50, 100, -1],
+                [10,20, 50, 100, "All"]],
                 "columnDefs": [
                     { "className": "dt-center", "targets": "_all" }
                 ],
@@ -70,6 +70,47 @@
                 buttons: ['copyHtml5', 'csv', 'excelHtml5']
             });
 
+
+
+            if (dmroatable) {
+                dmroatable.destroy();
+                dmroatable = null;
+            }
+            $("#dmroahead").empty();
+            $("#dmroacontent").empty();
+
+            $("#dmroahead").append('<tr>' +
+                    '<th>DMR</th>' +
+                    '<th>DMR DATE</th>' +
+                    '<th>OA STEP</th>' +
+                    '<th>OA STATUS</th>' +
+                    '<th>MODULE COUNT</th>' +
+                    '</tr>');
+
+
+            $.each(output.dmrstatuslist, function (i, val) {
+                var appendstr = '<tr>';
+                appendstr += '<td>' + val.DMRID + '</td>';
+                appendstr += '<td>' + val.DMRDate + '</td>';
+                appendstr += '<td>' + val.DMROAStep + '</td>';
+                appendstr += '<td>' + val.DMROAStatus + '</td>';
+                appendstr += '<td>' + val.ModuleCount + '</td>';
+                appendstr += '</tr>';
+                $("#dmroacontent").append(appendstr);
+            });
+
+            dmroatable = $('#dmroatable').DataTable({
+                'iDisplayLength': 10,
+                'aLengthMenu': [[10,20, 50, 100, -1],
+                [10,20, 50, 100, "All"]],
+                "columnDefs": [
+                    { "className": "dt-center", "targets": "_all" }
+                ],
+                "aaSorting": [],
+                "order": [],
+                dom: 'lBfrtip',
+                buttons: ['copyHtml5', 'csv', 'excelHtml5']
+            });
 
 
 
