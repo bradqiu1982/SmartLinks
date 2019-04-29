@@ -85,11 +85,13 @@ namespace SmartLinks.Models
 
         }
 
-        private static void UpdateSNStatus(string prodline)
+        private static Dictionary<string, DMRSNVM> UpdateSNStatus(string prodline)
         {
+            var ret = new Dictionary<string, DMRSNVM>();
+
             var dict = new Dictionary<string, string>();
             dict.Add("@DMRProdLine", prodline);
-            var sql = "select distinct SN FROM DMRSNVM where SNStatus <> 'SCRAP' and SNStatus <> 'CLOSED' and DMRProdLine=@DMRProdLine";
+            var sql = "select distinct SN FROM DMRSNVM where SNStatus <> 'SCRAP' and SNStatus <> 'CLOSED'  and DMROAStatus <> 'X'  and DMRProdLine=@DMRProdLine";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql,dict);
             var snlist = new List<string>();
 
@@ -115,7 +117,7 @@ namespace SmartLinks.Models
 	                        END 
 	                        END
 	                        END SNStatus ,jo.MfgOrderName
-                        ,pb.ProductName,wb.WorkflowName CRTWFName,ws.WorkflowStepName CRTWFStepName
+                        ,pb.ProductName,wb.WorkflowName CRTWFName,ws.WorkflowStepName CRTWFStepName,c.LastActivityDateGMT
                             from InsiteDB.insite.Container (nolock) c
                         left join InsiteDB.insite.MfgOrder (nolock) jo on c.MfgOrderId = jo.MfgOrderId
                         left join InsiteDB.insite.CurrentStatus (nolock) cs on c.CurrentStatusId = cs.CurrentStatusId
@@ -131,13 +133,17 @@ namespace SmartLinks.Models
                 foreach (var l in dbret)
                 {
                     var tempvm = new DMRSNVM();
-                    tempvm.SN = O2S(l[0]);
+                    tempvm.SN = O2S(l[0]).ToUpper().Trim();
                     tempvm.SNStatus = O2S(l[1]);
                     tempvm.JO = O2S(l[2]);
                     tempvm.PN = O2S(l[3]);
                     tempvm.WorkFlow = O2S(l[4]);
                     tempvm.WorkFlowStep = O2S(l[5]);
+                    tempvm.DMRDate = O2T(l[6]);
                     sninfo.Add(tempvm);
+
+                    if (!ret.ContainsKey(tempvm.SN))
+                    { ret.Add(tempvm.SN,tempvm); }
                 }
 
                 dict = new Dictionary<string, string>();
@@ -155,18 +161,20 @@ namespace SmartLinks.Models
                     DBUtility.ExeLocalSqlNoRes(sql, dict);
                 }
             }
+
+            return ret;
         }
 
-        private static void UpdateDMRStep(string prodline)
+        private static void UpdateDMRStep(string prodline, Dictionary<string, DMRSNVM> snlaststep)
         {
             var dict = new Dictionary<string, string>();
             dict.Add("@DMRProdLine", prodline);
-            var sql = "select distinct SN FROM DMRSNVM where DMRProdLine=@DMRProdLine and (DMRStartStep='' or DMRStoreStep='' or DMRRepairStep='' or DMRReturnStep='')";
+            var sql = "select distinct SN FROM DMRSNVM where DMRProdLine=@DMRProdLine  and DMROAStatus <> 'X'";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, dict);
             var snlist = new List<string>();
 
             foreach (var line in dbret)
-            { snlist.Add(Convert.ToString(line[0])); }
+            { snlist.Add(Convert.ToString(line[0]).ToUpper().Trim()); }
 
             if (snlist.Count > 0)
             {
@@ -175,6 +183,8 @@ namespace SmartLinks.Models
                 var snstepdict = new Dictionary<string, DMRSNVM>();
                 foreach (var s in snlist)
                 { snstepdict.Add(s, new DMRSNVM()); }
+
+                var snworkflowdict = new Dictionary<string, List<DMRSNVM>>();
 
                 sql = @"SELECT distinct c.ContainerName as SerialName,ws.WorkflowStepName ,hml.MfgDate
 		                    FROM InsiteDB.insite.container c with (nolock) 
@@ -186,26 +196,68 @@ namespace SmartLinks.Models
                 sql = sql.Replace("<sncond>", sncond);
                 dbret = DBUtility.ExeRealMESSqlWithRes(sql);
 
-                var previousstep = new DMRSNVM();
+                //split sn history workflowstep
                 foreach (var l in dbret)
                 {
                     try
                     {
-                        var sn = O2S(l[0]);
+                        var sn = O2S(l[0]).ToUpper().Trim();
                         var step = O2S(l[1]);
                         var ustep = step.ToUpper();
-                        var dt = Convert.ToDateTime(l[2]).ToString("yyyy-MM-dd HH:mm:ss");
+                        var dt = O2T(l[2]);
 
+                        var tempvm = new DMRSNVM();
+                        tempvm.SN = sn;
+                        tempvm.WorkFlowStep = step;
+                        tempvm.DMRDate = dt;
+
+                        if (snworkflowdict.ContainsKey(sn))
+                        {
+                            snworkflowdict[sn].Add(tempvm);
+                        }
+                        else
+                        {
+                            var templist = new List<DMRSNVM>();
+                            templist.Add(tempvm);
+                            snworkflowdict.Add(sn, templist);
+                        }
+                    }
+                    catch (Exception ex) { }
+                }//end foreach
+
+                //append current workflowstep
+                foreach (var wkv in snworkflowdict)
+                {
+                    if (snlaststep.ContainsKey(wkv.Key))
+                    {
+                        if (string.Compare(wkv.Value[wkv.Value.Count - 1].WorkFlowStep, snlaststep[wkv.Key].WorkFlowStep, true) != 0)
+                        {
+                            wkv.Value.Add(snlaststep[wkv.Key]);
+                        }
+                    }
+                }
+
+                //scan workflow step
+                foreach (var wkv in snworkflowdict)
+                {
+                    var previousstep = new DMRSNVM();
+
+                    foreach (var item in wkv.Value)
+                    {
+                        var sn = item.SN;
+                        var step = item.WorkFlowStep;
+                        var ustep = step.ToUpper();
+                        var dt = item.DMRDate;
 
                         if (!string.IsNullOrEmpty(snstepdict[sn].DMRRepairStep)
-                            && snstepdict[sn].DMRRepairStep.ToUpper().Contains("COMPONENTS")
-                           && snstepdict[sn].DMRRepairStep.ToUpper().Contains("REMOVE"))
+                                && snstepdict[sn].DMRRepairStep.ToUpper().Contains("COMPONENTS")
+                               && snstepdict[sn].DMRRepairStep.ToUpper().Contains("REMOVE"))
                         {
                             snstepdict[sn].DMRRepairStep = step;
                             //snstepdict[sn].DMRRepairTime = dt;
                         }
 
-                        if (!string.IsNullOrEmpty(snstepdict[sn].DMRStoreStep) 
+                        if (!string.IsNullOrEmpty(snstepdict[sn].DMRStoreStep)
                             && string.IsNullOrEmpty(snstepdict[sn].DMRRepairStep))
                         {
                             snstepdict[sn].DMRRepairStep = step;
@@ -240,8 +292,7 @@ namespace SmartLinks.Models
                         previousstep.SN = sn;
                         previousstep.DMRStartStep = step;
                         previousstep.DMRStartTime = dt;
-                    }
-                    catch (Exception ex) { }
+                    }//end foreach
                 }//end foreach
 
                 dict = new Dictionary<string, string>();
@@ -264,6 +315,47 @@ namespace SmartLinks.Models
                     DBUtility.ExeLocalSqlNoRes(sql, dict);
                 }
             }
+        }
+
+        private static void UpdateDMROAStatus(string prodline)
+        {
+            var dict = new Dictionary<string, string>();
+            dict.Add("@DMRProdLine", prodline);
+            var sql = "select distinct DMRID from DMRSNVM where DMRProdLine=@DMRProdLine and DMROAStatus <> 'C' and  DMROAStatus <> 'X'";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql,dict);
+            var dmridlist = new List<string>();
+            foreach (var l in dbret)
+            { dmridlist.Add(O2S(l[0])); }
+
+            if (dmridlist.Count > 0)
+            {
+                var oastatlist = new List<DMRSNVM>();
+
+                var dmridcond = "('" + string.Join("','", dmridlist) + "')";
+                sql = "SELECT distinct [DMR_ID],[Step_ID] ,[Status] FROM [eDMR].[dbo].[DMR_View_bk] where DMR_ID in <dmridcond>";
+                sql = sql.Replace("<dmridcond>", dmridcond);
+                dbret = DBUtility.ExeDMRSqlWithRes(sql);
+                foreach (var l in dbret)
+                {
+                    var tempvm = new DMRSNVM();
+                    tempvm.DMRID = O2S(l[0]);
+                    tempvm.DMROAStep = O2S(l[1]);
+                    tempvm.DMROAStatus = O2S(l[2]);
+                    oastatlist.Add(tempvm);
+                }
+
+                dict = new Dictionary<string, string>();
+                sql = @"update DMRSNVM set DMROAStep=@DMROAStep,DMROAStatus=@DMROAStatus where DMRID=@DMRID";
+                foreach (var oa in oastatlist)
+                {
+                    dict = new Dictionary<string, string>();
+                    dict.Add("@DMRID", oa.DMRID);
+                    dict.Add("@DMROAStep", oa.DMROAStep);
+                    dict.Add("@DMROAStatus", oa.DMROAStatus);
+                    DBUtility.ExeLocalSqlNoRes(sql, dict);
+                }
+            }
+            
         }
 
         private static string O2S(object obj)
@@ -297,8 +389,10 @@ namespace SmartLinks.Models
             if (ctrl.HttpContext.Cache.Get(prodline) == null)
             {
                 UpdateDMRSN(prodline,ctrl);
-                UpdateSNStatus(prodline);
-                UpdateDMRStep(prodline);
+                var snlaststep = UpdateSNStatus(prodline);
+                UpdateDMRStep(prodline,snlaststep);
+                UpdateDMROAStatus(prodline);
+
                 var cachehour = Convert.ToDouble(CfgUtility.GetSysConfig(ctrl)["DMRCACHEHOUR"]);
                 ctrl.HttpContext.Cache.Insert(prodline, "true", null, DateTime.Now.AddHours(cachehour), Cache.NoSlidingExpiration);
             }
@@ -316,7 +410,7 @@ namespace SmartLinks.Models
             {//period
                 sql = @"SELECT DMRID,DMRProdLine,DMRDate,DMRCreater,SN,SNFailure,SNStatus,JO,PN,WorkFlow,WorkFlowStep
                       ,DMRStartStep,DMRStartTime,DMRStoreStep,DMRStoreTime,DMRRepairStep,DMRRepairTime,DMRReturnStep
-                      ,DMRReturnTime FROM DMRSNVM where DMRProdLine = @DMRProdLine and DMRDate > @startdate and DMRDate < @enddate order by DMRDate asc,DMRID";
+                      ,DMRReturnTime,DMROAStep,DMROAStatus FROM DMRSNVM where DMRProdLine = @DMRProdLine and DMRDate > @startdate and DMRDate < @enddate and DMROAStatus <> 'X' order by DMRDate asc,DMRID";
                 dict.Add("@startdate", startdate);
                 dict.Add("@enddate", enddate);
             }
@@ -324,7 +418,7 @@ namespace SmartLinks.Models
             {//wip
                 sql = @"SELECT DMRID,DMRProdLine,DMRDate,DMRCreater,SN,SNFailure,SNStatus,JO,PN,WorkFlow,WorkFlowStep
                       ,DMRStartStep,DMRStartTime,DMRStoreStep,DMRStoreTime,DMRRepairStep,DMRRepairTime,DMRReturnStep
-                      ,DMRReturnTime FROM DMRSNVM where DMRProdLine = @DMRProdLine and  SNStatus <> 'SCRAP' and SNStatus <> 'CLOSED' order by DMRDate asc,DMRID";
+                      ,DMRReturnTime,DMROAStep,DMROAStatus FROM DMRSNVM where DMRProdLine = @DMRProdLine and  SNStatus <> 'SCRAP' and SNStatus <> 'CLOSED' and DMROAStatus <> 'X'  order by DMRDate asc,DMRID";
             }
 
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, dict);
@@ -332,7 +426,7 @@ namespace SmartLinks.Models
             {
                 ret.Add(new DMRSNVM(O2S(l[0]), O2S(l[1]), O2T(l[2]), O2S(l[3]), O2S(l[4]), O2S(l[5])
                     , O2S(l[6]), O2S(l[7]), O2S(l[8]), O2S(l[9]), O2S(l[10]), O2S(l[11])
-                    , O2S(l[12]), O2S(l[13]), O2S(l[14]), O2S(l[15]), O2S(l[16]), O2S(l[17]), O2S(l[18])));
+                    , O2S(l[12]), O2S(l[13]), O2S(l[14]), O2S(l[15]), O2S(l[16]), O2S(l[17]), O2S(l[18]),O2S(l[19]),O2S(l[20])));
             }
 
             return ret;
@@ -423,11 +517,14 @@ namespace SmartLinks.Models
             DMRRepairTime = "";
             DMRReturnStep = "";
             DMRReturnTime = "";
+
+            DMROAStep = "";
+            DMROAStatus = "";
         }
 
-        public DMRSNVM(string did,string dprod,string ddate,string dcrt,string sn,string snfail,string stat
+        public DMRSNVM(string did,string dprod,string ddate,string dcrt,string sn,string snfail,string snstat
             ,string jo,string pn,string wf,string step, string srtstep,string srttime
-            ,string dsrstep,string dsrtime,string drpstep,string drptime,string dretstep,string drettime)
+            ,string dsrstep,string dsrtime,string drpstep,string drptime,string dretstep,string drettime,string oastep,string oastat)
         {
             DMRID = did;
             DMRProdLine = dprod;
@@ -435,7 +532,7 @@ namespace SmartLinks.Models
             DMRCreater = dcrt;
             SN = sn;
             SNFailure = snfail;
-            SNStatus = stat;
+            SNStatus = snstat;
             JO = jo;
             PN = pn;
             WorkFlow = wf;
@@ -453,9 +550,12 @@ namespace SmartLinks.Models
             DMRReturnStep = dretstep;
             DMRReturnTime = drettime;
 
+            DMROAStep = oastep;
+            DMROAStatus = oastat;
+
             if (string.IsNullOrEmpty(DMRRepairStep)
                 && !string.IsNullOrEmpty(DMRStoreStep)
-                && !(WorkFlowStep.Contains("EQ") && WorkFlowStep.Contains("INVENTORY")))
+                && !(WorkFlowStep.ToUpper().Contains("EQ") && WorkFlowStep.ToUpper().Contains("INVENTORY")))
             {
                 DMRRepairStep = WorkFlowStep;
                 DMRRepairTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -468,6 +568,9 @@ namespace SmartLinks.Models
             {
                 try
                 {
+                    if (DateTime.Parse(s) > DateTime.Parse(e))
+                    { return string.Empty; }
+
                     return (DateTime.Parse(e) - DateTime.Parse(s)).Days.ToString();
                 }
                 catch (Exception ex) { }
@@ -498,6 +601,9 @@ namespace SmartLinks.Models
         public string DMRReturnTime { set; get; }
 
         public int ModuleCount { set; get; }
+
+        public string DMROAStep { set; get; }
+        public string DMROAStatus { set; get; }
 
         public string OASpend {
             get {

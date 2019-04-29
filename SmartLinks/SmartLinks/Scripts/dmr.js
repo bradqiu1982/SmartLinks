@@ -85,6 +85,8 @@
                     '<th>SN</th>' +
                     '<th>SN STAT</th>' +
                     '<th>DMR#</th>' +
+                    '<th>OA STEP</th>' +
+                    '<th>OA STATUS</th>' +
                     '<th>DMR START</th>' +
                     '<th>DMR RETURN</th>' +
                     '<th>FAILURE</th>' +
@@ -103,6 +105,8 @@
                 appendstr += '<td class="SNWORKFLOW" myid="' + val.SN + '"><strong>' + val.SN + '</strong></td>';
                 appendstr += '<td>' + val.SNStatus + '</td>';
                 appendstr += '<td>' + val.DMRID + '</td>';
+                appendstr += '<td>' + val.DMROAStep + '</td>';
+                appendstr += '<td>' + val.DMROAStatus + '</td>';
                 appendstr += '<td>' + val.DMRDate + '</td>';
                 appendstr += '<td>' + val.DMRReturnTime + '</td>';
                 appendstr += '<td>' + val.SNFailure + '</td>';
