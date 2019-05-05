@@ -22,7 +22,7 @@ namespace SmartLinks.Models
             return string.Empty;
         }
 
-        private static void UpdateDMRSN(string prodline,Controller ctrl)
+        private static void UpdateDMRSN(string prodline, Controller ctrl)
         {
             var dict = new Dictionary<string, string>();
             var sql = "SELECT distinct [DMR_ID],[Prod_Line],[Created_at],[Created_By],[File_URL]  FROM [eDMR].[dbo].[DMR_Detail_List_View] where Prod_Line =  @Prod_Line and File_URL is not null order by [Created_at] asc";
@@ -72,12 +72,12 @@ namespace SmartLinks.Models
 
                         var failure = l[2];
                         dict = new Dictionary<string, string>();
-                        dict.Add("@DMRID",vm.DMRID);
-                        dict.Add("@DMRProdLine",vm.DMRProdLine);
-                        dict.Add("@DMRDate",vm.DMRDate);
-                        dict.Add("@DMRCreater",vm.DMRCreater);
-                        dict.Add("@SN",sn);
-                        dict.Add("@SNFailure",failure);
+                        dict.Add("@DMRID", vm.DMRID);
+                        dict.Add("@DMRProdLine", vm.DMRProdLine);
+                        dict.Add("@DMRDate", vm.DMRDate);
+                        dict.Add("@DMRCreater", vm.DMRCreater);
+                        dict.Add("@SN", sn);
+                        dict.Add("@SNFailure", failure);
                         DBUtility.ExeLocalSqlNoRes(sql, dict);
                     }
                 }
@@ -92,7 +92,7 @@ namespace SmartLinks.Models
             var dict = new Dictionary<string, string>();
             dict.Add("@DMRProdLine", prodline);
             var sql = "select distinct SN FROM DMRSNVM where SNStatus <> 'SCRAP' and SNStatus <> 'CLOSED'  and DMROAStatus <> 'X'  and DMRProdLine=@DMRProdLine";
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql,dict);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, dict);
             var snlist = new List<string>();
 
             foreach (var line in dbret)
@@ -143,7 +143,7 @@ namespace SmartLinks.Models
                     sninfo.Add(tempvm);
 
                     if (!ret.ContainsKey(tempvm.SN))
-                    { ret.Add(tempvm.SN,tempvm); }
+                    { ret.Add(tempvm.SN, tempvm); }
                 }
 
                 dict = new Dictionary<string, string>();
@@ -151,13 +151,13 @@ namespace SmartLinks.Models
                 foreach (var s in sninfo)
                 {
                     dict = new Dictionary<string, string>();
-                    dict.Add("@SNStatus",s.SNStatus);
-                    dict.Add("@JO",s.JO);
-                    dict.Add("@PN",s.PN);
-                    dict.Add("@WorkFlow",s.WorkFlow);
-                    dict.Add("@WorkFlowStep",s.WorkFlowStep);
-                    dict.Add("@SN",s.SN);
-                    dict.Add("@DMRProdLine",prodline);
+                    dict.Add("@SNStatus", s.SNStatus);
+                    dict.Add("@JO", s.JO);
+                    dict.Add("@PN", s.PN);
+                    dict.Add("@WorkFlow", s.WorkFlow);
+                    dict.Add("@WorkFlowStep", s.WorkFlowStep);
+                    dict.Add("@SN", s.SN);
+                    dict.Add("@DMRProdLine", prodline);
                     DBUtility.ExeLocalSqlNoRes(sql, dict);
                 }
             }
@@ -165,7 +165,7 @@ namespace SmartLinks.Models
             return ret;
         }
 
-        private static void UpdateDMRStep(string prodline, Dictionary<string, DMRSNVM> snlaststep)
+        private static bool UpdateDMRStep(string prodline, Dictionary<string, DMRSNVM> snlaststep)
         {
             var dict = new Dictionary<string, string>();
             dict.Add("@DMRProdLine", prodline);
@@ -195,6 +195,8 @@ namespace SmartLinks.Models
                         and hml.MfgDate is not null order by SerialName,hml.MfgDate asc";
                 sql = sql.Replace("<sncond>", sncond);
                 dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+                if (dbret.Count == 0)
+                { return false; }
 
                 //split sn history workflowstep
                 foreach (var l in dbret)
@@ -301,7 +303,7 @@ namespace SmartLinks.Models
                 foreach (var kv in snstepdict)
                 {
                     dict = new Dictionary<string, string>();
-                    dict.Add("@DMRStartStep",kv.Value.DMRStartStep);
+                    dict.Add("@DMRStartStep", kv.Value.DMRStartStep);
                     dict.Add("@DMRStartTime", kv.Value.DMRStartTime);
                     dict.Add("@DMRStoreStep", kv.Value.DMRStoreStep);
                     dict.Add("@DMRStoreTime", kv.Value.DMRStoreTime);
@@ -315,6 +317,8 @@ namespace SmartLinks.Models
                     DBUtility.ExeLocalSqlNoRes(sql, dict);
                 }
             }
+
+            return true;
         }
 
         private static void UpdateDMROAStatus(string prodline)
@@ -322,7 +326,7 @@ namespace SmartLinks.Models
             var dict = new Dictionary<string, string>();
             dict.Add("@DMRProdLine", prodline);
             var sql = "select distinct DMRID from DMRSNVM where DMRProdLine=@DMRProdLine and DMROAStatus <> 'C' and  DMROAStatus <> 'X'";
-            var dbret = DBUtility.ExeLocalSqlWithRes(sql,dict);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, dict);
             var dmridlist = new List<string>();
             foreach (var l in dbret)
             { dmridlist.Add(O2S(l[0])); }
@@ -355,7 +359,31 @@ namespace SmartLinks.Models
                     DBUtility.ExeLocalSqlNoRes(sql, dict);
                 }
             }
-            
+
+        }
+
+        private static void UpdateDMRSNTestData(string prodline)
+        {
+            var dict = new Dictionary<string, string>();
+            dict.Add("@DMRProdLine", prodline);
+            var sql = "select SN,DMRStoreTime FROM DMRSNVM where DMRProdLine=@DMRProdLine  and DMROAStatus <> 'X' order by DMRDate desc";
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql, dict);
+            var sndict = new Dictionary<string,DateTime>();
+
+            foreach (var line in dbret)
+            {
+                var sn = O2S(line[0]).ToUpper().Trim();
+                var std = O2T(line[1]);
+                if (!sndict.ContainsKey(sn) && !string.IsNullOrEmpty(std))
+                {
+                    sndict.Add(sn, DateTime.Parse(std));
+                }
+            }
+
+            if (sndict.Count > 0)
+            {
+                DMRSNTestData.UpdataProductLineTestData(prodline,sndict);
+            }
         }
 
         private static string O2S(object obj)
@@ -373,7 +401,7 @@ namespace SmartLinks.Models
 
         private static string O2T(object obj)
         {
-            if (obj != null)
+            if (obj != null && !string.IsNullOrEmpty(obj.ToString()))
             {
                 try
                 {
@@ -388,13 +416,26 @@ namespace SmartLinks.Models
         {
             if (ctrl.HttpContext.Cache.Get(prodline) == null)
             {
-                UpdateDMRSN(prodline,ctrl);
-                var snlaststep = UpdateSNStatus(prodline);
-                UpdateDMRStep(prodline,snlaststep);
-                UpdateDMROAStatus(prodline);
+                var normal = true;
 
-                var cachehour = Convert.ToDouble(CfgUtility.GetSysConfig(ctrl)["DMRCACHEHOUR"]);
-                ctrl.HttpContext.Cache.Insert(prodline, "true", null, DateTime.Now.AddHours(cachehour), Cache.NoSlidingExpiration);
+                UpdateDMRSN(prodline, ctrl);
+                var snlaststep = UpdateSNStatus(prodline);
+                if (snlaststep.Count == 0)
+                { normal = false;
+                }
+
+                if (!UpdateDMRStep(prodline, snlaststep))
+                { normal = false;
+                }
+
+                UpdateDMROAStatus(prodline);
+                UpdateDMRSNTestData(prodline);
+
+                if (normal)
+                {
+                    var cachehour = Convert.ToDouble(CfgUtility.GetSysConfig(ctrl)["DMRCACHEHOUR"]);
+                    ctrl.HttpContext.Cache.Insert(prodline, "true", null, DateTime.Now.AddHours(cachehour), Cache.NoSlidingExpiration);
+                }
             }
         }
 

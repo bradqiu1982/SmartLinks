@@ -638,6 +638,58 @@ namespace SmartLinks.Controllers
             return ret;
         }
 
+        private object DMRModuleYield(string prodline,List<DMRSNVM> srcdata)
+        {
+            var sndict = new Dictionary<string, bool>();
+            foreach (var item in srcdata)
+            {
+                if (!sndict.ContainsKey(item.SN))
+                {
+                    sndict.Add(item.SN, true);
+                }
+            }
+            var testdata = DMRSNTestData.RetrieveTestData(prodline,sndict);
+            var yieldlist = (List<DMRSNTestData>)testdata[0];
+            var faillist = (List<DMRSNTestData>)testdata[1];
+
+            var cumyield = 1.0;
+
+            var titlelist = new List<string>();
+            titlelist.Add("");
+            var passlist = new List<string>();
+            passlist.Add("PASS");
+            var totlelist = new List<string>();
+            totlelist.Add("TOTAL");
+            var ydlist = new List<string>();
+            ydlist.Add("YIELD");
+
+            foreach (var item in yieldlist)
+            {
+                titlelist.Add(item.WhichTest);
+                passlist.Add(item.PassCnt.ToString());
+                totlelist.Add(item.TotalCnt.ToString());
+                if (item.Yield != 100.0)
+                { ydlist.Add("YD:"+item.Yield.ToString()+"%"); }
+                else
+                { ydlist.Add(item.Yield.ToString() + "%"); }
+
+                cumyield = cumyield * (item.Yield/100.0);
+            }
+
+            titlelist.Add("Cumm Yield");
+            passlist.Add("");
+            totlelist.Add("");
+            ydlist.Add(Math.Round(cumyield*100.0,2).ToString()+"%");
+
+            return new
+            {
+                titlelist = titlelist,
+                passlist = passlist,
+                totlelist = totlelist,
+                ydlist = ydlist,
+                faillist = faillist
+            };
+        }
 
         public JsonResult DMRWIPData()
         {
@@ -645,6 +697,7 @@ namespace SmartLinks.Controllers
             var dmrdata = DMRSNVM.RetrieveDMRSNData(prodline,null,null,this);
             var moduledist = ModuleDistribution(dmrdata);
             var dmrstatuslist = DMRStatusSum(dmrdata);
+            var yielddata = DMRModuleYield(prodline,dmrdata);
 
             var ret = new JsonResult();
             ret.MaxJsonLength = Int32.MaxValue;
@@ -652,7 +705,8 @@ namespace SmartLinks.Controllers
             {
                 moduledist = moduledist,
                 dmrstatuslist = dmrstatuslist,
-                dmrdata = dmrdata
+                dmrdata = dmrdata,
+                yielddata = yielddata
             };
             return ret;
         }
@@ -679,6 +733,7 @@ namespace SmartLinks.Controllers
                 ,enddate.ToString("yyyy-MM-dd HH:mm:ss"), this);
             var moduledist = ModuleDistribution(dmrdata);
             var dmrstatuslist = DMRStatusSum(dmrdata);
+            var yielddata = DMRModuleYield(prodline,dmrdata);
 
             var ret = new JsonResult();
             ret.MaxJsonLength = Int32.MaxValue;
@@ -686,11 +741,12 @@ namespace SmartLinks.Controllers
             {
                 moduledist = moduledist,
                 dmrstatuslist = dmrstatuslist,
-                dmrdata = dmrdata
+                dmrdata = dmrdata,
+                yielddata = yielddata
             };
             return ret;
         }
-
+        
         public JsonResult SNWholeWorkFlow()
         {
             var sn = Request.Form["sn"];
@@ -703,7 +759,6 @@ namespace SmartLinks.Controllers
             };
             return ret;
         }
-
 
     }
 }

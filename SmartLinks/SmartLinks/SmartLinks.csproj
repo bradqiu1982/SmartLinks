@@ -214,6 +214,7 @@
     <Compile Include="Models\CookieUtility.cs" />
     <Compile Include="Models\CWDM4Data.cs" />
     <Compile Include="Models\DBUtility.cs" />
+    <Compile Include="Models\DMRSNTestData.cs" />
     <Compile Include="Models\DMRSNVM.cs" />
     <Compile Include="Models\EmailUtility.cs" />
     <Compile Include="Models\ExcelReader.cs" />

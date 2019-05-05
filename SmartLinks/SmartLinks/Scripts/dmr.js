@@ -7,12 +7,15 @@
         var dmrdisttable = null;
         var dmroatable = null;
         var dmrsntable = null;
+        var dmrydtable = null;
+
         var snworkflowtable = null;
+        var failist = null;
 
         var loadprodline = function () {
             $.post('/SmartLinks/LoadDRMProLine', {
             }, function (output) {
-                console.log(output.prodlist);
+
                 $('#proline').autoComplete({
                     minChars: 0,
                     source: function (term, suggest) {
@@ -34,6 +37,7 @@
 
         var showtable = function (output) {
 
+            //sn distribution
             if (dmrdisttable) {
                 dmrdisttable.destroy();
                 dmrdisttable = null;
@@ -71,7 +75,7 @@
             });
 
 
-
+            //OA Status
             if (dmroatable) {
                 dmroatable.destroy();
                 dmroatable = null;
@@ -112,8 +116,63 @@
                 buttons: ['copyHtml5', 'csv', 'excelHtml5']
             });
 
+            //module yield
+            if (dmrydtable) {
+                dmrydtable.destroy();
+                dmrydtable = null;
+            }
+            $("#dmrydhead").empty();
+            $("#dmrydcontent").empty();
+
+            var apstr = '<tr>';
+            $.each(output.yielddata.titlelist, function (i, val) {
+                apstr += '<th>' + val + '</th>';
+            });
+            apstr += '</tr>';
+            $("#dmrydhead").append(apstr);
+
+            apstr = '<tr>';
+            $.each(output.yielddata.passlist, function (i, val) {
+                apstr += '<td>' + val + '</td>';
+            });
+            apstr += '</tr>';
+            $("#dmrydcontent").append(apstr);
+
+            apstr = '<tr>';
+            $.each(output.yielddata.totlelist, function (i, val) {
+                apstr += '<td>' + val + '</td>';
+            });
+            apstr += '</tr>';
+            $("#dmrydcontent").append(apstr);
+
+            apstr = '<tr>';
+            $.each(output.yielddata.ydlist, function (i, val) {
+                if (val.indexOf('YD:') != -1) {
+                    val = val.replace('YD:', '');
+                    apstr += '<td class="DMRFAILYDDATA" myid="' + output.yielddata.titlelist[i] + '">' + val + '</td>';
+                }
+                else {
+                    apstr += '<td>' + val + '</td>';
+                }
+            });
+            apstr += '</tr>';
+            $("#dmrydcontent").append(apstr);
+
+            dmrydtable = $('#dmrydtable').DataTable({
+                'iDisplayLength': 10,
+                'aLengthMenu': [[10, 20, 50, 100, -1],
+                [10, 20, 50, 100, "All"]],
+                "columnDefs": [
+                    { "className": "dt-center", "targets": "_all" }
+                ],
+                "aaSorting": [],
+                "order": [],
+                dom: 'lBfrtip',
+                buttons: ['copyHtml5', 'csv', 'excelHtml5']
+            });
 
 
+            //sn trace
             if (dmrsntable) {
                 dmrsntable.destroy();
                 dmrsntable = null;
@@ -198,6 +257,11 @@
                 function (output) {
                     $.bootstrapLoading.end();
                     showtable(output);
+
+                    failist = new Array();
+                    $.each(output.yielddata.faillist, function (i, val) {
+                        failist.push(val);
+                    });
             })
 
         }
@@ -236,6 +300,11 @@
                 function (output) {
                     $.bootstrapLoading.end();
                     showtable(output);
+
+                    failist = new Array();
+                    $.each(output.yielddata.faillist, function (i, val) {
+                        failist.push(val);
+                    });
                 })
         }
 
@@ -255,7 +324,19 @@
                     snworkflowtable.destroy();
                     snworkflowtable = null;
                 }
+                $('#snworkflowhead').empty();
                 $("#snworkflowcontent").empty();
+
+                $('#snworkflowhead').append(
+                    '<tr>'+
+                        '<th>SN</th>'+
+                        '<th>PN</th>'+
+                        '<th>WORKFLOW</th>'+
+                        '<th>WORKFLOW STEP</th>'+
+                        '<th>JO</th>'+
+                        '<th>TIMESTAMP</th>'+
+                    '</tr>'
+                    );
 
                 $.each(output.snworkflowlist, function (i, val) {
                     var appendstr = '<tr>';
@@ -286,7 +367,57 @@
             });
         })
 
+        $('body').on('click', '.DMRFAILYDDATA', function () {
+            var whichtest = $(this).attr('myid');
 
+            if (failist == null)
+            { return false;}
+
+            if (snworkflowtable) {
+                snworkflowtable.destroy();
+                snworkflowtable = null;
+            }
+            $('#snworkflowhead').empty();
+            $("#snworkflowcontent").empty();
+
+            $('#snworkflowhead').append(
+                '<tr>' +
+                    '<th>SN</th>' +
+                    '<th>WhichTest</th>' +
+                    '<th>Failure</th>' +
+                    '<th>TIMESTAMP</th>' +
+                '</tr>'
+                );
+
+            $.each(failist, function (i, val) {
+                if (val.WhichTest == whichtest)
+                {
+                    var appendstr = '<tr>';
+                    appendstr += '<td>' + val.SN + '</td>';
+                    appendstr += '<td>' + val.WhichTest + '</td>';
+                    appendstr += '<td>' + val.Failure + '</td>';
+                    appendstr += '<td>' + val.TestTime + '</td>';
+                    appendstr += '</tr>';
+                    $("#snworkflowcontent").append(appendstr);
+                }
+
+            });
+
+            snworkflowtable = $('#snworkflowtable').DataTable({
+                'iDisplayLength': 50,
+                'aLengthMenu': [[20, 50, 100, -1],
+                [20, 50, 100, "All"]],
+                "columnDefs": [
+                    { "className": "dt-center", "targets": "_all" }
+                ],
+                "aaSorting": [],
+                "order": [],
+                dom: 'lBfrtip',
+                buttons: ['copyHtml5', 'csv', 'excelHtml5']
+            });
+
+            $('#snworkflowmodal').modal('show');
+        });
 
     }
 

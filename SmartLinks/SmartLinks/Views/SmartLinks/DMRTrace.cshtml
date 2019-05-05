@@ -16,6 +16,11 @@
         cursor:pointer;
         color:royalblue;
     }
+
+    .DMRFAILYDDATA {
+        cursor:pointer;
+        color:royalblue;
+    }
 </style>
 
 <div class="row" style="margin-top:10px;">
@@ -68,6 +73,13 @@
                 </table>
             </div>
             <div class="v-content">
+                <table class="table table-hover  table-condensed table-striped" id="dmrydtable" style="margin-top:1%">
+                    <caption class="tb-caption">DMR Module Yield</caption>
+                    <thead id="dmrydhead"></thead>
+                    <tbody id="dmrydcontent"></tbody>
+                </table>
+            </div>
+            <div class="v-content">
                 <table class="table table-hover  table-condensed table-striped" id="dmrsntable" style="margin-top:1%">
                     <caption class="tb-caption">DMR Module Trace</caption>
                     <thead id="dmrsnhead"></thead>
@@ -83,20 +95,11 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Module WORKFLOW</h4>
+                <h4 class="modal-title">Module Data</h4>
             </div>
             <div class="modal-body">
                 <table class="table table-hover  table-condensed table-striped" id="snworkflowtable" style="margin-top:1%">
-                    <thead>
-                        <tr>
-                            <th>SN</th>
-                            <th>PN</th>
-                            <th>WORKFLOW</th>
-                            <th>WORKFLOW STEP</th>
-                            <th>JO</th>
-                            <th>TIMESTAMP</th>
-                        </tr>
-                    </thead>
+                    <thead id="snworkflowhead"></thead>
                     <tbody id="snworkflowcontent"></tbody>
                 </table>
             </div>
