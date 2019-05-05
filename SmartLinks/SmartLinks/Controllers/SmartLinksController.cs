@@ -631,7 +631,7 @@ namespace SmartLinks.Controllers
                 ret = dmrdict.Values.ToList();
                 ret.Sort(delegate (DMRSNVM obj1, DMRSNVM obj2)
                 {
-                    return obj1.DMRID.CompareTo(obj2.DMRID);
+                    return obj2.ModuleCount.CompareTo(obj1.ModuleCount);
                 });
             }
 
