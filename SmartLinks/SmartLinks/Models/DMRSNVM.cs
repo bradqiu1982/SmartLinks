@@ -100,51 +100,60 @@ namespace SmartLinks.Models
 
             if (snlist.Count > 0)
             {
-                var sncond = "('" + string.Join("','", snlist) + "')";
-                sql = @"select distinct c.ContainerName, CASE WHEN (c.STATUS IS NULL) THEN 'NONEXIST' 
-	                        ELSE CASE WHEN (c.STATUS = 1 AND c.holdReasonId IS NULL) THEN 'ACTIVE'
-	                        ELSE CASE WHEN  CHARINDEX('scrap',ws.WorkflowStepName) > 0 THEN 'SCRAP' 
-	                        ELSE CASE WHEN (c.STATUS = 1 AND c.holdReasonId IS NOT NULL) THEN 'HOLD' 
-	                        ELSE CASE WHEN (c.STATUS = 2 AND c.qty > 0 AND ws.workflowstepname <> 'SHIPPING') THEN 'CLOSED' 
-	                        ELSE  CASE WHEN (c.STATUS = 2 AND c.qty = 0) THEN 'SCRAP' 
-	                        ELSE CASE WHEN (c.STATUS = 4) THEN 'ISSUED' 
-	                        ELSE CASE WHEN (ws.workflowstepname = 'SHIPPING' AND c.qty > 0 AND c.STATUS = 2) THEN 'SHIPPING' ELSE 'UNKNOW' 
-	                        END 
-	                        END 
-	                        END 
-	                        END 
-	                        END 
-	                        END 
-	                        END
-	                        END SNStatus ,jo.MfgOrderName
-                        ,pb.ProductName,wb.WorkflowName CRTWFName,ws.WorkflowStepName CRTWFStepName,c.LastActivityDateGMT
-                            from InsiteDB.insite.Container (nolock) c
-                        left join InsiteDB.insite.MfgOrder (nolock) jo on c.MfgOrderId = jo.MfgOrderId
-                        left join InsiteDB.insite.CurrentStatus (nolock) cs on c.CurrentStatusId = cs.CurrentStatusId
-                        left join InsiteDB.insite.WorkflowStep (nolock) ws on cs.WorkflowStepId = ws.WorkflowStepId
-                        left join InsiteDB.insite.Workflow (nolock) wf on ws.WorkflowId = wf.WorkflowId
-                        left join InsiteDB.insite.WorkflowBase (nolock) wb on wf.WorkflowBaseId = wb.WorkflowBaseId
-                        left join [InsiteDB].[insite].[Product]  (nolock) pd on pd.ProductId = c.ProductId
-                        left join [InsiteDB].[insite].[ProductBase]  (nolock) pb on pb.ProductBaseId = pd.ProductBaseId
-                        where c.ContainerName in <sncond> and Len(c.ContainerName) = 7";
-                sql = sql.Replace("<sncond>", sncond);
-                dbret = DBUtility.ExeRealMESSqlWithRes(sql);
                 var sninfo = new List<DMRSNVM>();
-                foreach (var l in dbret)
+                var snlistlist = UT.SplitList(snlist, 5000);
+                foreach (var tempsnlist in snlistlist)
                 {
-                    var tempvm = new DMRSNVM();
-                    tempvm.SN = O2S(l[0]).ToUpper().Trim();
-                    tempvm.SNStatus = O2S(l[1]);
-                    tempvm.JO = O2S(l[2]);
-                    tempvm.PN = O2S(l[3]);
-                    tempvm.WorkFlow = O2S(l[4]);
-                    tempvm.WorkFlowStep = O2S(l[5]);
-                    tempvm.DMRDate = O2T(l[6]);
-                    sninfo.Add(tempvm);
+                    if (tempsnlist.Count == 0)
+                    { break; }
 
-                    if (!ret.ContainsKey(tempvm.SN))
-                    { ret.Add(tempvm.SN, tempvm); }
-                }
+                    var sncond = "('" + string.Join("','", tempsnlist) + "')";
+                    sql = @"select distinct c.ContainerName, CASE WHEN (c.STATUS IS NULL) THEN 'NONEXIST' 
+	                            ELSE CASE WHEN (c.STATUS = 1 AND c.holdReasonId IS NULL) THEN 'ACTIVE'
+	                            ELSE CASE WHEN  CHARINDEX('scrap',ws.WorkflowStepName) > 0 THEN 'SCRAP' 
+	                            ELSE CASE WHEN (c.STATUS = 1 AND c.holdReasonId IS NOT NULL) THEN 'HOLD' 
+	                            ELSE CASE WHEN (c.STATUS = 2 AND c.qty > 0 AND ws.workflowstepname <> 'SHIPPING') THEN 'CLOSED' 
+	                            ELSE  CASE WHEN (c.STATUS = 2 AND c.qty = 0) THEN 'SCRAP' 
+	                            ELSE CASE WHEN (c.STATUS = 4) THEN 'ISSUED' 
+	                            ELSE CASE WHEN (ws.workflowstepname = 'SHIPPING' AND c.qty > 0 AND c.STATUS = 2) THEN 'SHIPPING' ELSE 'UNKNOW' 
+	                            END 
+	                            END 
+	                            END 
+	                            END 
+	                            END 
+	                            END 
+	                            END
+	                            END SNStatus ,jo.MfgOrderName
+                            ,pb.ProductName,wb.WorkflowName CRTWFName,ws.WorkflowStepName CRTWFStepName,c.LastActivityDateGMT
+                                from InsiteDB.insite.Container (nolock) c
+                            left join InsiteDB.insite.MfgOrder (nolock) jo on c.MfgOrderId = jo.MfgOrderId
+                            left join InsiteDB.insite.CurrentStatus (nolock) cs on c.CurrentStatusId = cs.CurrentStatusId
+                            left join InsiteDB.insite.WorkflowStep (nolock) ws on cs.WorkflowStepId = ws.WorkflowStepId
+                            left join InsiteDB.insite.Workflow (nolock) wf on ws.WorkflowId = wf.WorkflowId
+                            left join InsiteDB.insite.WorkflowBase (nolock) wb on wf.WorkflowBaseId = wb.WorkflowBaseId
+                            left join [InsiteDB].[insite].[Product]  (nolock) pd on pd.ProductId = c.ProductId
+                            left join [InsiteDB].[insite].[ProductBase]  (nolock) pb on pb.ProductBaseId = pd.ProductBaseId
+                            where c.ContainerName in <sncond> and Len(c.ContainerName) = 7";
+                    sql = sql.Replace("<sncond>", sncond);
+                    dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+                    foreach (var l in dbret)
+                    {
+                        var tempvm = new DMRSNVM();
+                        tempvm.SN = O2S(l[0]).ToUpper().Trim();
+                        tempvm.SNStatus = O2S(l[1]);
+                        tempvm.JO = O2S(l[2]);
+                        tempvm.PN = O2S(l[3]);
+                        tempvm.WorkFlow = O2S(l[4]);
+                        tempvm.WorkFlowStep = O2S(l[5]);
+                        tempvm.DMRDate = O2T(l[6]);
+                        sninfo.Add(tempvm);
+
+                        if (!ret.ContainsKey(tempvm.SN))
+                        { ret.Add(tempvm.SN, tempvm); }
+                    }//end foreach
+                }//end foreach
+
+
 
                 dict = new Dictionary<string, string>();
                 sql = @"update DMRSNVM set SNStatus=@SNStatus,JO=@JO,PN=@PN,WorkFlow=@WorkFlow,WorkFlowStep=@WorkFlowStep where SN=@SN and DMRProdLine=@DMRProdLine";
@@ -178,53 +187,58 @@ namespace SmartLinks.Models
 
             if (snlist.Count > 0)
             {
-                var sncond = "('" + string.Join("','", snlist) + "')";
-
                 var snstepdict = new Dictionary<string, DMRSNVM>();
                 foreach (var s in snlist)
                 { snstepdict.Add(s, new DMRSNVM()); }
-
                 var snworkflowdict = new Dictionary<string, List<DMRSNVM>>();
 
-                sql = @"SELECT distinct c.ContainerName as SerialName,ws.WorkflowStepName ,hml.MfgDate
-		                    FROM InsiteDB.insite.container c with (nolock) 
-	                    left join InsiteDB.insite.historyMainline hml with (nolock) on c.containerId = hml.containerId
-	                    left join InsiteDB.insite.MoveHistory mv with (nolock) on mv.HistoryMainlineId= hml.HistoryMainlineId
-	                    left join InsiteDB.insite.workflowstep ws(nolock) on  ws.WorkflowStepId  = hml.WorkflowStepId
-	                    where c.ContainerName in <sncond> and mv.MoveInTime is not null and ws.WorkflowStepName  is not null
-                        and hml.MfgDate is not null order by SerialName,hml.MfgDate asc";
-                sql = sql.Replace("<sncond>", sncond);
-                dbret = DBUtility.ExeRealMESSqlWithRes(sql);
-                if (dbret.Count == 0)
-                { return false; }
-
-                //split sn history workflowstep
-                foreach (var l in dbret)
+                var snlistlist = UT.SplitList(snlist, 5000);
+                foreach (var tempsnlist in snlistlist)
                 {
-                    try
+                    if (tempsnlist.Count == 0)
+                    { break; }
+
+                    var sncond = "('" + string.Join("','", tempsnlist) + "')";
+                    sql = @"SELECT distinct c.ContainerName as SerialName,ws.WorkflowStepName ,hml.MfgDate
+		                        FROM InsiteDB.insite.container c with (nolock) 
+	                        left join InsiteDB.insite.historyMainline hml with (nolock) on c.containerId = hml.containerId
+	                        left join InsiteDB.insite.MoveHistory mv with (nolock) on mv.HistoryMainlineId= hml.HistoryMainlineId
+	                        left join InsiteDB.insite.workflowstep ws(nolock) on  ws.WorkflowStepId  = hml.WorkflowStepId
+	                        where c.ContainerName in <sncond> and mv.MoveInTime is not null and ws.WorkflowStepName  is not null
+                            and hml.MfgDate is not null order by SerialName,hml.MfgDate asc";
+                    sql = sql.Replace("<sncond>", sncond);
+                    dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+                    if (dbret.Count == 0)
+                    { return false; }
+
+                    //split sn history workflowstep
+                    foreach (var l in dbret)
                     {
-                        var sn = O2S(l[0]).ToUpper().Trim();
-                        var step = O2S(l[1]);
-                        var ustep = step.ToUpper();
-                        var dt = O2T(l[2]);
-
-                        var tempvm = new DMRSNVM();
-                        tempvm.SN = sn;
-                        tempvm.WorkFlowStep = step;
-                        tempvm.DMRDate = dt;
-
-                        if (snworkflowdict.ContainsKey(sn))
+                        try
                         {
-                            snworkflowdict[sn].Add(tempvm);
+                            var sn = O2S(l[0]).ToUpper().Trim();
+                            var step = O2S(l[1]);
+                            var ustep = step.ToUpper();
+                            var dt = O2T(l[2]);
+
+                            var tempvm = new DMRSNVM();
+                            tempvm.SN = sn;
+                            tempvm.WorkFlowStep = step;
+                            tempvm.DMRDate = dt;
+
+                            if (snworkflowdict.ContainsKey(sn))
+                            {
+                                snworkflowdict[sn].Add(tempvm);
+                            }
+                            else
+                            {
+                                var templist = new List<DMRSNVM>();
+                                templist.Add(tempvm);
+                                snworkflowdict.Add(sn, templist);
+                            }
                         }
-                        else
-                        {
-                            var templist = new List<DMRSNVM>();
-                            templist.Add(tempvm);
-                            snworkflowdict.Add(sn, templist);
-                        }
-                    }
-                    catch (Exception ex) { }
+                        catch (Exception ex) { }
+                    }//end foreach
                 }//end foreach
 
                 //append current workflowstep

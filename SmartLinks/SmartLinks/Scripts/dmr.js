@@ -267,7 +267,9 @@
         }
 
         $('body').on('click', '#btn-wip', function () {
-            DMRWIPFUN();
+            if (confirm('WIP function is a globe view of DMR.So it will take a long time to query. Do you want to continue?')) {
+                DMRWIPFUN();
+            }
         })
 
 

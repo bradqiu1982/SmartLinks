@@ -238,6 +238,7 @@
     <Compile Include="Models\TraceViewVM.cs" />
     <Compile Include="Models\TunableInfoData.cs" />
     <Compile Include="Models\UserVM.cs" />
+    <Compile Include="Models\UT.cs" />
     <Compile Include="Models\VLogHelper.cs" />
     <Compile Include="Models\VTestScore.cs" />
     <Compile Include="Models\VTestVM.cs" />
