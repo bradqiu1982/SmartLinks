@@ -487,6 +487,29 @@ namespace SmartLinks.Models
             return ret;
         }
 
+        public static List<DMRSNVM> RetrieveDMRSNDataBySN(List<string> snlist)
+        {
+            var ret = new List<DMRSNVM>();
+            if (snlist.Count == 0)
+            { return ret; }
+
+            var sncond = "('" + string.Join("','", snlist) + "')";
+            var sql = @"SELECT DMRID,DMRProdLine,DMRDate,DMRCreater,SN,SNFailure,SNStatus,JO,PN,WorkFlow,WorkFlowStep
+                      ,DMRStartStep,DMRStartTime,DMRStoreStep,DMRStoreTime,DMRRepairStep,DMRRepairTime,DMRReturnStep
+                      ,DMRReturnTime,DMROAStep,DMROAStatus FROM DMRSNVM where SN in <sncond> order by SN";
+            sql = sql.Replace("<sncond>", sncond);
+            var dbret = DBUtility.ExeLocalSqlWithRes(sql);
+            foreach (var l in dbret)
+            {
+                ret.Add(new DMRSNVM(O2S(l[0]), O2S(l[1]), O2T(l[2]), O2S(l[3]), O2S(l[4]), O2S(l[5])
+                    , O2S(l[6]), O2S(l[7]), O2S(l[8]), O2S(l[9]), O2S(l[10]), O2S(l[11])
+                    , O2S(l[12]), O2S(l[13]), O2S(l[14]), O2S(l[15]), O2S(l[16]), O2S(l[17]), O2S(l[18]), O2S(l[19]), O2S(l[20])));
+            }
+
+            return ret;
+        }
+
+
         public static List<DMRSNVM> RetrieveSNWorkFlow(string sn)
         {
             var ret = new List<DMRSNVM>();

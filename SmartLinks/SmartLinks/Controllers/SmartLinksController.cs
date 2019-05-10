@@ -711,6 +711,20 @@ namespace SmartLinks.Controllers
             return ret;
         }
 
+        public JsonResult SNTRACEData()
+        {
+            var sns = Request.Form["sns"];
+            var snlist = sns.Replace("'", "").Replace("\r\n", " ").Split(new string[] { ";", " ", "," }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            var dmrdata = DMRSNVM.RetrieveDMRSNDataBySN(snlist);
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new
+            {
+                dmrdata = dmrdata
+            };
+            return ret;
+        }
+
         public JsonResult DMRTRACEData()
         {
             var prodline = Request.Form["prodline"];

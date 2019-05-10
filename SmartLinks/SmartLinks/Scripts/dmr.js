@@ -314,7 +314,116 @@
             DMRTRACE();
         })
 
+        var SNTRACE = function () {
+            var sns = $('#querysn').val();
+            if (sns == '') {
+                alert('SN need be input for SN-TRACE function!');
+                return false;
+            }
 
+            var options = {
+                loadingTips: "正在处理数据，请稍候...",
+                backgroundColor: "#aaa",
+                borderColor: "#fff",
+                opacity: 0.8,
+                borderColor: "#fff",
+                TipsColor: "#000",
+            }
+            $.bootstrapLoading.start(options);
+
+            $.post('/SmartLinks/SNTRACEData',
+                {
+                    sns:sns
+                },
+                function (output) {
+                    $.bootstrapLoading.end();
+
+                    if (dmrdisttable) {
+                        dmrdisttable.destroy();
+                        dmrdisttable = null;
+                    }
+                    $("#dmrdisthead").empty();
+                    $("#dmrdistcontent").empty();
+
+                    if (dmroatable) {
+                        dmroatable.destroy();
+                        dmroatable = null;
+                    }
+                    $("#dmroahead").empty();
+                    $("#dmroacontent").empty();
+
+                    if (dmrydtable) {
+                        dmrydtable.destroy();
+                        dmrydtable = null;
+                    }
+                    $("#dmrydhead").empty();
+                    $("#dmrydcontent").empty();
+
+                    //sn trace
+                    if (dmrsntable) {
+                        dmrsntable.destroy();
+                        dmrsntable = null;
+                    }
+                    $("#dmrsnhead").empty();
+                    $("#dmrsncontent").empty();
+
+                    $("#dmrsnhead").append(
+                        '<tr style="font-size:12px;">' +
+                            '<th>SN</th>' +
+                            '<th>SN STAT</th>' +
+                            '<th>DMR#</th>' +
+                            '<th>OA STEP</th>' +
+                            '<th>OA STATUS</th>' +
+                            '<th>DMR START</th>' +
+                            '<th>DMR RETURN</th>' +
+                            '<th>FAILURE</th>' +
+                            '<th>CRT WFSTEP</th>' +
+                            '<th>CRT WF</th>' +
+                            '<th>RW FROM</th>' +
+                            '<th>OA(D)</th>' +
+                            '<th>DMR STORE(D)</th>' +
+                            '<th>DMR REPAIR(D)</th>' +
+                            '<th>DMR TOTAL(D)</th>' +
+                        '</tr>'
+                        );
+
+                    $.each(output.dmrdata, function (i, val) {
+                        var appendstr = '<tr style="font-size:10px;">';
+                        appendstr += '<td class="SNWORKFLOW" myid="' + val.SN + '"><strong>' + val.SN + '</strong></td>';
+                        appendstr += '<td>' + val.SNStatus + '</td>';
+                        appendstr += '<td>' + val.DMRID + '</td>';
+                        appendstr += '<td>' + val.DMROAStep + '</td>';
+                        appendstr += '<td>' + val.DMROAStatus + '</td>';
+                        appendstr += '<td>' + val.DMRDate + '</td>';
+                        appendstr += '<td>' + val.DMRReturnTime + '</td>';
+                        appendstr += '<td>' + val.SNFailure + '</td>';
+                        appendstr += '<td>' + val.WorkFlowStep + '</td>';
+                        appendstr += '<td>' + val.WorkFlow + '</td>';
+                        appendstr += '<td>' + val.DMRRepairStep + '</td>';
+                        appendstr += '<td>' + val.OASpend + '</td>';
+                        appendstr += '<td>' + val.StoreSpend + '</td>';
+                        appendstr += '<td>' + val.RepairSpend + '</td>';
+                        appendstr += '<td>' + val.TotleDRMSpend + '</td>';
+                        appendstr += '</tr>';
+                        $("#dmrsncontent").append(appendstr);
+                    });
+
+
+                    dmrsntable = $('#dmrsntable').DataTable({
+                        'iDisplayLength': 50,
+                        'aLengthMenu': [[20, 50, 100, -1],
+                        [20, 50, 100, "All"]],
+                        "aaSorting": [],
+                        "order": [],
+                        dom: 'lBfrtip',
+                        buttons: ['copyHtml5', 'csv', 'excelHtml5']
+                    });
+                })
+        }
+
+        $('body').on('click', '#btn-sn', function () {
+            SNTRACE();
+        })
 
         $('body').on('click', '.SNWORKFLOW', function () {
             var sn = $(this).attr('myid');
