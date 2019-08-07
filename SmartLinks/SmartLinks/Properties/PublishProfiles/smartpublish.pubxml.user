@@ -13,10 +13,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/22/2013 08:43:40</publishTime>
     </File>
     <File Include="bin/App_global.asax.compiled">
-      <publishTime>04/02/2019 09:03:59</publishTime>
+      <publishTime>07/11/2019 17:43:25</publishTime>
     </File>
     <File Include="bin/App_global.asax.dll">
-      <publishTime>04/02/2019 09:03:59</publishTime>
+      <publishTime>07/11/2019 17:43:25</publishTime>
     </File>
     <File Include="bin/EntityFramework.dll">
       <publishTime>03/02/2015 09:32:26</publishTime>
@@ -118,7 +118,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>06/18/2015 20:19:46</publishTime>
     </File>
     <File Include="bin/SmartLinks.dll">
-      <publishTime>04/02/2019 09:03:34</publishTime>
+      <publishTime>07/11/2019 17:42:58</publishTime>
     </File>
     <File Include="bin/System.Web.Helpers.dll">
       <publishTime>01/28/2015 04:04:30</publishTime>
@@ -336,6 +336,9 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="Content/images/distribution.png">
       <publishTime>05/17/2018 15:28:13</publishTime>
     </File>
+    <File Include="Content/images/DMRICON.png">
+      <publishTime>04/29/2019 16:34:38</publishTime>
+    </File>
     <File Include="Content/images/Domino.png">
       <publishTime>09/07/2017 15:52:34</publishTime>
     </File>
@@ -395,6 +398,9 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     </File>
     <File Include="Content/images/ie8/distribution.png">
       <publishTime>05/17/2018 15:27:34</publishTime>
+    </File>
+    <File Include="Content/images/ie8/DMRICON.png">
+      <publishTime>04/29/2019 16:34:57</publishTime>
     </File>
     <File Include="Content/images/ie8/Domino.png">
       <publishTime>09/11/2017 10:58:39</publishTime>
@@ -565,7 +571,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>02/26/2018 16:52:12</publishTime>
     </File>
     <File Include="Content/Site.css">
-      <publishTime>09/01/2017 08:41:03</publishTime>
+      <publishTime>04/23/2019 16:54:19</publishTime>
     </File>
     <File Include="Content/technicalvideo.css">
       <publishTime>03/30/2018 14:25:55</publishTime>
@@ -595,7 +601,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/29/2019 07:53:51</publishTime>
     </File>
     <File Include="PrecompiledApp.config">
-      <publishTime>04/02/2019 09:03:38</publishTime>
+      <publishTime>07/11/2019 17:43:11</publishTime>
     </File>
     <File Include="Scripts/ajaxfileupload.js">
       <publishTime>09/04/2017 08:28:10</publishTime>
@@ -604,7 +610,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/05/2017 07:44:07</publishTime>
     </File>
     <File Include="Scripts/alllinks_1.js">
-      <publishTime>03/28/2019 17:22:38</publishTime>
+      <publishTime>04/29/2019 16:41:49</publishTime>
     </File>
     <File Include="Scripts/asset.js">
       <publishTime>04/16/2018 14:18:55</publishTime>
@@ -653,6 +659,9 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     </File>
     <File Include="Scripts/datatables/jszip.min.js">
       <publishTime>09/18/2018 16:59:40</publishTime>
+    </File>
+    <File Include="Scripts/dmr.js">
+      <publishTime>05/09/2019 17:58:57</publishTime>
     </File>
     <File Include="Scripts/exam.js">
       <publishTime>03/28/2018 16:51:40</publishTime>
@@ -718,10 +727,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/18/2018 17:07:57</publishTime>
     </File>
     <File Include="Scripts/SmartLinks-db-script.txt">
-      <publishTime>01/25/2019 10:34:07</publishTime>
+      <publishTime>05/05/2019 09:33:50</publishTime>
     </File>
     <File Include="Scripts/SmartLinksCfg.txt">
-      <publishTime>03/23/2019 13:09:37</publishTime>
+      <publishTime>07/11/2019 13:59:28</publishTime>
     </File>
     <File Include="Scripts/snapfile.js">
       <publishTime>01/30/2019 15:35:13</publishTime>
@@ -745,7 +754,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/18/2019 11:06:39</publishTime>
     </File>
     <File Include="Scripts/_references.js">
-      <publishTime>03/28/2019 16:53:56</publishTime>
+      <publishTime>04/23/2019 13:41:47</publishTime>
     </File>
     <File Include="userfiles/ImageUpload.ashx">
       <publishTime>04/11/2018 10:03:02</publishTime>
@@ -802,7 +811,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>03/28/2019 16:55:24</publishTime>
     </File>
     <File Include="Views/Shared/_Layout4ProdLine.cshtml">
-      <publishTime>03/28/2019 16:55:24</publishTime>
+      <publishTime>04/24/2019 10:24:56</publishTime>
     </File>
     <File Include="Views/Shared/_Layout4Scrap.cshtml">
       <publishTime>03/28/2019 16:55:24</publishTime>
@@ -830,6 +839,9 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     </File>
     <File Include="Views/SmartLinks/CWDM4WLInfo.cshtml">
       <publishTime>10/24/2018 08:53:46</publishTime>
+    </File>
+    <File Include="Views/SmartLinks/DMRTrace.cshtml">
+      <publishTime>05/09/2019 17:38:28</publishTime>
     </File>
     <File Include="Views/SmartLinks/JOWorkFlow.cshtml">
       <publishTime>03/28/2019 16:09:02</publishTime>
@@ -874,7 +886,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>09/01/2017 08:41:03</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>01/29/2019 14:34:13</publishTime>
+      <publishTime>05/05/2019 17:10:03</publishTime>
     </File>
   </ItemGroup>
 </Project>
