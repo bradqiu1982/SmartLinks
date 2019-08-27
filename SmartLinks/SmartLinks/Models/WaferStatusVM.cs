@@ -20,7 +20,7 @@ namespace SmartLinks.Models
             }
             wafercond = wafercond.Substring(3);
 
-            var sql = @"SELECT left(dc.[ParamValueString],9) WaferNum, c.ContainerName,ws.WorkflowStepName,pbb.ProductName ProductPN,pf.ProductFamilyName,hml.MfgDate
+            var sql = @"SELECT distinct left(dc.[ParamValueString],9) WaferNum, c.ContainerName,ws.WorkflowStepName,pbb.ProductName ProductPN,pf.ProductFamilyName,hml.MfgDate
                         FROM InsiteDB.insite.container c with (nolock) 
                         left join InsiteDB.insite.currentStatus cs (nolock) on c.currentStatusId = cs.currentStatusId 
                         left join InsiteDB.insite.workflowstep ws(nolock) on  cs.WorkflowStepId = ws.WorkflowStepId 
@@ -43,7 +43,7 @@ namespace SmartLinks.Models
                         left join InsiteDB.insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid 
                         left join InsiteDB.insite.dc_AOC_ManualInspection dc (nolock) on hmll.[HistoryMainlineId]=dc.[HistoryMainlineId] 
                         WHERE dc.parametername='Trace_ID' and p.description like '%VCSEL%' and (<wafercond>) 
-	                        and Len(c.ContainerName) = 7  order by dc.[ParamValueString],hml.MfgDate asc";
+	                        and Len(c.ContainerName) = 7";
             sql = sql.Replace("<wafercond>", wafercond);
 
             var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
