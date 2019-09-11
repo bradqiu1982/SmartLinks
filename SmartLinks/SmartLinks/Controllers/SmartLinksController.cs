@@ -774,5 +774,24 @@ namespace SmartLinks.Controllers
             return ret;
         }
 
+
+        public ActionResult TestExcelFile()
+        {
+
+            var data = ExcelReader.RetrieveDataFromExcel(@"E:\video\Rel FA Summary_William Wu_NewData.xls", "Sheet1");
+            data = ExcelReader.RetrieveDataFromExcel(@"E:\video\ReceivingValueReport2019-09-04.xls", "");
+
+            data = ExcelReader.RetrieveDataFromExcel(@"E:\video\Finisar - OTS for WUXI.csv", "");
+            data = ExcelReader.RetrieveDataFromExcel(@"E:\video\Jobs_WXI2019-09-05.CSV", "");
+
+            data = ExcelReader.RetrieveDataFromExcel(@"E:\video\FA JO checklist_Engineering.xlsx", "Sheet1");
+            data = ExcelReader.RetrieveDataFromExcel(@"E:\video\Rel FA Summary_William Wu_NewData.xlsx", "Sheet1");
+
+            data = ExcelReader.RetrieveDataFromExcel(@"E:\video\Mini-PIP_log_current 20190726.xlsm", "Mini-PIP");
+            data = ExcelReader.RetrieveDataFromExcel(@"E:\video\Mini-PIP_log_current.xlsm", "Mini-PIP");
+
+            return View("All");
+        }
+
     }
 }

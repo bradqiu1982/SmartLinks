@@ -4,6 +4,23 @@ using System.Linq;
 using System.Web;
 using System.Runtime.InteropServices;
 using Excel = Microsoft.Office.Interop.Excel;
+using System.Windows.Documents;
+using System.Diagnostics;
+
+
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml;
+
+using CsvHelper;
+using System.IO;
+
+
+using NPOI.HSSF.UserModel;
+using NPOI.HPSF;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
+using NPOI.XSSF.Streaming;
 
 namespace SmartLinks.Models
 {
@@ -151,7 +168,10 @@ bool updateLinks)
             return ret;
         }
 
-        public static List<List<string>> RetrieveDataFromExcel(string wholefn, string sheetname, int columns = 101)
+        [DllImport("user32.dll")]
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+        public static List<List<string>> RetrieveDataFromExcel_OLD(string wholefn, string sheetname, int columns = 101)
         {
             var data = new List<List<string>>();
 
@@ -159,6 +179,8 @@ bool updateLinks)
             Excel.Workbook wkb = null;
             Excel.Workbooks books = null;
             Excel.Worksheet sheet = null;
+            int hWnd = 0;
+            uint processID = 0;
 
             try
             {
@@ -166,6 +188,9 @@ bool updateLinks)
                 excel.DisplayAlerts = false;
                 books = excel.Workbooks;
                 wkb = OpenBook(books, wholefn, true, false, false);
+
+                hWnd = excel.Application.Hwnd;
+                GetWindowThreadProcessId((IntPtr)hWnd, out processID);
 
                 if (string.IsNullOrEmpty(sheetname))
                 {
@@ -198,10 +223,30 @@ bool updateLinks)
 
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+
+                try
+                {
+                    Process[] procs = Process.GetProcessesByName("EXCEL");
+                    foreach (Process p in procs)
+                    {
+                        if (p.Id == processID)
+                        {
+                            p.Kill();
+                        }
+                        else
+                        {
+                            var btime = p.TotalProcessorTime;
+                            new System.Threading.ManualResetEvent(false).WaitOne(200);
+                            p.Refresh();
+                            var etime = p.TotalProcessorTime;
+                            if ((etime - btime).Ticks <= 10)
+                            { p.Kill(); }
+                        }
+                    }
+                }
+                catch (Exception e) { }
+
+
 
                 return ret;
 
@@ -236,9 +281,531 @@ bool updateLinks)
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
 
+                try
+                {
+                    Process[] procs = Process.GetProcessesByName("EXCEL");
+                    foreach (Process p in procs)
+                    {
+                        if (p.Id == processID)
+                        {
+                            p.Kill();
+                        }
+                        else
+                        {
+                            var btime = p.TotalProcessorTime;
+                            new System.Threading.ManualResetEvent(false).WaitOne(200);
+                            p.Refresh();
+                            var etime = p.TotalProcessorTime;
+                            if ((etime - btime).Ticks <= 10)
+                            { p.Kill(); }
+                        }
+                    }
+                }
+                catch (Exception e) { }
+
                 return data;
             }
 
+        }
+
+        public static List<List<string>> RetrieveDataFromExcel(string wholefn, string sheetname, int columns = 101)
+        {
+            var ext = Path.GetExtension(wholefn).ToUpper();
+            if (ext.Contains("XLSX") || ext.Contains("XLSM"))
+            {
+                return RetrieveDataFromExcel_XLSX(wholefn, sheetname, columns);
+            }
+            else if (ext.Contains("XLS"))
+            {
+                return RetrieveDataFromExcel_XLS(wholefn, sheetname, columns);
+            }
+            else if (ext.Contains("CSV"))
+            {
+                return RetrieveDataFromExcel_CSV(wholefn, sheetname, columns);
+            }
+            else
+            {
+                return RetrieveDataFromExcel_XLSX(wholefn, sheetname, columns);
+            }
+        }
+
+        public static List<List<string>> RetrieveDataFromExcel_XLSX(string wholefn, string sheetname, int columns = 101)
+        {
+            var ret = new List<List<string>>();
+            try
+            {
+                using (SpreadsheetDocument document =
+                    SpreadsheetDocument.Open(wholefn, false))
+                {
+                    document.WorkbookPart.Workbook.CalculationProperties.ForceFullCalculation = true;
+                    document.WorkbookPart.Workbook.CalculationProperties.FullCalculationOnLoad = true;
+
+                    WorkbookPart wbPart = document.WorkbookPart;
+                    Sheets theSheets = wbPart.Workbook.Sheets;
+                    WorksheetPart wsPart = null;
+
+                    if (!string.IsNullOrEmpty(sheetname))
+                    {
+                        foreach (Sheet item in theSheets)
+                        {
+                            if (string.Compare(item.Name, sheetname, true) == 0)
+                            {
+                                wsPart = (WorksheetPart)wbPart.GetPartById(item.Id);
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var idlist = new List<StringValue>();
+                        foreach (Sheet item in theSheets)
+                        {
+                            idlist.Add(item.Id);
+                        }
+                        if (idlist.Count > 0)
+                        {
+                            idlist.Sort(delegate (StringValue obj1, StringValue obj2)
+                            {
+                                var i1 = Convert.ToInt32(obj1.Value);
+                                var i2 = Convert.ToInt32(obj2.Value);
+                                return i1.CompareTo(i2);
+                            });
+                            wsPart = (WorksheetPart)wbPart.GetPartById(idlist[0]);
+                        }
+                    }
+
+                    if (wsPart == null)
+                    { return ret; }
+
+                    using (OpenXmlReader reader = OpenXmlReader.Create(wsPart))
+                    {
+                        while (reader.Read())
+                        {
+                            if (reader.ElementType == typeof(Row) && reader.IsStartElement)
+                            {
+                                Row row = (Row)reader.LoadCurrentElement();
+                                var line = new List<string>();
+                                var cells = row.Elements<Cell>();
+                                foreach (Cell c in cells)
+                                {
+                                    line.Add(GetFormattedCellValue(wbPart, c));
+                                    if (line.Count >= columns)
+                                    { break; }
+                                }
+                                if (WholeLineEmpty(line)) { continue; }
+                                ret.Add(line);
+                            }
+                        }
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                logthdinfo(DateTime.Now.ToString() + " Exception on " + wholefn + " :" + ex.Message + "\r\n\r\n");
+            }
+            return ret;
+        }
+
+        private static string GetFormattedCellValue(WorkbookPart workbookPart, Cell cell)
+        {
+            if (cell == null 
+                || cell.CellValue == null
+                || string.IsNullOrEmpty(cell.CellValue.Text))
+            {
+                return "";
+            }
+
+            var numberingFormats = workbookPart.WorkbookStylesPart.Stylesheet.NumberingFormats;
+
+            string value = "";
+            try
+            {
+                if (cell.DataType == null) // number & dates
+                {
+                    int styleIndex = (int)cell.StyleIndex.Value;
+                    CellFormat cellFormat = (CellFormat)workbookPart.WorkbookStylesPart.Stylesheet.CellFormats.ElementAt(styleIndex);
+                    uint formatId = cellFormat.NumberFormatId.Value;
+
+                    if (formatId >= 14 && formatId <= 22)
+                    {
+                        double oaDate;
+                        if (double.TryParse(cell.CellValue.Text, out oaDate))
+                        {
+                            value = DateTime.FromOADate(oaDate).ToString("yyyy-MM-dd HH:mm:ss");
+                        }
+                    }
+                    else if (formatId == 0)
+                    {
+                        value = cell.CellValue.Text;
+                    }
+                    else
+                    {
+                        NumberingFormat numberingFormat = null;
+                        try
+                        {
+                            numberingFormat = numberingFormats.Cast<NumberingFormat>()
+                               .SingleOrDefault(f => f.NumberFormatId.Value == formatId);
+                        }
+                        catch (Exception e) { }
+
+                        if (numberingFormat != null && numberingFormat.FormatCode.Value.Contains("yy"))
+                        {
+                            double oaDate;
+                            if (double.TryParse(cell.CellValue.Text, out oaDate))
+                            {
+                                value = DateTime.FromOADate(oaDate).ToString("yyyy-MM-dd HH:mm:ss");
+                            }
+                        }
+                        else
+                        {
+                            value = cell.CellValue.Text;
+                        }
+                    }
+                }
+                else // Shared string or boolean
+                {
+                    switch (cell.DataType.Value)
+                    {
+                        case CellValues.SharedString:
+                            SharedStringItem ssi = workbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(int.Parse(cell.CellValue.Text));
+                            value = ssi.Text.Text;
+                            break;
+                        case CellValues.Boolean:
+                            value = cell.CellValue.Text == "0" ? "false" : "true";
+                            break;
+                        default:
+                            value = cell.CellValue.Text;
+                            break;
+                    }
+                }
+            }
+            catch (Exception ex) {
+                return "";
+            }
+
+            return value;
+        }
+
+        public static List<List<string>> RetrieveDataFromExcel_CSV(string wholefn, string sheetname, int columns = 101)
+        {
+            var ret = new List<List<string>>();
+            try
+            {
+                using (var reader = new StreamReader(wholefn))
+                using (var csv = new CsvReader(reader))
+                {
+                    while (csv.Read())
+                    {
+                        var line = new List<string>();
+                        for (var idx = 0; idx < columns; idx++)
+                        {
+                            var val = "";
+                            if (csv.TryGetField<string>(idx, out val))
+                            {
+                                line.Add(val);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }//end for
+
+                        if (WholeLineEmpty(line)) { continue; }
+                        ret.Add(line);
+                    }//end while
+                }
+
+            }
+            catch (Exception ex) {
+                logthdinfo(DateTime.Now.ToString() + " Exception on " + wholefn + " :" + ex.Message + "\r\n\r\n");
+            }
+            return ret;
+        }
+
+        private static string GetFormulaVal(IFormulaEvaluator formula, ICell c)
+        {
+            var ret = "";
+            formula.EvaluateInCell(c);
+            switch (c.CellType)
+            {
+                case NPOI.SS.UserModel.CellType.Numeric:
+                    ret = c.NumericCellValue.ToString();
+                    break;
+                case NPOI.SS.UserModel.CellType.String:
+                    ret = c.StringCellValue.ToString();
+                    break;
+            }
+            return ret;
+        }
+
+        public static List<List<string>> RetrieveDataFromExcel_XLS(string wholefn, string sheetname, int columns = 101)
+        {
+            var ret = new List<List<string>>();
+            HSSFWorkbook hssfwb = null;
+            try
+            {
+                using (var fs = File.OpenRead(wholefn))
+                {
+                    
+                    hssfwb = new HSSFWorkbook(fs);
+                    HSSFFormulaEvaluator formula = new HSSFFormulaEvaluator(hssfwb);
+
+                    ISheet targetsheet = null;
+                    if (!string.IsNullOrEmpty(sheetname))
+                    {
+                        targetsheet = hssfwb.GetSheet(sheetname);
+                    }
+                    else
+                    {
+                        targetsheet = hssfwb.GetSheetAt(0);
+                    }
+
+                    if (targetsheet == null)
+                    { return ret; }
+
+                    var rownum = targetsheet.LastRowNum;
+                    for (var ridx = 0; ridx <= rownum; ridx++)
+                    {
+                        var row = targetsheet.GetRow(ridx);
+                        var cells = row.Cells;
+                        var line = new List<string>();
+                        foreach (var c in cells)
+                        {
+                            if (c == null)
+                            {
+                                line.Add("");
+                            }
+                            else
+                            {
+                                switch (c.CellType) {
+                                    case NPOI.SS.UserModel.CellType.String:
+                                        line.Add(c.StringCellValue);
+                                        break;
+                                    case NPOI.SS.UserModel.CellType.Numeric:
+                                        if (DateUtil.IsCellDateFormatted(c))
+                                        {
+                                            line.Add(c.DateCellValue.ToString("yyyy-MM-dd HH:mm:ss"));
+                                        }
+                                        else
+                                        {
+                                            line.Add(c.NumericCellValue.ToString());
+                                        }
+                                        break;
+                                    case NPOI.SS.UserModel.CellType.Boolean:
+                                        line.Add(c.StringCellValue);
+                                        break;
+                                    case NPOI.SS.UserModel.CellType.Blank:
+                                        line.Add("");
+                                        break;
+                                    case NPOI.SS.UserModel.CellType.Formula:
+                                        line.Add(GetFormulaVal(formula,c));
+                                        break;
+                                    default:
+                                        line.Add("");
+                                        break;
+                                }
+
+                            }
+
+                            if (line.Count > columns)
+                            { break; }
+                        }
+
+                        if (WholeLineEmpty(line)) { continue; }
+
+                        ret.Add(line);
+                    }
+                    hssfwb.Close();
+                }
+
+            }
+            catch (Exception ex) {
+                if (hssfwb != null)
+                { hssfwb.Close(); }
+                logthdinfo(DateTime.Now.ToString() + " Exception on " + wholefn + " :" + ex.Message + "\r\n\r\n");
+            }            
+
+            return ret;
+        }
+
+
+
+        public static List<List<string>> RetrieveDataFromExcel_XLSXNPOI(string wholefn, string sheetname, int columns = 101)
+        {
+            var ret = new List<List<string>>();
+            XSSFWorkbook xssfwb = null;
+            try
+            {
+                using (var fs = File.OpenRead(wholefn))
+                {
+
+                    xssfwb = new XSSFWorkbook(fs);
+                    XSSFFormulaEvaluator formula = new XSSFFormulaEvaluator(xssfwb);
+
+                    ISheet targetsheet = null;
+                    if (!string.IsNullOrEmpty(sheetname))
+                    {
+                        targetsheet = xssfwb.GetSheet(sheetname);
+                    }
+                    else
+                    {
+                        targetsheet = xssfwb.GetSheetAt(0);
+                    }
+
+                    if (targetsheet == null)
+                    { return ret; }
+
+                    var rownum = targetsheet.LastRowNum;
+                    for (var ridx = 0; ridx <= rownum; ridx++)
+                    {
+                        var row = targetsheet.GetRow(ridx);
+                        var cells = row.Cells;
+                        var line = new List<string>();
+                        foreach (var c in cells)
+                        {
+                            if (c == null)
+                            {
+                                line.Add("");
+                            }
+                            else
+                            {
+                                switch (c.CellType)
+                                {
+                                    case NPOI.SS.UserModel.CellType.String:
+                                        line.Add(c.StringCellValue);
+                                        break;
+                                    case NPOI.SS.UserModel.CellType.Numeric:
+                                        if (DateUtil.IsCellDateFormatted(c))
+                                        {
+                                            line.Add(c.DateCellValue.ToString("yyyy-MM-dd HH:mm:ss"));
+                                        }
+                                        else
+                                        {
+                                            line.Add(c.NumericCellValue.ToString());
+                                        }
+                                        break;
+                                    case NPOI.SS.UserModel.CellType.Boolean:
+                                        line.Add(c.StringCellValue);
+                                        break;
+                                    case NPOI.SS.UserModel.CellType.Blank:
+                                        line.Add("");
+                                        break;
+                                    case NPOI.SS.UserModel.CellType.Formula:
+                                        line.Add(GetFormulaVal(formula, c));
+                                        break;
+                                    default:
+                                        line.Add("");
+                                        break;
+                                }
+
+                            }
+
+                            if (line.Count > columns)
+                            { break; }
+                        }
+
+                        if (WholeLineEmpty(line)) { continue; }
+
+                        ret.Add(line);
+                    }
+                    xssfwb.Close();
+                }
+
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+            }
+            catch (Exception ex)
+            {
+                if (xssfwb != null)
+                { xssfwb.Close(); }
+                logthdinfo(DateTime.Now.ToString() + " Exception on " + wholefn + " :" + ex.Message + "\r\n\r\n");
+            }
+
+            return ret;
+        }
+
+        public static List<List<string>> RetrieveDataFromExcel_XLSXDOM(string wholefn, string sheetname, int columns = 101)
+        {
+            var ret = new List<List<string>>();
+            try
+            {
+                using (SpreadsheetDocument document =
+                    SpreadsheetDocument.Open(wholefn, false))
+                {
+                    document.WorkbookPart.Workbook.CalculationProperties.ForceFullCalculation = true;
+                    document.WorkbookPart.Workbook.CalculationProperties.FullCalculationOnLoad = true;
+
+                    WorkbookPart wbPart = document.WorkbookPart;
+                    Sheets theSheets = wbPart.Workbook.Sheets;
+                    SheetData sheetData = null;
+
+                    if (!string.IsNullOrEmpty(sheetname))
+                    {
+                        foreach (Sheet item in theSheets)
+                        {
+                            if (string.Compare(item.Name, sheetname, true) == 0)
+                            {
+                                WorksheetPart wsPart = (WorksheetPart)wbPart.GetPartById(item.Id);
+                                sheetData = wsPart.Worksheet.Elements<SheetData>().FirstOrDefault();
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var idlist = new List<StringValue>();
+                        foreach (Sheet item in theSheets)
+                        {
+                            idlist.Add(item.Id);
+                        }
+                        if (idlist.Count > 0)
+                        {
+                            idlist.Sort(delegate (StringValue obj1, StringValue obj2)
+                            {
+                                var i1 = Convert.ToInt32(obj1.Value);
+                                var i2 = Convert.ToInt32(obj2.Value);
+                                return i1.CompareTo(i2);
+                            });
+                            WorksheetPart wsPart = (WorksheetPart)wbPart.GetPartById(idlist[0]);
+                            sheetData = wsPart.Worksheet.Elements<SheetData>().FirstOrDefault();
+                        }
+                    }
+
+                    if (sheetData == null)
+                    { return ret; }
+                    var rows = sheetData.Elements<Row>();
+                    foreach (Row r in rows)
+                    {
+                        var line = new List<string>();
+                        var cells = r.Elements<Cell>();
+                        foreach (Cell c in cells)
+                        {
+                            line.Add(GetFormattedCellValue(wbPart, c));
+                            if (line.Count >= columns)
+                            { break; }
+                        }
+
+                        if (WholeLineEmpty(line)) { continue; }
+
+                        ret.Add(line);
+                    }
+                }
+
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                new System.Threading.ManualResetEvent(false).WaitOne(500);
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+
+            }
+            catch (Exception ex)
+            {
+                logthdinfo(DateTime.Now.ToString() + " Exception on " + wholefn + " :" + ex.Message + "\r\n\r\n");
+            }
+            return ret;
         }
 
         public static List<List<string>> RetrieveDataFromExcel_bak(string wholefn, string sheetname)
