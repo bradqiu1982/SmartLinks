@@ -141,7 +141,7 @@ namespace SmartLinks.Models
                     }
                     catch (Exception ex)
                     {
-                        logthdinfo("send exception: " + ex.Message);
+                        logthdinfo("Smartlinks send exception: " + ex.Message);
                     }
                 }).Start();
             }
