@@ -778,7 +778,17 @@ namespace SmartLinks.Controllers
         public ActionResult TestExcelFile()
         {
 
-            var data = ExcelReader.RetrieveDataFromExcel(@"E:\video\E186949_WorkFlowTable.csv", "");
+            var data = ExcelReader.RetrieveDataFromExcel(@"E:\video\HCR registry.xlsx", "");
+            return View("All");
+        }
+
+
+        public ActionResult TestEmail()
+        {
+            var to = new List<string>();
+            to.Add("brad.qiu@finisar.com");
+            EmailUtility.SendEmail(this, "TEST NEW EMAIL SERVER3", to, "Hello World3");
+            new System.Threading.ManualResetEvent(false).WaitOne(500);
             return View("All");
         }
 
