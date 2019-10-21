@@ -778,7 +778,7 @@ namespace SmartLinks.Controllers
         public ActionResult TestExcelFile()
         {
 
-            var data = ExcelReader.RetrieveDataFromExcel(@"E:\video\HCR registry.xlsx", "");
+            var data = ExcelReader.RetrieveDataFromExcel(@"E:\video\mechanical issue.xlsx", "");
             return View("All");
         }
 
