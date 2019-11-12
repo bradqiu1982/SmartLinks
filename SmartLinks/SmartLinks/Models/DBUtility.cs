@@ -356,6 +356,93 @@ namespace SmartLinks.Models
             }
         }
 
+        private static SqlConnection GetNebulaConnector()
+        {
+            var conn = new SqlConnection();
+            try
+            {
+                conn.ConnectionString = @"Server=wuxinpi;User ID=NebulaNPI;Password=abc@123;Database=NebulaTrace;Connection Timeout=120;";
+                conn.Open();
+                return conn;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("fail to connect to the mes report pdms database:" + ex.Message);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("fail to connect to the mes report pdms database" + ex.Message);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
+        }
+
+        /* parameters: 
+         * if you want to defense SQL injection,
+         * you can prepare @param in sql,
+         * and give @param-values in parameters.
+         */
+        public static List<List<object>> ExeNebulaSqlWithRes(string sql, Dictionary<string, string> parameters = null)
+        {
+            //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+
+            var ret = new List<List<object>>();
+            var conn = GetNebulaConnector();
+            try
+            {
+                if (conn == null)
+                    return ret;
+
+                var command = conn.CreateCommand();
+                command.CommandTimeout = 60;
+                command.CommandText = sql;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        command.Parameters.AddWithValue(param.Key, param.Value);
+                    }
+                }
+                var sqlreader = command.ExecuteReader();
+                if (sqlreader.HasRows)
+                {
+
+                    while (sqlreader.Read())
+                    {
+                        var newline = new List<object>();
+                        for (var i = 0; i < sqlreader.FieldCount; i++)
+                        {
+                            newline.Add(sqlreader.GetValue(i));
+                        }
+                        ret.Add(newline);
+                    }
+                }
+
+                sqlreader.Close();
+                CloseConnector(conn);
+                return ret;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                //System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                //System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+        }
+
+
 
         private static SqlConnection GetDMRConnector()
         {

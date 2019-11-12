@@ -775,6 +775,23 @@ namespace SmartLinks.Controllers
         }
 
 
+        public ActionResult SNFAFStatus()
+        { return View(); }
+
+        public JsonResult SNFAFStatusData()
+        {
+            var marks = Request.Form["marks"];
+            List<string> snlist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
+            var sndatalist = JODetailVM.SnFAFStatus(snlist);
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new
+            {
+                sndatalist = sndatalist
+            };
+            return ret;
+        }
+
         public ActionResult TestExcelFile()
         {
 

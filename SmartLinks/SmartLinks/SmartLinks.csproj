@@ -535,6 +535,7 @@
     <Content Include="Views\SmartLinks\JOWorkFlow.cshtml" />
     <Content Include="Views\SmartLinks\SNLatestStatus.cshtml" />
     <Content Include="Views\SmartLinks\DMRTrace.cshtml" />
+    <Content Include="Views\SmartLinks\SNFAFStatus.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

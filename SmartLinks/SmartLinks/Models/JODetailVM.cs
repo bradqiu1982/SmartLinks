@@ -7,6 +7,106 @@ namespace SmartLinks.Models
 {
     public class JODetailVM
     {
+
+        public static Dictionary<string, string> GetJOFromSN(List<string> snlist)
+        {
+            var ret = new Dictionary<string, string>();
+
+            var sql = @"select distinct c.ContainerName,jo.MfgOrderName from InsiteDB.insite.Container (nolock) c
+                    left join InsiteDB.insite.MfgOrder (nolock) jo on c.MfgOrderId = jo.MfgOrderId
+                    where c.ContainerName in <sncond>";
+            var sncond = "('" + string.Join("','", snlist) + "')";
+            sql = sql.Replace("<sncond>", sncond);
+            var dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+            foreach (var line in dbret)
+            {
+                var sn = UT.O2S(line[0]).ToUpper();
+                var jo = UT.O2S(line[1]).ToUpper();
+                if (!ret.ContainsKey(sn))
+                { ret.Add(sn, jo); }
+            }
+
+            foreach (var sn in snlist)
+            {
+                if (!ret.ContainsKey(sn))
+                {
+                    ret.Add(sn.ToUpper(), "");
+                }
+            }
+            return ret;
+        }
+
+        private static List<JODetailVM> GetFAFStatus(string jo)
+        {
+            var ret = new List<JODetailVM>();
+
+            var sql = "select [Checked],[ConfirmPeople],[ConfirmTime] from [NebulaTrace].[dbo].[FAFJoVM] where JO = @JO";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@JO", jo);
+            var dbret = DBUtility.ExeNebulaSqlWithRes(sql, dict);
+            foreach (var line in dbret)
+            {
+                var check = UT.O2S(line[0]).ToUpper();
+                var tempvm = new JODetailVM();
+                tempvm.CRTWFName = "NO";
+                if (check.Contains("TRUE"))
+                { tempvm.CRTWFName = "YES"; }
+                tempvm.CRTWFRev = UT.O2S(line[1]);
+                tempvm.CRTWFStepName = UT.O2S(line[2]);
+                ret.Add(tempvm);
+                break;
+            }
+
+            return ret;
+        }
+
+        public static List<object> SnFAFStatus(List<string> snlist)
+        {
+            var ret = new List<object>();
+            var snjodict = GetJOFromSN(snlist);
+            foreach (var kv in snjodict)
+            {
+                if (kv.Value.Contains("FAF"))
+                {
+                    var fafstat = GetFAFStatus(kv.Value);
+                    if (fafstat.Count == 0)
+                    {
+                        ret.Add(new
+                        {
+                            sn = kv.Key,
+                            jo = kv.Value,
+                            cfmstat = "JO NOT IN FAF CONFIRM LIST",
+                            cfmguy = "",
+                            cfmdt = ""
+                        });
+                    }
+                    else
+                    {
+                        ret.Add(new
+                        {
+                            sn = kv.Key,
+                            jo = kv.Value,
+                            cfmstat = fafstat[0].CRTWFName,
+                            cfmguy = fafstat[0].CRTWFRev,
+                            cfmdt = fafstat[0].CRTWFStepName
+                        });
+                    }
+                }
+                else
+                {
+                    ret.Add(new {
+                        sn = kv.Key,
+                        jo = kv.Value,
+                        cfmstat = "NOT FAF JO",
+                        cfmguy = "",
+                        cfmdt = ""
+                    });
+                }
+            }
+            return ret;
+        }
+
+
         public static List<JODetailVM> LoadData(List<string> jolist)
         {
             var ret = new List<JODetailVM>();
