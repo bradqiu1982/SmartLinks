@@ -69,8 +69,12 @@ namespace SmartLinks.Models
                         if (sn.Length != 7) {
                             continue;
                         }
+                        var failure = "N/A";
+                        if (l.Count >= 3)
+                        {
+                            failure = l[2];
+                        }
 
-                        var failure = l[2];
                         dict = new Dictionary<string, string>();
                         dict.Add("@DMRID", vm.DMRID);
                         dict.Add("@DMRProdLine", vm.DMRProdLine);
