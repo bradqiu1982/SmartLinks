@@ -46,5 +46,33 @@ namespace SmartLinks.Models
             return string.Empty;
         }
 
+
+        public static double O2D(object obj)
+        {
+            if (obj != null)
+            {
+                try
+                {
+                    return Convert.ToDouble(obj);
+                }
+                catch (Exception ex) { return 0.0; }
+            }
+            return 0.0;
+        }
+
+        public static int O2I(object obj)
+        {
+            if (obj != null)
+            {
+                try
+                {
+                    return Convert.ToInt32(obj);
+                }
+                catch (Exception ex) { return 0; }
+            }
+            return 0;
+        }
+
+
     }
 }

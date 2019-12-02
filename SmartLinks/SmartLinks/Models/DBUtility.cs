@@ -11,7 +11,7 @@ using System.IO;
 using System.Data;
 using System.Web.Caching;
 using System.Web.Mvc;
-using Oracle.DataAccess.Client;
+//using Oracle.DataAccess.Client;
 
 namespace SmartLinks.Models
 {
@@ -188,7 +188,177 @@ namespace SmartLinks.Models
             }
         }
 
+        private static SqlConnection GetAllenConnector()
+        {
+            var conn = new SqlConnection();
+            try
+            {
+                conn.ConnectionString = @"Server=TEX-CSSQL.texas.ads.finisar.com;User ID=jmpuser;Password=UhnWNcgHo;Database=EngrData;Connection Timeout=120;";
+                conn.Open();
+                return conn;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("fail to connect to the allen database:" + ex.Message);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("fail to connect to the allen database" + ex.Message);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
+        }
 
+        public static bool ExeAllenSqlNoRes(string sql, Dictionary<string, string> parameters = null)
+        {
+
+            var conn = GetAllenConnector();
+            if (conn == null)
+                return false;
+            SqlCommand command = null;
+
+            try
+            {
+                command = conn.CreateCommand();
+                command.CommandText = sql;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        SqlParameter parameter = new SqlParameter();
+                        parameter.ParameterName = param.Key;
+                        parameter.SqlDbType = SqlDbType.NVarChar;
+                        parameter.Value = param.Value;
+                        command.Parameters.Add(parameter);
+                    }
+                }
+                command.ExecuteNonQuery();
+                CloseConnector(conn);
+
+                return true;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                try
+                {
+                    if (command != null)
+                    {
+                        command.Dispose();
+                    }
+                }
+                catch (Exception e) { }
+                CloseConnector(conn);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return false;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                try
+                {
+                    if (command != null)
+                    {
+                        command.Dispose();
+                    }
+                }
+                catch (Exception e) { }
+                CloseConnector(conn);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return false;
+            }
+        }
+
+        public static List<List<object>> ExeAllenSqlWithRes(string sql, Dictionary<string, string> parameters = null)
+        {
+            var ret = new List<List<object>>();
+            var conn = GetAllenConnector();
+            if (conn == null)
+                return ret;
+            SqlDataReader sqlreader = null;
+            SqlCommand command = null;
+
+            try
+            {
+                command = conn.CreateCommand();
+                command.CommandTimeout = 180;
+                command.CommandText = sql;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        SqlParameter parameter = new SqlParameter();
+                        parameter.ParameterName = param.Key;
+                        parameter.SqlDbType = SqlDbType.NVarChar;
+                        parameter.Value = param.Value;
+                        command.Parameters.Add(parameter);
+                    }
+                }
+                sqlreader = command.ExecuteReader();
+                if (sqlreader.HasRows)
+                {
+                    while (sqlreader.Read())
+                    {
+                        Object[] values = new Object[sqlreader.FieldCount];
+                        sqlreader.GetValues(values);
+                        ret.Add(values.ToList<object>());
+                    }
+
+                }
+
+                sqlreader.Close();
+                CloseConnector(conn);
+                return ret;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+
+                try
+                {
+                    if (sqlreader != null)
+                    {
+                        sqlreader.Close();
+                    }
+                    if (command != null)
+                    {
+                        command.Dispose();
+                    }
+                }
+                catch (Exception e)
+                { }
+
+                CloseConnector(conn);
+
+                ret.Clear();
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+
+                try
+                {
+                    if (sqlreader != null)
+                    {
+                        sqlreader.Close();
+                    }
+                    if (command != null)
+                    {
+                        command.Dispose();
+                    }
+                }
+                catch (Exception e)
+                { }
+
+                CloseConnector(conn);
+
+                ret.Clear();
+                return ret;
+            }
+        }
 
         private static SqlConnection GetLocalBSConnector()
         {
@@ -682,69 +852,69 @@ namespace SmartLinks.Models
             }
         }
 
-        public static List<List<object>> ExeATESqlWithRes(string sql)
-        {
+        //public static List<List<object>> ExeATESqlWithRes(string sql)
+        //{
 
-            var ret = new List<List<object>>();
+        //    var ret = new List<List<object>>();
 
-            OracleConnection Oracleconn = null;
-            try
-            {
-                var ConnectionStr = "User Id=extviewer;Password=extviewer;Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=shg-oracle)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ateshg)));";
+        //    OracleConnection Oracleconn = null;
+        //    try
+        //    {
+        //        var ConnectionStr = "User Id=extviewer;Password=extviewer;Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=shg-oracle)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=ateshg)));";
 
-                Oracleconn = new OracleConnection(ConnectionStr);
-                try
-                {
-                    if (Oracleconn.State == ConnectionState.Closed)
-                    {
-                        Oracleconn.Open();
-                    }
-                    else if (Oracleconn.State == ConnectionState.Broken)
-                    {
-                        Oracleconn.Close();
-                        Oracleconn.Open();
-                    }
-                }
-                catch (Exception e)
-                {
-                    //System.Windows.MessageBox.Show(e.Message);
-                }
+        //        Oracleconn = new OracleConnection(ConnectionStr);
+        //        try
+        //        {
+        //            if (Oracleconn.State == ConnectionState.Closed)
+        //            {
+        //                Oracleconn.Open();
+        //            }
+        //            else if (Oracleconn.State == ConnectionState.Broken)
+        //            {
+        //                Oracleconn.Close();
+        //                Oracleconn.Open();
+        //            }
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            //System.Windows.MessageBox.Show(e.Message);
+        //        }
 
-                OracleCommand cmd = new OracleCommand(sql, Oracleconn);
-                cmd.CommandType = CommandType.Text;
-                OracleDataReader dr = cmd.ExecuteReader();
+        //        OracleCommand cmd = new OracleCommand(sql, Oracleconn);
+        //        cmd.CommandType = CommandType.Text;
+        //        OracleDataReader dr = cmd.ExecuteReader();
 
-                while (dr.Read())
-                {
-                    var line = new List<object>();
-                    for (int idx = 0; idx < dr.FieldCount; idx++)
-                    {
-                        line.Add(dr[idx]);
-                    }
-                    ret.Add(line);
-                }
+        //        while (dr.Read())
+        //        {
+        //            var line = new List<object>();
+        //            for (int idx = 0; idx < dr.FieldCount; idx++)
+        //            {
+        //                line.Add(dr[idx]);
+        //            }
+        //            ret.Add(line);
+        //        }
 
-                Oracleconn.Close();
-            }
-            catch (Exception ex)
-            {
-                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+        //        Oracleconn.Close();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
 
-                //System.Windows.MessageBox.Show(ex.Message);
+        //        //System.Windows.MessageBox.Show(ex.Message);
 
-                try
-                {
-                    if (Oracleconn != null)
-                    {
-                        Oracleconn.Close();
-                    }
-                }
-                catch (Exception ex1) { }
+        //        try
+        //        {
+        //            if (Oracleconn != null)
+        //            {
+        //                Oracleconn.Close();
+        //            }
+        //        }
+        //        catch (Exception ex1) { }
 
-            }
-            return ret;
+        //    }
+        //    return ret;
 
-        }
+        //}
 
     }
 }

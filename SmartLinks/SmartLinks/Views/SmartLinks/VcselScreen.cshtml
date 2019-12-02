@@ -1,0 +1,79 @@
+﻿
+@{
+    ViewBag.Title = "VcselScreen";
+    Layout = "~/Views/Shared/_Layout4ProdLine.cshtml";
+}
+
+
+<script type="text/javascript" src="~/Scripts/vcselscreen.js"></script>
+<script type="text/javascript">
+    VCSELSCREEN.INIT();
+</script>
+
+<style type="text/css">
+    .body-content {
+        height: 80%!important;    
+    }
+
+    th, td {
+        text-align: center;
+    }
+</style>
+
+
+<div class="row">
+    <div class="col-xs-4"></div>
+    <div class="col-xs-4"><h2>VCSEL SCREEN</h2></div>
+    <div class="col-xs-4"></div>
+</div>
+
+<hr>
+
+<div class="row form-group">
+    <div class="col-xs-2"><input class="form-control" type="text" readonly value="WAFER NUMBER" tabindex="-1" /></div>
+    <div class="col-xs-3"><input class="form-control" type="text" id="wafernum" name="wafernum" readonly="readonly"></div>
+    <div class="col-xs-7"></div>
+</div>
+<div class="row form-group">
+    <div class="col-xs-2"><input class="form-control" type="text" readonly value="X" tabindex="-1"/></div>
+    <div class="col-xs-3"><input class="form-control" type="text" id="x" name="x" /></div>
+    <div class="col-xs-7"></div>
+</div>
+<div class="row form-group">
+    <div class="col-xs-2"><input class="form-control" type="text" readonly value="Y" tabindex="-1"/></div>
+    <div class="col-xs-3"><input class="form-control" type="text" id="y" name="y" /></div>
+    <div class="col-xs-1"><button type="button" class="btn btn-success" id="btn-search" name="btn-search">Search</button></div>
+    <div class="col-xs-1"><button type="button" class="btn btn-success" id="btn-hisdata" name="btn-hisdata">History</button></div>
+    <div class="col-xs-5"></div>
+</div>
+
+
+<hr>
+
+<div class="row form-group">
+    <div class="col-xs-2"><h3 id="sw" name="sw"></h3></div>
+    <div class="col-xs-1"><h3 id="sx" name="sx"></h3></div>
+    <div class="col-xs-1"><h3 id="sy" name="sy"></h3></div>
+    <div class="col-xs-2"><h3 id="sa" name="sa"></h3></div>
+    <div class="col-xs-2"><h3 id="sp" name="sp"></h3></div>
+    <div class="col-xs-4"></div>
+</div>
+
+<div class="row form-group">
+    <div class="col-xs-2"></div>
+    <div class="col-xs-6" style="font-size:72px!important" id="result" name="result"></div>
+    <div class="col-xs-4"></div>
+</div>
+
+<div class="row form-group">
+    <div class="col-xs-1"></div>
+    <div class="col-xs-10">
+        <table class="table  table-condensed" id="mywafertable">
+            <caption class="tb-caption" id="tablename" name="tablename"></caption>
+            <thead id="WaferHead"></thead>
+            <tbody id="WaferTableID"></tbody>
+        </table>
+    </div>
+    <div class="col-xs-1"></div>
+</div>
+

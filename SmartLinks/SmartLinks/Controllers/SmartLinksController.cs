@@ -795,7 +795,7 @@ namespace SmartLinks.Controllers
         public ActionResult TestExcelFile()
         {
 
-            var data = ExcelReader.RetrieveDataFromExcel(@"E:\video\mechanical issue.xlsx", "");
+            var data = ExcelReader.RetrieveDataFromExcel(@"E:\video\HCR registry.xlsx", "");
             return View("All");
         }
 
@@ -809,5 +809,188 @@ namespace SmartLinks.Controllers
             return View("All");
         }
 
+
+
+        //public ActionResult LoadNeoMapData()
+        //{
+        //    var path = @"\\wux-engsys01\CostData\Apcalc2162\";
+
+        //    var fnames = new string[] { "191006-20.D02.filtered2.csv", "191006-30.D01.filtered2.csv", "191006-80.D00.filtered2.csv"
+        //        , "191419-20.D01.filtered2.csv","191419-60.D02.filtered2.csv","191419-70.D02.filtered2.csv","191420-30.D00.filtered2.csv"
+        //        ,"191420-50.D00.filtered2.csv","191420-60.D00.filtered2.csv","191420-70.D00.filtered2.csv" };
+        //    foreach (var f in fnames)
+        //    {
+        //        var alldata = ExcelReader.RetrieveDataFromExcel_CSV(path + f, "");
+
+        //        var datalist = new List<ProbeTestData>();
+
+        //        var idx = 0;
+        //        foreach (var line in alldata)
+        //        {
+        //            if (idx == 0)
+        //            { idx++; continue; }
+
+        //            var wafer = UT.O2S(line[0]);
+        //            var famy = UT.O2S(line[1]);
+        //            var x = UT.O2S(UT.O2I(line[2]));
+        //            var y = UT.O2S(UT.O2I(line[3]));
+        //            var bin = UT.O2S(line[4]);
+        //            var apsize = UT.O2S(line[5]);
+
+        //            if (!string.IsNullOrEmpty(wafer)
+        //                && !string.IsNullOrEmpty(x)
+        //                && !string.IsNullOrEmpty(y)
+        //                && !string.IsNullOrEmpty(apsize))
+        //            {
+        //                datalist.Add(new ProbeTestData(wafer, famy, x, y, bin, apsize));
+        //            }
+        //        }
+
+        //        if (datalist.Count > 0)
+        //        {
+        //            ProbeTestData.CleanData(datalist[0].Wafer);
+        //        }
+
+        //        if (datalist.Count > 0)
+        //        {
+        //            var array = ProbeTestData.GetWaferArray(datalist[0].Wafer);
+        //            foreach (var item in datalist)
+        //            {
+        //                item.APVal1 = array;
+        //                item.StoreData();
+        //            }
+        //        }
+
+        //    }
+        //    return View("All");
+        //}
+
+        public ActionResult VcselScreen()
+        {
+            return View();
+        }
+
+        public JsonResult VcselScreenData()
+        {
+            string IP = Request.UserHostName;
+            string compName = DetermineCompName(IP);
+
+            var wf = Request.Form["wf"];
+            var x = UT.O2I(Request.Form["x"]).ToString();
+            var y = UT.O2I(Request.Form["y"]).ToString();
+
+            var xlist = new List<int>();
+            var rest = "";
+            var probe = ProbeTestData.GetApSizeByWafer(wf, x, y);
+            if (string.IsNullOrEmpty(probe.ApSize))
+            {
+                if (ProbeTestData.HasData(wf))
+                { rest = "<span style='color:red'>NO DATA</span>"; }
+                else
+                { rest = "<span style='color:red'>NO WAFER</span>"; }
+            }
+            else
+            {
+                var aps = UT.O2D(probe.ApSize);
+                if (aps > 6.5)
+                {
+                    var array = UT.O2I(probe.APVal1);
+                    if (array > 1)
+                    {
+
+                        var idx = (UT.O2I(x)-1) / array;
+                        var firstx = idx * array + 1;
+                        xlist.Add(firstx);
+                        for (var i = 1; i < array; i++)
+                        { xlist.Add(firstx + i); }
+
+                        var matchfail = false;
+                        foreach (var tempx in xlist)
+                        {
+                            probe = ProbeTestData.GetApSizeByWafer(wf, tempx.ToString(), y);
+                            if (!string.IsNullOrEmpty(probe.ApSize) && UT.O2D(probe.ApSize) <= 6.5)
+                            {
+                                matchfail = true;
+                                break;
+                            }
+                        }
+
+                        if (matchfail)
+                        { rest = "<span style='color:red'>FAIL</span>"; }
+                        else
+                        { rest = "<span style='color:green'>PASS</span>"; }
+                        
+                    }
+                    else
+                    { rest = "<span style='color:green'>PASS</span>"; }
+                }
+                else
+                { rest = "<span style='color:red'>FAIL</span>"; }
+            }
+
+            ProbeTestData.UpdateQueryHistory(wf, x, y, compName, rest);
+            foreach (var tmpx in xlist)
+            { ProbeTestData.UpdateQueryHistory(wf, tmpx.ToString(), y, compName, rest); }
+
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new
+            {
+                wf= wf,
+                x = "X: " + x,
+                y = "Y: " + y,
+                ar = "Array: 1x"+probe.APVal1,
+                ap = "AP: "+probe.ApSize,
+                rest = rest
+            };
+            return ret;
+        }
+
+        public JsonResult VcselScreenWafer()
+        {
+            var wflist = ProbeTestData.WaferList();
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new
+            {
+                wflist = wflist
+            };
+            return ret;
+        }
+
+        public JsonResult GetVcselScreenHistory()
+        {
+            var wf = Request.Form["wf"];
+            var x = Request.Form["x"];
+            var y = Request.Form["y"];
+            if (x.Length > 0)
+            { x = UT.O2I(x).ToString(); }
+            if (y.Length > 0)
+            { y = UT.O2I(y).ToString(); }
+
+            var hisdata = ProbeTestData.GetQueryHistory(wf, x, y);
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new
+            {
+                hisdata = hisdata
+            };
+            return ret;
+        }
+
+        public ActionResult TestOCR()
+        {
+            try
+            {
+                //var rest = Ocr.Read(@"E:\video\die2.jpg");
+                //var rtxt = rest.Text;
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return View("All");
+        }
     }
 }
