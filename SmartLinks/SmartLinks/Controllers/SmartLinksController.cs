@@ -815,9 +815,7 @@ namespace SmartLinks.Controllers
         //{
         //    var path = @"\\wux-engsys01\CostData\Apcalc2162\";
 
-        //    var fnames = new string[] { "191006-20.D02.filtered2.csv", "191006-30.D01.filtered2.csv", "191006-80.D00.filtered2.csv"
-        //        , "191419-20.D01.filtered2.csv","191419-60.D02.filtered2.csv","191419-70.D02.filtered2.csv","191420-30.D00.filtered2.csv"
-        //        ,"191420-50.D00.filtered2.csv","191420-60.D00.filtered2.csv","191420-70.D00.filtered2.csv" };
+        //    var fnames = new string[] { "191007-10.D00.filtered.csv" };
         //    foreach (var f in fnames)
         //    {
         //        var alldata = ExcelReader.RetrieveDataFromExcel_CSV(path + f, "");
@@ -832,8 +830,8 @@ namespace SmartLinks.Controllers
 
         //            var wafer = UT.O2S(line[0]);
         //            var famy = UT.O2S(line[1]);
-        //            var x = UT.O2S(UT.O2I(line[2]));
-        //            var y = UT.O2S(UT.O2I(line[3]));
+        //            var x = UT.O2S(UT.O2I(line[2].Replace(".000000","")));
+        //            var y = UT.O2S(UT.O2I(line[3].Replace(".000000", "")));
         //            var bin = UT.O2S(line[4]);
         //            var apsize = UT.O2S(line[5]);
 
@@ -875,19 +873,37 @@ namespace SmartLinks.Controllers
             string IP = Request.UserHostName;
             string compName = DetermineCompName(IP);
 
-            var wf = Request.Form["wf"];
+            var wf = Request.Form["wf"].Trim();
             var x = UT.O2I(Request.Form["x"]).ToString();
             var y = UT.O2I(Request.Form["y"]).ToString();
 
-            var xlist = new List<int>();
             var rest = "";
+            if (wf.Length != 9 || !wf.Contains("-"))
+            {
+                rest = "<span style='color:red'>WAFER NUMBER WRONG</span>";
+                var ret1 = new JsonResult();
+                ret1.MaxJsonLength = Int32.MaxValue;
+                ret1.Data = new
+                {
+                    wf = wf,
+                    x = "X: " + x,
+                    y = "Y: " + y,
+                    ar = "Array: ",
+                    ap = "AP: ",
+                    rest = rest
+                };
+                return ret1;
+            }
+
+            var xlist = new List<int>();
+            
             var probe = ProbeTestData.GetApSizeByWafer(wf, x, y);
             if (string.IsNullOrEmpty(probe.ApSize))
             {
                 if (ProbeTestData.HasData(wf))
                 { rest = "<span style='color:red'>NO DATA</span>"; }
                 else
-                { rest = "<span style='color:red'>NO WAFER</span>"; }
+                { rest = "<span style='color:red'>"+ ProbeTestData.PrepareWaferAPSizeData(wf) + "</span>"; }
             }
             else
             {
@@ -978,6 +994,53 @@ namespace SmartLinks.Controllers
             return ret;
         }
 
+        public ActionResult SNApertureSize()
+        {
+            return View();
+        }
+
+        public JsonResult SNApertureSizeData()
+        {
+            var marks = Request.Form["marks"];
+            List<string> snlist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
+            var aplist = SNApertureSizeVM.LoadData(snlist,this);
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new
+            {
+                aplist = aplist
+            };
+            return ret;
+        }
+
+
+        public ActionResult PrepareApertureSize()
+        { return View(); }
+
+        public JsonResult PrepareApertureSizeData()
+        {
+            var marks = Request.Form["marks"];
+            List<string> wflist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
+            var aplist = new List<object>();
+            foreach (var wf in wflist)
+            {
+                var stat = ProbeTestData.PrepareWaferAPSizeData(wf);
+                aplist.Add(new
+                {
+                    wf = wf,
+                    stat = stat
+                });
+            }
+
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new
+            {
+                aplist = aplist
+            };
+            return ret;
+        }
+
         public ActionResult TestOCR()
         {
             try
@@ -992,5 +1055,75 @@ namespace SmartLinks.Controllers
             }
             return View("All");
         }
+
+        public ActionResult TestCDF()
+        {
+            try
+            {
+                var fi = new FileInfo(@"E:\video\191006-20.D02");
+                var CDF = new CDF(fi);
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return View("All");
+        }
+
+        //public ActionResult CheckOGPCorrection()
+        //{
+        //    var ogpdict = new Dictionary<string, Dictionary<string, bool>>();
+        //    var ogpcorrect = new Dictionary<string, int>();
+
+        //    var sql = "SELECT distinct [Wafer] ,[X] ,[Y] FROM [AIProjects].[dbo].[CouponData] where X<> '' and Y <> '' and timestamp < '2019-11-25 00:00:00' and timestamp > '2019-11-09 00:00:00' order by Wafer";
+        //    var dbret = DBUtility.ExeOGPSqlWithRes(sql);
+        //    foreach (var line in dbret)
+        //    {
+        //        var w = UT.O2S(line[0]);
+        //        var x = UT.O2S(UT.O2I(line[1]));
+        //        var y = UT.O2S(UT.O2I(line[2]));
+        //        var k = x + ":::" + y;
+
+        //        if (ogpdict.ContainsKey(w))
+        //        {
+        //            ogpdict[w].Add(k, true);
+        //        }
+        //        else
+        //        {
+        //            var tempdict = new Dictionary<string, bool>();
+        //            tempdict.Add(k, true);
+        //            ogpdict.Add(w, tempdict);
+        //        }
+        //    }
+
+        //    foreach (var kv in ogpdict)
+        //    {
+        //        var allxydict = new Dictionary<string, bool>();
+        //        var dict = new Dictionary<string, string>();
+        //        dict.Add("@WaferID", kv.Key);
+        //        sql = "select distinct Xcoord,Ycoord from [EngrData].[dbo].[VR_Eval_Pts_Data_Basic] where WaferID =@WaferID";
+        //        dbret = DBUtility.ExeLocalSqlWithRes(sql, dict);
+        //        foreach (var line in dbret)
+        //        {
+        //            var x = UT.O2S(UT.O2I(line[0]));
+        //            var y = UT.O2S(UT.O2I(line[1]));
+        //            var k = x + ":::" + y;
+        //            allxydict.Add(k, true);
+        //        }
+
+        //        ogpcorrect.Add(kv.Key, 0);
+        //        foreach (var ogpxy in kv.Value)
+        //        {
+        //            if (allxydict.ContainsKey(ogpxy.Key))
+        //            {
+        //                ogpcorrect[kv.Key] += 1; 
+        //            }
+        //        }
+
+        //    }
+
+        //    return View("All");
+        //}
+
     }
 }

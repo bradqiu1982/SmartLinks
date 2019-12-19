@@ -72,6 +72,22 @@ namespace SmartLinks.Models
             DBUtility.ExeLocalSqlNoRes(sql, dict);
         }
 
+        public void StoreMoreData()
+        {
+            var sql = "insert into ProbeTestData(Wafer,Famy,X,Y,Bin,ApSize,APVal1,APVal2,APVal3) values(@Wafer,@Famy,@X,@Y,@Bin,@ApSize,@APVal1,@APVal2,@APVal3)";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@Wafer", Wafer);
+            dict.Add("@Famy", Famy);
+            dict.Add("@X", X);
+            dict.Add("@Y", Y);
+            dict.Add("@Bin", Bin);
+            dict.Add("@ApSize", ApSize);
+            dict.Add("@APVal1", APVal1);
+            dict.Add("@APVal2", APVal2);
+            dict.Add("@APVal3", APVal3);
+            DBUtility.ExeLocalSqlNoRes(sql, dict);
+        }
+
         public static bool HasData(string w)
         {
             var sql = "select top 1 Wafer from ProbeTestData where Wafer = @Wafer";
@@ -227,6 +243,153 @@ namespace SmartLinks.Models
                 ret.Add(tempvm);
             }
             return ret;
+        }
+
+        public static bool AllenHasData(string WaferNum)
+        {
+            var sql = @"select top 1 [Xcoord],[Ycoord],[Ith],[SeriesR],[SlopEff] from [EngrData].[dbo].[Wuxi_WAT_VR_Report] 
+                        where [WaferID] = @WaferID and [Ith] is not null and [SeriesR] is not null and [SlopEff] is not null";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@WaferID", WaferNum);
+            var dbret = DBUtility.ExeAllenSqlWithRes(sql, dict);
+            if (dbret.Count > 0)
+            { return true; }
+            else
+            { return false; }
+        }
+
+        public static bool AddProbeTrigge2Allen(string WaferNum)
+        {
+            var sql = @"insert into [EngrData].[dbo].[NeoMAP_Triggers] ([Wafer_ID],[Trigger_Type],[Source]) 
+                    values(@WaferNum,'wuxiwat','Neo-Expert:david.mathes')";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@WaferNum", WaferNum);
+            return DBUtility.ExeAllenSqlNoRes(sql, dict);
+        }
+
+        public static List<ProbeTestData> GetIthFromAllen(string WaferNum)
+        {
+            var ret = new List<ProbeTestData>();
+            var sql = @"select distinct [WaferID],[Xcoord],[Ycoord],[Ith] from [EngrData].[dbo].[Wuxi_WAT_VR_Report] 
+                        where [WaferID] = @WaferNum and [Ith] is not null ";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@WaferNum", WaferNum);
+            var dbret = DBUtility.ExeAllenSqlWithRes(sql, dict);
+            foreach (var line in dbret)
+            {
+                var tempvm = new ProbeTestData();
+                tempvm.Wafer = UT.O2S(line[0]);
+                tempvm.X = UT.O2S(line[1]);
+                tempvm.Y = UT.O2S(line[2]);
+                tempvm.APVal2 = UT.O2S(line[3]);
+                ret.Add(tempvm);
+            }
+            return ret;
+        }
+
+        private static string GetAPConst2162FromAllen(string WaferNum)
+        {
+            var ConstList = new List<double>();
+
+            var dict = new Dictionary<string, string>();
+            dict.Add("@WaferNum", WaferNum);
+            var sql = "SELECT [ApCalc2162],[Ith] FROM [EngrData].[dbo].[VR_Ox_Pts_Data] where WaferID = @WaferNum";
+            var dbret = DBUtility.ExeAllenSqlWithRes(sql, dict);
+            if (dbret.Count == 0)
+            {
+                sql = @"select distinct m.Value as APSIZE_Meas,v.Ith from EngrData.dbo.Ox_meas_view m 
+                        left join AllenDataSQL.AllenData.dbo.Legacy_Oxide_Coordinates_View  x on m.product = x.product and x.Fieldname = m.Location
+                        left join EngrData.dbo.Wuxi_WAT_VR_Report v on v.WaferID = m.container and v.Xcoord= x.X_coord and v.Ycoord= x.Y_coord
+                        where m.container = @WaferNum and v.Ith is not null";
+                dbret = DBUtility.ExeAllenSqlWithRes(sql, dict);
+            }
+            
+            foreach (var line in dbret)
+            {
+                var apm = UT.O2D(line[0]);
+                var ith = UT.O2D(line[1]);
+                if (apm != 0 && ith != 0)
+                {
+                    var c = apm - 7996.8 * ith;
+                    ConstList.Add(c);
+                }
+            }
+
+            if (ConstList.Count > 0)
+            {
+                return MathNet.Numerics.Statistics.Statistics.Median(ConstList).ToString();
+            }
+
+            return string.Empty;
+        }
+
+        private static string GetAPConst2162FromLocal(string WaferNum)
+        {
+            var sql = "select ApConst from  WAT.dbo.WaferAPConst where Wafer= @Wafer";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@Wafer", WaferNum);
+            var dbret = DBUtility.ExeWATSqlWithRes(sql, dict);
+            foreach (var line in dbret)
+            {
+                return UT.O2S(line[0]);
+            }
+            return string.Empty;
+        }
+
+        private static void StoreAPConst2162ToLocal(string WaferNum,string apconst)
+        {
+            var sql = "insert into WAT.dbo.WaferAPConst(Wafer,ApConst) values(@Wafer,@ApConst)";
+            var dict = new Dictionary<string, string>();
+            dict.Add("@Wafer", WaferNum);
+            dict.Add("@ApConst", apconst);
+            DBUtility.ExeWATSqlNoRes(sql, dict);
+        }
+
+        public static string PrepareAPConst2162(string WaferNum)
+        {
+            if (WaferNum.Length != 9 || !WaferNum.Contains("-"))
+            { return string.Empty; }
+            var apconst = "";
+            apconst = GetAPConst2162FromLocal(WaferNum);
+            if (!string.IsNullOrEmpty(apconst))
+            { return apconst; }
+
+            apconst = GetAPConst2162FromAllen(WaferNum);
+            if (!string.IsNullOrEmpty(apconst))
+            { StoreAPConst2162ToLocal(WaferNum, apconst); }
+            return apconst;
+        }
+
+        public static string PrepareWaferAPSizeData(string WaferNum)
+        {
+            if (!AllenHasData(WaferNum))
+            {
+                AddProbeTrigge2Allen(WaferNum);
+                return "Wait 5 minutes.....";
+            }
+            else
+            {
+                var apconst = PrepareAPConst2162(WaferNum);
+                if (!string.IsNullOrEmpty(apconst))
+                {
+                    var probelist = GetIthFromAllen(WaferNum);
+                    var array = GetWaferArray(WaferNum);
+                    var dapconst = UT.O2D(apconst);
+                    foreach (var item in probelist)
+                    {
+                        item.APVal1 = array;
+                        item.APVal3 = apconst;
+                        item.ApSize = (UT.O2D(item.APVal2) * 7996.8 + dapconst).ToString();
+                        item.StoreMoreData();
+                    }
+
+                    return "TRY AGAIN";
+                }
+                else
+                {
+                    return "NO AP CONST";
+                }
+            }
         }
 
         public string Wafer { set; get; }

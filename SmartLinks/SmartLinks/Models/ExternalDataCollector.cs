@@ -300,6 +300,94 @@ namespace SmartLinks.Models
             }
         }
 
+        public static List<string> DirectoryEnumerateAllFiles(Controller ctrl, string dirname)
+        {
+            try
+            {
+                var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+                var folderuser = syscfgdict["SHAREFOLDERUSER"];
+                var folderdomin = syscfgdict["SHAREFOLDERDOMIN"];
+                var folderpwd = syscfgdict["SHAREFOLDERPWD"];
+
+                using (NativeMethods cv = new NativeMethods(folderuser, folderdomin, folderpwd))
+                {
+                    var ret = new Dictionary<string, string>();
+                    var nofolderfiles = Directory.GetFiles(dirname);
+                    foreach (var f in nofolderfiles)
+                    {
+                        var uf = f.ToUpper();
+                        if (!ret.ContainsKey(uf))
+                        { ret.Add(uf, f); }
+                    }
+
+                    var folders = Directory.GetDirectories(dirname);
+                    foreach (var fd in folders)
+                    {
+                        var fs = Directory.GetFiles(fd);
+                        foreach (var f in fs)
+                        {
+                            var uf = f.ToUpper();
+                            if (!ret.ContainsKey(uf))
+                            { ret.Add(uf, f); }
+                        }
+                    }
+                    return ret.Values.ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return new List<string>();
+            }
+        }
+
+        public static List<string> DirectoryEnumerateAllFilesByYear(Controller ctrl, string dirname, string foldematch)
+        {
+            try
+            {
+                var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+                var folderuser = syscfgdict["SHAREFOLDERUSER"];
+                var folderdomin = syscfgdict["SHAREFOLDERDOMIN"];
+                var folderpwd = syscfgdict["SHAREFOLDERPWD"];
+
+                using (NativeMethods cv = new NativeMethods(folderuser, folderdomin, folderpwd))
+                {
+                    var ret = new Dictionary<string, string>();
+                    //var nofolderfiles = Directory.GetFiles(dirname);
+                    //foreach (var f in nofolderfiles)
+                    //{
+                    //    var uf = f.ToUpper();
+                    //    if (!ret.ContainsKey(uf))
+                    //    { ret.Add(uf, f); }
+                    //}
+
+                    var folders = Directory.GetDirectories(dirname);
+                    foreach (var fd in folders)
+                    {
+                        var fds = fd.Split(new string[] { "\\" }, StringSplitOptions.RemoveEmptyEntries);
+                        var fdname = fds[fds.Length - 1];
+                        if (fdname.Length < 4)
+                        { continue; }
+
+                        if (!foldematch.Contains(fdname.Substring(0, 4)))
+                        { continue; }
+
+                        var fs = Directory.GetFiles(fd);
+                        foreach (var f in fs)
+                        {
+                            var uf = f.ToUpper();
+                            if (!ret.ContainsKey(uf))
+                            { ret.Add(uf, f); }
+                        }
+                    }
+                    return ret.Values.ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                return new List<string>();
+            }
+        }
+
         public static List<List<string>> RetrieveDataFromExcelWithAuth(Controller ctrl, string filename, string sheetname = null, int columns = 101)
         {
             try

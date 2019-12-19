@@ -11,6 +11,7 @@ using System.IO;
 using System.Data;
 using System.Web.Caching;
 using System.Web.Mvc;
+using System.Data.Odbc;
 //using Oracle.DataAccess.Client;
 
 namespace SmartLinks.Models
@@ -94,6 +95,7 @@ namespace SmartLinks.Models
             {
                 var command = conn.CreateCommand();
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -140,6 +142,7 @@ namespace SmartLinks.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 60;
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -188,6 +191,230 @@ namespace SmartLinks.Models
             }
         }
 
+        public static SqlConnection GetWATConnector()
+        {
+            var conn = new SqlConnection();
+            try
+            {
+                conn.ConnectionString = "Server=wuxinpi;User ID=WATApp;Password=WATApp@123;Database=WAT;Connection Timeout=120;";
+                conn.Open();
+                return conn;
+            }
+            catch (SqlException ex)
+            {
+                //System.Windows.MessageBox.Show(ex.ToString());
+                logthdinfo("open connect exception: " + ex.Message + "\r\n");
+                CloseConnector(conn);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                //System.Windows.MessageBox.Show(ex.ToString());
+                logthdinfo("open connect exception: " + ex.Message + "\r\n");
+                CloseConnector(conn);
+                return null;
+            }
+        }
+
+
+        public static bool ExeWATSqlNoRes(string sql, Dictionary<string, string> parameters = null)
+        {
+            //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+
+            var conn = GetWATConnector();
+            if (conn == null)
+                return false;
+
+            try
+            {
+                var command = conn.CreateCommand();
+                command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        SqlParameter parameter = new SqlParameter();
+                        parameter.ParameterName = param.Key;
+                        parameter.SqlDbType = SqlDbType.NVarChar;
+                        parameter.Value = param.Value;
+                        command.Parameters.Add(parameter);
+                    }
+                }
+                command.ExecuteNonQuery();
+                CloseConnector(conn);
+                return true;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                CloseConnector(conn);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return false;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                CloseConnector(conn);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return false;
+            }
+
+        }
+
+        public static List<List<object>> ExeWATSqlWithRes(string sql, Dictionary<string, string> parameters = null)
+        {
+            //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+
+            var ret = new List<List<object>>();
+            var conn = GetWATConnector();
+            try
+            {
+                if (conn == null)
+                    return ret;
+
+                var command = conn.CreateCommand();
+                command.CommandTimeout = 60;
+                command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        SqlParameter parameter = new SqlParameter();
+                        parameter.ParameterName = param.Key;
+                        parameter.SqlDbType = SqlDbType.NVarChar;
+                        parameter.Value = param.Value;
+                        command.Parameters.Add(parameter);
+                    }
+                }
+                var sqlreader = command.ExecuteReader();
+                if (sqlreader.HasRows)
+                {
+
+                    while (sqlreader.Read())
+                    {
+                        var newline = new List<object>();
+                        for (var i = 0; i < sqlreader.FieldCount; i++)
+                        {
+                            newline.Add(sqlreader.GetValue(i));
+                        }
+                        ret.Add(newline);
+                    }
+                }
+
+                sqlreader.Close();
+                CloseConnector(conn);
+                return ret;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                //System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                //System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+        }
+
+
+        public static SqlConnection GetOGPConnector()
+        {
+            var conn = new SqlConnection();
+            try
+            {
+                conn.ConnectionString = "Server=Wux-Parallel.china.ads.finisar.com;User ID=AiProject;Password=Ai@parallel;Database=AIProjects;Connection Timeout=120";
+                conn.Open();
+                return conn;
+            }
+            catch (SqlException ex)
+            {
+                //System.Windows.MessageBox.Show(ex.ToString());
+                logthdinfo("open connect exception: " + ex.Message + "\r\n");
+                CloseConnector(conn);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                //System.Windows.MessageBox.Show(ex.ToString());
+                logthdinfo("open connect exception: " + ex.Message + "\r\n");
+                CloseConnector(conn);
+                return null;
+            }
+        }
+
+        public static List<List<object>> ExeOGPSqlWithRes(string sql, Dictionary<string, string> parameters = null)
+        {
+            //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+
+            var ret = new List<List<object>>();
+            var conn = GetOGPConnector();
+            try
+            {
+                if (conn == null)
+                    return ret;
+
+                var command = conn.CreateCommand();
+                command.CommandTimeout = 60;
+                command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        SqlParameter parameter = new SqlParameter();
+                        parameter.ParameterName = param.Key;
+                        parameter.SqlDbType = SqlDbType.NVarChar;
+                        parameter.Value = param.Value;
+                        command.Parameters.Add(parameter);
+                    }
+                }
+                var sqlreader = command.ExecuteReader();
+                if (sqlreader.HasRows)
+                {
+
+                    while (sqlreader.Read())
+                    {
+                        var newline = new List<object>();
+                        for (var i = 0; i < sqlreader.FieldCount; i++)
+                        {
+                            newline.Add(sqlreader.GetValue(i));
+                        }
+                        ret.Add(newline);
+                    }
+                }
+
+                sqlreader.Close();
+                CloseConnector(conn);
+                return ret;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                //System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                //System.Windows.MessageBox.Show(ex.ToString());
+                CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+        }
+
+
         private static SqlConnection GetAllenConnector()
         {
             var conn = new SqlConnection();
@@ -223,6 +450,7 @@ namespace SmartLinks.Models
             {
                 command = conn.CreateCommand();
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -285,6 +513,7 @@ namespace SmartLinks.Models
                 command = conn.CreateCommand();
                 command.CommandTimeout = 180;
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -398,6 +627,7 @@ namespace SmartLinks.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 60;
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -480,6 +710,7 @@ namespace SmartLinks.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 180;
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -568,6 +799,7 @@ namespace SmartLinks.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 60;
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -647,6 +879,7 @@ namespace SmartLinks.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 180;
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -727,6 +960,7 @@ namespace SmartLinks.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 120;
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -806,6 +1040,7 @@ namespace SmartLinks.Models
                 var command = conn.CreateCommand();
                 command.CommandTimeout = 180;
                 command.CommandText = sql;
+                command.CommandText = "SET ARITHABORT ON;" + command.CommandText;
                 if (parameters != null)
                 {
                     foreach (var param in parameters)
@@ -847,6 +1082,113 @@ namespace SmartLinks.Models
             {
                 logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
                 CloseConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+        }
+
+
+        private static OdbcConnection GetCDPConnector()
+        {
+            var conn = new OdbcConnection();
+            try
+            {
+                conn.ConnectionString = @"driver={Cloudera ODBC Driver for Impala};Database=wuxi;host=10.20.10.202;port=21050;uid=bqiu;pwd=finisar123";
+                conn.Open();
+                return conn;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("fail to connect to the FAI summary database:" + ex.Message);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("fail to connect to the FAI summary database" + ex.Message);
+                //System.Windows.MessageBox.Show(ex.ToString());
+                return null;
+            }
+        }
+
+        public static void CloseOConnector(OdbcConnection conn)
+        {
+            if (conn == null)
+                return;
+
+            try
+            {
+                conn.Dispose();
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("close conn exception: " + ex.Message + "\r\n");
+                //System.Windows.MessageBox.Show(ex.ToString());
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("close conn exception: " + ex.Message + "\r\n");
+            }
+        }
+
+        /* parameters: 
+         * if you want to defense SQL injection,
+         * you can prepare @param in sql,
+         * and give @param-values in parameters.
+         */
+        public static List<List<object>> ExeCDPSqlWithRes(string sql, Dictionary<string, string> parameters = null)
+        {
+            //var syscfgdict = CfgUtility.GetSysConfig(ctrl);
+
+            var ret = new List<List<object>>();
+            var conn = GetCDPConnector();
+            try
+            {
+                if (conn == null)
+                    return ret;
+
+                var command = conn.CreateCommand();
+                command.CommandTimeout = 60;
+                command.CommandText = sql;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        command.Parameters.AddWithValue(param.Key, param.Value);
+                    }
+                }
+                var sqlreader = command.ExecuteReader();
+                if (sqlreader.HasRows)
+                {
+
+                    while (sqlreader.Read())
+                    {
+                        var newline = new List<object>();
+                        for (var i = 0; i < sqlreader.FieldCount; i++)
+                        {
+                            newline.Add(sqlreader.GetValue(i));
+                        }
+                        ret.Add(newline);
+                    }
+                }
+
+                sqlreader.Close();
+                CloseOConnector(conn);
+                return ret;
+            }
+            catch (SqlException ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                //System.Windows.MessageBox.Show(ex.ToString());
+                CloseOConnector(conn);
+                ret.Clear();
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                logthdinfo("execute exception: " + sql + "\r\n" + ex.Message + "\r\n");
+                //System.Windows.MessageBox.Show(ex.ToString());
+                CloseOConnector(conn);
                 ret.Clear();
                 return ret;
             }

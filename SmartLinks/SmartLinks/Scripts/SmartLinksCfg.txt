@@ -73,3 +73,5 @@ COCCOS-1287238:::COS
 
 DMRTRACEPRODUCTLINES:::Para CWDM4 Gen3 -OSA CWDM4 Gen
 DMRCACHEHOUR:::6.0
+
+BIITHFOLDER:::\\vcselbi-fs\Production_test_data\active\vcsel bi test\QSFP 28G
