@@ -33,7 +33,7 @@ public class ImageUpload : IHttpHandler {
 
                 var fn = Path.GetFileNameWithoutExtension(tempfn) + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(tempfn);
                 fn = fn.Replace(" ", "_").Replace("#", "").Replace("'", "")
-                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "");
+                            .Replace("&", "").Replace("?", "").Replace("%", "").Replace("+", "").Replace(":","");
 
                 uploads.SaveAs(imgdir + fn);
                 url = "/userfiles/images/" + datestring + "/" + fn;
@@ -103,8 +103,7 @@ public class ImageUpload : IHttpHandler {
 
             if (string.Compare(bimage,"IMG")== 0)
             {
-                //context.Response.Write("<p><img src='" + url + "'/></p>");
-                context.Response.Write( url );
+                context.Response.Write("<p><img src='" + url + "'/></p>");
             }
             else if (string.Compare(bimage,"VIDEO")== 0)
             {

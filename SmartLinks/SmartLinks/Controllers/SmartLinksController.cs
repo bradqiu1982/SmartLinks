@@ -1070,60 +1070,95 @@ namespace SmartLinks.Controllers
             return View("All");
         }
 
-        //public ActionResult CheckOGPCorrection()
-        //{
-        //    var ogpdict = new Dictionary<string, Dictionary<string, bool>>();
-        //    var ogpcorrect = new Dictionary<string, int>();
+        public ActionResult FR4Binning()
+        {
+            return View();
+        }
 
-        //    var sql = "SELECT distinct [Wafer] ,[X] ,[Y] FROM [AIProjects].[dbo].[CouponData] where X<> '' and Y <> '' and timestamp < '2019-11-25 00:00:00' and timestamp > '2019-11-09 00:00:00' order by Wafer";
-        //    var dbret = DBUtility.ExeOGPSqlWithRes(sql);
-        //    foreach (var line in dbret)
-        //    {
-        //        var w = UT.O2S(line[0]);
-        //        var x = UT.O2S(UT.O2I(line[1]));
-        //        var y = UT.O2S(UT.O2I(line[2]));
-        //        var k = x + ":::" + y;
+        public JsonResult FR4BinningData()
+        {
+            var marks = Request.Form["marks"];
+            List<string> pnlist = (List<string>)Newtonsoft.Json.JsonConvert.DeserializeObject(marks, (new List<string>()).GetType());
+            var sdate = "";
+            var edate = "";
 
-        //        if (ogpdict.ContainsKey(w))
-        //        {
-        //            ogpdict[w].Add(k, true);
-        //        }
-        //        else
-        //        {
-        //            var tempdict = new Dictionary<string, bool>();
-        //            tempdict.Add(k, true);
-        //            ogpdict.Add(w, tempdict);
-        //        }
-        //    }
+            if (!string.IsNullOrEmpty(Request.Form["sdate"]))
+            {
+                sdate = Request.Form["sdate"] + " 00:00:00";
+                edate = Request.Form["edate"] + " 23:59:59";
+            }
+            else
+            {
+                sdate = "1982-05-06 10:00:00";
+                edate = sdate;
+            }
 
-        //    foreach (var kv in ogpdict)
-        //    {
-        //        var allxydict = new Dictionary<string, bool>();
-        //        var dict = new Dictionary<string, string>();
-        //        dict.Add("@WaferID", kv.Key);
-        //        sql = "select distinct Xcoord,Ycoord from [EngrData].[dbo].[VR_Eval_Pts_Data_Basic] where WaferID =@WaferID";
-        //        dbret = DBUtility.ExeLocalSqlWithRes(sql, dict);
-        //        foreach (var line in dbret)
-        //        {
-        //            var x = UT.O2S(UT.O2I(line[0]));
-        //            var y = UT.O2S(UT.O2I(line[1]));
-        //            var k = x + ":::" + y;
-        //            allxydict.Add(k, true);
-        //        }
 
-        //        ogpcorrect.Add(kv.Key, 0);
-        //        foreach (var ogpxy in kv.Value)
-        //        {
-        //            if (allxydict.ContainsKey(ogpxy.Key))
-        //            {
-        //                ogpcorrect[kv.Key] += 1; 
-        //            }
-        //        }
+            var datalist = PNSNFR4Binning.GetPNSNData(pnlist, sdate, edate);
 
-        //    }
+            var ret = new JsonResult();
+            ret.MaxJsonLength = Int32.MaxValue;
+            ret.Data = new
+            {
+                sndatalist = datalist
+            };
+            return ret;
+        }
 
-        //    return View("All");
-        //}
+            //public ActionResult CheckOGPCorrection()
+            //{
+            //    var ogpdict = new Dictionary<string, Dictionary<string, bool>>();
+            //    var ogpcorrect = new Dictionary<string, int>();
 
-    }
+            //    var sql = "SELECT distinct [Wafer] ,[X] ,[Y] FROM [AIProjects].[dbo].[CouponData] where X<> '' and Y <> '' and timestamp < '2019-11-25 00:00:00' and timestamp > '2019-11-09 00:00:00' order by Wafer";
+            //    var dbret = DBUtility.ExeOGPSqlWithRes(sql);
+            //    foreach (var line in dbret)
+            //    {
+            //        var w = UT.O2S(line[0]);
+            //        var x = UT.O2S(UT.O2I(line[1]));
+            //        var y = UT.O2S(UT.O2I(line[2]));
+            //        var k = x + ":::" + y;
+
+            //        if (ogpdict.ContainsKey(w))
+            //        {
+            //            ogpdict[w].Add(k, true);
+            //        }
+            //        else
+            //        {
+            //            var tempdict = new Dictionary<string, bool>();
+            //            tempdict.Add(k, true);
+            //            ogpdict.Add(w, tempdict);
+            //        }
+            //    }
+
+            //    foreach (var kv in ogpdict)
+            //    {
+            //        var allxydict = new Dictionary<string, bool>();
+            //        var dict = new Dictionary<string, string>();
+            //        dict.Add("@WaferID", kv.Key);
+            //        sql = "select distinct Xcoord,Ycoord from [EngrData].[dbo].[VR_Eval_Pts_Data_Basic] where WaferID =@WaferID";
+            //        dbret = DBUtility.ExeLocalSqlWithRes(sql, dict);
+            //        foreach (var line in dbret)
+            //        {
+            //            var x = UT.O2S(UT.O2I(line[0]));
+            //            var y = UT.O2S(UT.O2I(line[1]));
+            //            var k = x + ":::" + y;
+            //            allxydict.Add(k, true);
+            //        }
+
+            //        ogpcorrect.Add(kv.Key, 0);
+            //        foreach (var ogpxy in kv.Value)
+            //        {
+            //            if (allxydict.ContainsKey(ogpxy.Key))
+            //            {
+            //                ogpcorrect[kv.Key] += 1; 
+            //            }
+            //        }
+
+            //    }
+
+            //    return View("All");
+            //}
+
+        }
 }

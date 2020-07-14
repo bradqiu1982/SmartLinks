@@ -1,0 +1,111 @@
+﻿
+@{
+    ViewBag.Title = "FR4Binning";
+    Layout = "~/Views/Shared/_Layout4ProdLine.cshtml";
+}
+
+
+
+<link type="text/css" rel="stylesheet" href="~/Content/wafer.css" />
+
+<style type="text/css">
+    th, td {
+        text-align: center;
+    }
+</style>
+
+<script type="text/javascript" src="~/Scripts/joworkflow.js"></script>
+<script type="text/javascript" src="~/Scripts/jquery-bootstrap-loading.js"></script>
+<script type="text/javascript">
+    $(function(){
+        JOWORKFLOW.pninit();
+    })
+</script>
+
+<style type="text/css">
+    .marks {
+    width: 100%;
+    height: 70% !important;
+    max-height: 100%;
+    max-width: 100%;
+    font-size: 18px;
+    }
+
+    .total-marks {
+	font-size: 18px;
+	padding: 6px 12px;
+	border-radius: 4px;
+	text-align: center;
+    }
+
+    th {
+        font-size:12px!important;
+    }
+    td {
+        font-size:10px!important;
+    }
+</style>
+
+<div class="col-xs-3 mark-lists">
+    <div class="marks-title">
+        <span>Please Input PN:</span>
+    </div>
+    <textarea class="form-control marks" id="marks"></textarea>
+    <div class="row" style="margin-top:10px;padding-left:15px;">
+        <div class="total-marks label-success col-xs-3">START</div>
+        <div class="col-xs-8">
+            <div class="input-group date" data-date="" data-date-format="yyyy-mm-dd">
+                <input type="text" class="form-control"
+                       id="sdate" name="sdate" value="" placeholder="Start Date" readonly>
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-th"></span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row"  style="margin-top:10px;padding-left:15px;">
+        <div class="total-marks label-success col-xs-3">END</div>
+        <div class="col-xs-8">
+            <div class="input-group date" data-date="" data-date-format="yyyy-mm-dd">
+                <input type="text" class="form-control"
+                       id="edate" name="edate" value="" placeholder="End Date" readonly>
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-th"></span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row"  style="margin-top:10px;padding-left:15px;">
+        <div class="total-marks label-danger col-xs-3" id="total-marks">0</div>
+        <div class="col-xs-4">
+            <input type="button" class="btn btn-success btn-marks-submit" id="btn-marks-snsubmit" value="SN">
+        </div>
+        <div class="marks-op col-xs-4 ">
+            <input type="button" class="btn btn-success btn-marks-submit" id="btn-marks-submit" value="PN">
+        </div>
+    </div>
+</div>
+<div class="col-xs-9 mark-detail">
+    <div class="mark-detail-op">
+    </div>
+    <table class="table  table-condensed" id="mywafertable">
+        <caption class="tb-caption">FDR4 BINNING</caption>
+        <thead>
+            <tr>
+                <th>SN</th>
+                <th>PN</th>
+                <th>MPN</th>
+                <th>TIME</th>
+                <th>ErrAbbr</th>
+                <th>ProductGrade</th>
+                <th>ProdBinPwrCsum</th>
+                <th>ModTempC</th>
+                <th>WorkFlowStep</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="WaferTableID"></tbody>
+    </table>
+</div>
+
+

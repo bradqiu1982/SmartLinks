@@ -274,17 +274,50 @@ namespace SmartLinks.Models
                 }
             }
 
+            if (leftsnlist.Count > 0)
+            {
+                var sncond2 = "('"+string.Join("','", leftsnlist)+"')";
+
+                sql = @"select tco.ContainerName,left(dc.ParamValueString,9) as wafer,pb.ProductName
+	                from InsiteDB.insite.container fco (nolock) 
+	                inner join insitedb.insite.IssueActualsHistory iah with(nolock) on iah.FromContainerId = fco.ContainerId
+	                inner join  InsiteDB.insite.container tco (nolock) on iah.ToContainerId = tco.ContainerId
+	                inner join insitedb.insite.Product p  (nolock) on p.ProductId  = fco.ProductId
+	                inner join insitedb.insite.ProductBase pb  (nolock) on pb.ProductBaseId  = p.ProductBaseId
+	                inner join  InsiteDB.insite.container orgco (nolock) on orgco.ContainerName = fco.DateCode
+	                inner join insitedb.insite.Historymainline hml  with(nolock) on hml.HistoryId = orgco.ContainerId
+	                inner join InsiteDB.insite.dc_AOC_ManualInspection dc (nolock) on dc.historymainlineid = hml.historymainlineid
+	                 where tco.ContainerName in <SNCOND> and p.description like '%VCSEL%' and dc.ParameterName = 'Trace_ID' and dc.ParamValueString is not null";
+
+                sql = sql.Replace("<SNCOND>", sncond2);
+                dbret = DBUtility.ExeRealMESSqlWithRes(sql);
+                foreach (var line in dbret)
+                {
+                    var tempvm = new WaferTableItem();
+                    tempvm.SN = Convert.ToString(line[0]);
+                    tempvm.WaferNum = Convert.ToString(line[1]);
+                    tempvm.PN = Convert.ToString(line[2]);
+                    tetmpres.Add(tempvm);
+
+                    if (!queryedsndict.ContainsKey(tempvm.SN.Trim().ToUpper()))
+                    {
+                        queryedsndict.Add(tempvm.SN.Trim().ToUpper(), true);
+                    }
+                }
+            }
+
+            leftsnlist = new List<string>();
+            foreach (var item in desdata)
+            {
+                if (!string.IsNullOrEmpty(item.SN.Trim())
+                    && !queryedsndict.ContainsKey(item.SN.Trim().ToUpper()))
+                {
+                    leftsnlist.Add(item.SN.Trim());
+                }
+            }
 
             if (leftsnlist.Count > 0)
             {
-                //sncond = " ('";
-                //foreach (var item in leftsnlist)
-                //{
-                //    sncond = sncond + item + "','";
-                //}
-                //sncond = sncond.Substring(0, sncond.Length - 2);
-                //sncond = sncond + ") ";
-
                 StringBuilder sb1 = new StringBuilder(10 * (leftsnlist.Count + 5));
                 sb1.Append("('");
                 foreach (var line in leftsnlist)
@@ -293,23 +326,6 @@ namespace SmartLinks.Models
                 }
                 var tempstr1 = sb1.ToString();
                 var sncond1 = tempstr1.Substring(0, tempstr1.Length - 2) + ")";
-
-                //sql = "SELECT distinct c.ContainerName as SN,dc.[ParamValueString] as wafer,pb.productname MaterialPN FROM insite.container c with(nolock)"
-                //    + " inner join insite.currentStatus cs(nolock) on c.currentStatusId = cs.currentStatusId "
-                //    + "inner join insite.workflowstep ws(nolock) on cs.WorkflowStepId = ws.WorkflowStepId "
-                //    + "inner join insite.historyMainline hml with (nolock) on c.containerId = hml.containerId "
-                //    + "inner join insite.componentIssueHistory cih with (nolock) on hml.historyMainlineId=cih.historyMainlineId "
-                //    + "inner join insite.issueHistoryDetail ihd with (nolock) on cih.componentIssueHistoryId = ihd.componentIssueHistoryId "
-                //    + "inner join insite.issueActualsHistory iah with (nolock) on ihd.issueHistoryDetailId = iah.issueHistoryDetailId "
-                //    + "inner join insite.container cFrom with (nolock) on iah.fromContainerId = cFrom.containerId "
-                //    + "inner join insite.product p with (nolock) on cFrom.productId = p.productId "
-                //    + "inner join insite.productBase pb with (nolock) on p.productBaseId  = pb.productBaseId "
-                //    + "inner join insite.historyMainline hmll with (nolock)on cFrom.containerId=hmll.historyid "
-                //    + "inner join insite.product pp with (nolock) on c.productid=pp.productid "
-                //    + "left outer join insite.productfamily pf (nolock) on pp.productFamilyId = pf.productFamilyId "
-                //    + "inner join insite.productbase pbb with (nolock) on pp.productbaseid=pbb.productbaseid "
-                //    + "inner join[InsiteDB].[insite].[dc_AOC_ManualInspection] dc (nolock) on hmll.[HistoryMainlineId]= dc.[HistoryMainlineId] "
-                //    + "where dc.parametername= 'Trace_ID'  and p.description like '%VCSEL%'  and c.containername in <SNCOND> order by c.ContainerName,pb.productname ";
 
                 sql = @"SELECT distinct c.ContainerName as SerialName,isnull(dc.[ParamValueString],'') as WaferLot,pb.productname MaterialPN ,hml.MfgDate
                         FROM InsiteDB.insite.container c with (nolock) 
@@ -352,8 +368,10 @@ namespace SmartLinks.Models
                     }
                     tempvm.PN = Convert.ToString(line[2]);
                     tetmpres.Add(tempvm);
+
                 }
             }
+ 
 
             foreach (var des in desdata)
             {

@@ -344,3 +344,17 @@ CREATE TABLE dbo.ProbeTestData(
 	[APVal9] DATETIME      DEFAULT ('1982-05-06 10:00:00') NOT NULL
 );
 
+CREATE TABLE [dbo].[SimpleNoteVM] (
+	[notekey]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[doorcode]   NVARCHAR (200)   DEFAULT ('')  NOT NULL,
+	[note]   NVARCHAR (MAX)   DEFAULT ('')  NOT NULL,
+    [notedate]   DATETIME       DEFAULT ('1982-05-06 10:00:00') NOT NULL,
+	[APVal1] NVARCHAR(200) DEFAULT ('') NOT NULL,
+	[APVal2] NVARCHAR(200) DEFAULT ('') NOT NULL,
+	[APVal3] NVARCHAR(200) DEFAULT ('') NOT NULL
+);
+
+create index dooridx on SimpleNoteVM(doorcode);
+
+
+

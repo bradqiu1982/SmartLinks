@@ -1,0 +1,53 @@
+﻿
+@{
+    ViewBag.Title = "DoorCode";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/welcome.css" rel="stylesheet" type="text/css" />
+
+<div class="row" style="min-height:90%">
+    <div class="wel-container">
+        <div class="wel-bg">
+            <img src="~/Content/images/welcome.png" class="wel-bg-img" />
+        </div>
+        <div class="wel-body">
+            <div class="wel-title">Welcome to Simple Notes</div>
+            <div class="wel-op">
+                <div class="input-group">
+                    <label class="form-control  wel-label">Door Code</label>
+                    <input type="text" class="form-control wel-input" id="username" name="username">
+                </div>
+                <div class="wel-eg">
+                    <span class="wel-eg-txt">Door Code can be any word you input.Rememeber it when you come back</span>
+                </div>
+                <div class="wel-submit">
+                    <input type="button" class="btn btn-success btn-wel-submit" value="Submit" onclick="UpdateUserName()" />
+                </div>
+
+            </div>
+            <script type="text/javascript">
+            $(function () {
+                $('#username').focus();
+            })
+
+            function UpdateUserName() {
+                var username = $('#username').val();
+                if (username) {
+                    window.location.href = '/PWDNotes/SimpleNotes?doorcode=' + encodeURIComponent(username)
+                }
+                return false;
+            }
+
+            $('body').on('keypress', '#username', function (e) {
+                if (e.keyCode == 13) {
+                   UpdateUserName();
+               }
+            })
+            </script>
+
+        </div>
+
+    </div>
+</div>
+
