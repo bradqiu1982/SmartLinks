@@ -236,7 +236,7 @@ namespace SmartLinks.Controllers
                 var sharefilename = Path.GetFileNameWithoutExtension(Server.MapPath("~" + url));
                 var towho = new List<string>();
                 foreach (var s in sharetolist)
-                { towho.Add(s + "@finisar.com"); }
+                { towho.Add(s + "@II-VI.COM"); }
 
                 SendShareDocEmail(towho,owener, sharefilename,docid);
             }

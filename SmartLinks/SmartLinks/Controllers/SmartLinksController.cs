@@ -803,7 +803,7 @@ namespace SmartLinks.Controllers
         public ActionResult TestEmail()
         {
             var to = new List<string>();
-            to.Add("brad.qiu@finisar.com");
+            to.Add("brad.qiu@II-VI.COM");
             EmailUtility.SendEmail(this, "TEST NEW EMAIL SERVER3", to, "Hello World3");
             new System.Threading.ManualResetEvent(false).WaitOne(500);
             return View("All");
