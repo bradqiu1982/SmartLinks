@@ -31,7 +31,7 @@ namespace SmartLinks.Models
             var ret = new List<SimpleNoteVM>();
             var dict = new Dictionary<string, string>();
             dict.Add("@doorcode", doorcode);
-            var sql = "select top 100 notekey,doorcode,note,notedate from SimpleNoteVM where doorcode=@doorcode order by notedate desc";
+            var sql = "select top 300 notekey,doorcode,note,notedate from SimpleNoteVM where doorcode=@doorcode order by notedate desc";
             var dbret = DBUtility.ExeLocalSqlWithRes(sql, dict);
             foreach (var line in dbret)
             {
