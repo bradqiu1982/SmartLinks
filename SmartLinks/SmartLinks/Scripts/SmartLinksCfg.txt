@@ -1,7 +1,7 @@
 ﻿TRACEVIEWFOLDER:::\\cn-traceview\Traceview
 SHAREFOLDERUSER:::brad.qiu
 SHAREFOLDERDOMIN:::china
-SHAREFOLDERPWD:::wangle@4567898
+SHAREFOLDERPWD:::wangle@4567892
 
 WUX-L80008501:::Shawn.Zhang
 SHG-L80003583:::Brad.Qiu
@@ -27,8 +27,8 @@ EMAILSSL:::FALSE
 
 SCRAP4PROCESSNAME:::Post_Burn_in;Pre_Burn_in;Die attach;UnderFill;Lens_Alignment;Post_Re_flow Inspection;PCBA initial;PCBA_Baking;SilverEpoxyCure;Wire Bond;VCSEL_Burn_in;PostDieAttachIns;Flip-chip;Dieattach;upload flex;structure_epoxy;WireBonding;_VMI;Reflow;IPQC;LES check;Power check;Wafer VMI;VCSEL ID Check;Packing_D/C;Wafercheck;Repacking_Label;Module Assembly;Packing_Check;SCRAP_;
 
-DIESORTFOLDER:::\\wux-engsys01.china.ads.finisar.com\DieSorting
-DIESORTSHARE:::\\wux-engsys01.china.ads.finisar.com\DieSortingNew
+DIESORTFOLDER:::\\wux-engsys01.chn.ii-vi.net\DieSorting
+DIESORTSHARE:::\\wux-engsys01.chn.ii-vi.net\DieSortingNew
 
 CWDM4SHTOL:::\\wux-fs\PUBLIC\Wuxi Parallel NPI\CWDM4\S-HTOL\Data\S-HTOL Record.xlsx
 CWDM4ORL:::\\wux-engsys01\CWDM4_ORL\ORL TEST DAT_aaa.xlsx

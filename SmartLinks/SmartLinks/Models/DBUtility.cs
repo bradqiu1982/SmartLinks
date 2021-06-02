@@ -331,7 +331,7 @@ namespace SmartLinks.Models
             var conn = new SqlConnection();
             try
             {
-                conn.ConnectionString = "Server=Wux-Parallel.china.ads.finisar.com;User ID=AiProject;Password=Ai@parallel;Database=AIProjects;Connection Timeout=120";
+                conn.ConnectionString = "Server=Wux-Parallel.chn.ii-vi.net;User ID=AiProject;Password=Ai@parallel;Database=AIProjects;Connection Timeout=120";
                 conn.Open();
                 return conn;
             }
