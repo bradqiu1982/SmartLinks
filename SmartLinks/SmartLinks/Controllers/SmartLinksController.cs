@@ -268,7 +268,7 @@ namespace SmartLinks.Controllers
                 }
 
 
-                if (validlink.Contains("wuxinpi"))
+                if (validlink.Contains("wux-engsys01"))
                 {
                     var now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                     var timestamp = now +"_joke";

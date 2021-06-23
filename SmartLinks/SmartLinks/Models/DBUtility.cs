@@ -65,7 +65,7 @@ namespace SmartLinks.Models
             try
             {
                 //conn.ConnectionString = "Server=WUX-D80008792;User ID=dbg;Password=dbgpwd;Database=DebugDB;Connection Timeout=120;";
-                conn.ConnectionString = "Server=wuxinpi;User ID=NPI;Password=NPI@NPI;Database=NPITrace;Connection Timeout=120;";
+                conn.ConnectionString = "Server=wux-engsys01;User ID=NPI;Password=NPI@NPI;Database=NPITrace;Connection Timeout=120;";
                 conn.Open();
                 return conn;
             }
@@ -196,7 +196,7 @@ namespace SmartLinks.Models
             var conn = new SqlConnection();
             try
             {
-                conn.ConnectionString = "Server=wuxinpi;User ID=WATApp;Password=WATApp@123;Database=WAT;Connection Timeout=120;";
+                conn.ConnectionString = "Server=wux-engsys01;User ID=WATApp;Password=WATApp@123;Database=WAT;Connection Timeout=120;";
                 conn.Open();
                 return conn;
             }
@@ -331,7 +331,7 @@ namespace SmartLinks.Models
             var conn = new SqlConnection();
             try
             {
-                conn.ConnectionString = "Server=Wux-Parallel.chn.ii-vi.net;User ID=AiProject;Password=Ai@parallel;Database=AIProjects;Connection Timeout=120";
+                conn.ConnectionString = "Server=Wux-Parallel;User ID=AiProject;Password=Ai@parallel;Database=AIProjects;Connection Timeout=120";
                 conn.Open();
                 return conn;
             }
@@ -595,7 +595,7 @@ namespace SmartLinks.Models
             try
             {
                 //conn.ConnectionString = "Server=WUX-D80008792;User ID=dbg;Password=dbgpwd;Database=DebugDB;Connection Timeout=120;";
-                conn.ConnectionString = "Server=wuxinpi;User ID=BSApp;Password=magic@123;Database=BSSupport;Connection Timeout=120;";
+                conn.ConnectionString = "Server=wux-engsys01;User ID=BSApp;Password=magic@123;Database=BSSupport;Connection Timeout=120;";
                 conn.Open();
                 return conn;
             }
@@ -762,7 +762,7 @@ namespace SmartLinks.Models
             var conn = new SqlConnection();
             try
             {
-                conn.ConnectionString = @"Server=wuxinpi;User ID=NebulaNPI;Password=abc@123;Database=NebulaTrace;Connection Timeout=120;";
+                conn.ConnectionString = @"Server=wux-engsys01;User ID=NebulaNPI;Password=abc@123;Database=NebulaTrace;Connection Timeout=120;";
                 conn.Open();
                 return conn;
             }
